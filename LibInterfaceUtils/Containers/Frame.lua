@@ -5,6 +5,7 @@ local objectType, version = "Frame", 1
 
 local frame
 local handlers, methods, protected, protectedScripts, scripts, templates
+-- Required: MarkDirty, SetFullAnchor, ParentChild
 
 handlers = {
     OnAcquire = function(self, ...)
@@ -68,10 +69,19 @@ handlers = {
         end
     end,
 
-    MarkDirty = function(self)
-        protected.horizontalBox:SetHeight(self.content:GetHeight())
+    MarkDirty = function(self, usedWidth, height)
+        protected.content:SetSize(usedWidth, height)
+        protected.horizontalBox:SetHeight(protected.content:GetHeight())
         protected.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateQueued)
         protected.verticalBox:FullUpdate(ScrollBoxConstants.UpdateQueued)
+    end,
+
+    ParentChild = function(self, child)
+        child:SetParent(protected.content)
+    end,
+
+    SetFullAnchor = function(self, child, height)
+        child:SetPoint("TOPRIGHT", protected.verticalBox, "TOPRIGHT", 0, -height)
     end,
 
     SetStatus = function(self, text)
@@ -359,9 +369,6 @@ local function creationFunc()
     protected.titleBar = titleBar
     protected.verticalBox = verticalBox
 
-    frame.content = content
-    frame.verticalBox = verticalBox
-
     for protectedObject, scripts in pairs(protectedScripts) do
         local object = protected[protectedObject]
         for script, handler in pairs(scripts) do
@@ -382,6 +389,7 @@ function lib:TestFrame()
     for i = 1, 50 do
         local button = frame:New("Button")
         -- button:SetFullWidth(true)
+        button:SetWidth(400)
         button:SetText(i)
     end
 

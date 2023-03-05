@@ -10,7 +10,7 @@ local ContainerMethods, ObjectMethods
 ContainerMethods = {
     New = function(self, objectType)
         local object = lib:New(objectType)
-        object:SetParent(self.content)
+        self:ParentChild(object)
         tinsert(self.children, object)
 
         return object
@@ -153,13 +153,12 @@ private.List = function(self)
         height = height + child:GetHeight()
 
         if child:GetFullWidth() then
-            child:SetPoint("TOPRIGHT", self.verticalBox, "TOPRIGHT", 0, -height)
+            self:SetFullAnchor(child, height)
         end
         usedWidth = max(child:GetWidth(), usedWidth)
     end
 
-    self.content:SetSize(usedWidth, height)
-    self:MarkDirty()
+    self:MarkDirty(usedWidth, height)
 end
 
 function private:GetObjectName(objectType)
