@@ -3,6 +3,7 @@ local lib, minor = LibStub:GetLibrary(addonName)
 local objectType, version = "Frame", 1
 -- if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
+local frame
 local handlers, methods, protected, protectedScripts, scripts, templates
 
 handlers = {
@@ -175,21 +176,51 @@ protected = {}
 protectedScripts = {
     close = {
         OnClick = function(self)
-            self:GetParent():GetParent():Release()
+            frame:Release()
         end,
     },
+
     content = {
+        OnMouseDown = function(self)
+            frame:StartMoving()
+        end,
+
+        OnMouseUp = function(self)
+            frame:StopMovingOrSizing()
+        end,
+
         OnSizeChanged = function(self)
             protected.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
             protected.verticalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
         end,
     },
+
+    horizontalBox = {
+        OnMouseDown = function(self)
+            frame:StartMoving()
+        end,
+
+        OnMouseUp = function(self)
+            frame:StopMovingOrSizing()
+        end,
+    },
+
     resizer = {
         OnMouseDown = function(self)
-            self:GetParent():GetParent():StartSizing()
+            frame:StartSizing()
         end,
         OnMouseUp = function(self)
-            self:GetParent():GetParent():StopMovingOrSizing()
+            frame:StopMovingOrSizing()
+        end,
+    },
+
+    verticalBox = {
+        OnMouseDown = function(self)
+            frame:StartMoving()
+        end,
+
+        OnMouseUp = function(self)
+            frame:StopMovingOrSizing()
         end,
     },
 }
@@ -242,7 +273,7 @@ templates = {
 }
 
 local function creationFunc()
-    local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
+    frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
     frame:SetFrameStrata("DIALOG")
     frame.overrideForbidden = true
 
@@ -290,8 +321,8 @@ local function creationFunc()
     horizontalBox:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 5)
     horizontalBox:SetScript("OnMouseWheel", nil)
 
-    frame.content = CreateFrame("Frame", nil, horizontalBox, "ResizeLayoutFrame")
-    frame.content.scrollable = true
+    local content = CreateFrame("Frame", nil, horizontalBox, "ResizeLayoutFrame")
+    content.scrollable = true
 
     local horizontalView = CreateScrollBoxLinearView()
     horizontalView:SetPanExtent(50)
@@ -321,12 +352,15 @@ local function creationFunc()
     protected.bg = bg
     protected.borders = borders
     protected.close = titleBar.close
-    protected.content = frame.content
+    protected.content = content
     protected.horizontalBox = horizontalBox
     protected.resizer = statusBar.resizer
     protected.statusBar = statusBar
     protected.titleBar = titleBar
     protected.verticalBox = verticalBox
+
+    frame.content = content
+    frame.verticalBox = verticalBox
 
     for protectedObject, scripts in pairs(protectedScripts) do
         local object = protected[protectedObject]
@@ -347,7 +381,9 @@ function lib:TestFrame()
 
     for i = 1, 50 do
         local button = frame:New("Button")
-        button:SetWidth(400)
+        -- button:SetFullWidth(true)
         button:SetText(i)
     end
+
+    frame:DoLayout()
 end

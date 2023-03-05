@@ -8,14 +8,10 @@ end
 local ContainerMethods, ObjectMethods
 
 ContainerMethods = {
-    New = function(self, objectType, skipLayout)
+    New = function(self, objectType)
         local object = lib:New(objectType)
         object:SetParent(self.content)
         tinsert(self.children, object)
-
-        if not skipLayout then
-            self:DoLayout()
-        end
 
         return object
     end,
@@ -43,6 +39,10 @@ ObjectMethods = {
         end
     end,
 
+    GetFullWidth = function(self)
+        return self:GetUserData("fullWidth")
+    end,
+
     GetUserData = function(self, key)
         return self.userdata[key]
     end,
@@ -57,6 +57,10 @@ ObjectMethods = {
 
         self:Fire("OnRelease")
         wipe(self.userdata)
+    end,
+
+    SetFullWidth = function(self, isFullWidth)
+        self:SetUserData("fullWidth", isFullWidth)
     end,
 
     SetUserData = function(self, key, value)
@@ -147,6 +151,10 @@ private.List = function(self)
     for _, child in pairs(self.children) do
         child:SetPoint("TOPLEFT", 0, -height)
         height = height + child:GetHeight()
+
+        if child:GetFullWidth() then
+            child:SetPoint("TOPRIGHT", self.verticalBox, "TOPRIGHT", 0, -height)
+        end
         usedWidth = max(child:GetWidth(), usedWidth)
     end
 
