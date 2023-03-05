@@ -1,0 +1,15 @@
+## Interface: 100002
+## Interface-Wrath: 30400
+
+## Title: Lib: LibInterfaceUtils
+## Author: Nikketa-Hyjal-US
+## Notes: Library for GUI creation.
+## Version: @project-version@
+## X-Category: Library
+## OptionalDeps: LibStub
+
+# ## X-Curse-Project-ID: 
+# ## X-WoWI-ID: 
+# ## X-Wago-ID: 
+
+LibInterfaceUtils/embeds.xml

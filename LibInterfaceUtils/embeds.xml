@@ -1,0 +1,5 @@
+<Ui>
+    <Script file="LibInterfaceUtils.lua"/>
+    <Script file="Containers/Frame.lua"/>
+    <Script file="Widgets/Button.lua"/>
+</Ui>
