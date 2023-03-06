@@ -27,13 +27,18 @@ function lib:CreateTestFrame()
     for i = 1, 50 do
         local button = frame:New("Button")
         button:SetText(i)
+        button:SetOffsets(10, -10, -10, 10)
         -- button:SetOffsets(i == 1 and 0 or 5, i == 1 and 0 or -5)
         if fastrandom(1, 10) > 5 then
-            button:SetOffsets(20, 0)
             button:SetFullWidth(true)
         else
             button:SetWidth(400)
         end
+
+        if i == 10 then
+            button:SetFullHeight(true)
+        end
+
         -- button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1), borderColor = CreateColor(1, 1, 1, 1) })
     end
 
@@ -66,7 +71,7 @@ ContainerMethods = {
         self.layoutRef = customFunc and "custom" or layout or "Flow"
     end,
 
-    -- Required container methods (relies on protected frames): FillX, FillY, GetAvailableWidth, MarkDirty, ParentChild
+    -- Required container methods (relies on protected frames): Fill, FillX, FillY, GetAvailableWidth, MarkDirty, ParentChild
 }
 
 ObjectMethods = {
@@ -108,14 +113,19 @@ ObjectMethods = {
         self:RegisterForDrag(...)
     end,
 
+    SetFullHeight = function(self, isFullHeight)
+        self:SetUserData("fullHeight", isFullHeight)
+    end,
+
     SetFullWidth = function(self, isFullWidth)
         self:SetUserData("fullWidth", isFullWidth)
     end,
 
-    SetOffsets = function(self, xOffset, yOffset, fillOffset)
+    SetOffsets = function(self, xOffset, yOffset, xFill, yFill)
         self:SetUserData("xOffset", xOffset)
         self:SetUserData("yOffset", yOffset)
-        self:SetUserData("fillOffset", fillOffset)
+        self:SetUserData("xFill", xFill)
+        self:SetUserData("yFill", yFill)
     end,
 
     SetSpacing = function(self, spacingH, spacingV)

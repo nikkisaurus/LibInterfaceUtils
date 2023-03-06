@@ -2,14 +2,13 @@ local addonName, private = ...
 local lib, minor = LibStub:GetLibrary(addonName)
 
 private.Fill = function(self)
-    -- TODO implement insets
     local child = self.children[1]
     if not child then
         return
     end
 
     child:ClearAllPoints()
-    self:FillY(child)
+    self:Fill(child)
 end
 
 private.Flow = function(self)
@@ -51,13 +50,21 @@ end
 
 private.List = function(self)
     local usedWidth, usedHeight, xOffsets = 0, 0, 0
+    local availableHeight = self:GetAvailableHeight()
     local spacingV = self:GetUserData("spacingV") or 0
 
     for id, child in pairs(self.children) do
+        -- Restore default height for fullHeight children so it doesn't get exponentially bigger, resulting in a scrollbar
+        local height = child:GetUserData("height")
+        if height then
+            child:SetHeight(height)
+        end
+
         local xOffset = child:GetUserData("xOffset") or 0
         local yOffset = child:GetUserData("yOffset") or 0
         local childWidth = child:GetWidth()
-        local childHeight = child:GetHeight() - yOffset
+        local rawChildHeight = child:GetHeight()
+        local childHeight = rawChildHeight - yOffset
         self:ParentChild(child)
         child:ClearAllPoints()
 
@@ -74,7 +81,19 @@ private.List = function(self)
         end
 
         if child:GetUserData("fullWidth") then
-            self:FillX(child, child:GetUserData("fillOffset") or 0)
+            self:FillX(child)
+        end
+
+        if child:GetUserData("fullHeight") then
+            if usedHeight < availableHeight then
+                if not height then
+                    child:SetUserData("height", rawChildHeight)
+                end
+                local extra = availableHeight - usedHeight
+                child:SetHeight(rawChildHeight + extra)
+                usedHeight = usedHeight + extra
+            end
+            break
         end
     end
 

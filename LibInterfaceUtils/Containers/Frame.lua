@@ -86,14 +86,34 @@ methods = {
         end
     end,
 
-    FillX = function(self, child, x)
-        child:SetPoint("RIGHT", protected.verticalBox, "RIGHT", x or 0, 0)
-        return protected.verticalBox:GetWidth() + (x or 0)
+    Fill = function(self, child)
+        local xOffset = child:GetUserData("xOffset")
+        local yOffset = child:GetUserData("yOffset")
+        local xFill = child:GetUserData("xFill")
+        local yFill = child:GetUserData("yFill")
+
+        child:SetParent(protected.verticalBox)
+        child:SetPoint("TOPLEFT", xOffset, yOffset)
+        child:SetPoint("BOTTOMRIGHT", xFill, yFill)
     end,
 
-    FillY = function(self, child, x, y)
-        child:SetParent(protected.verticalBox)
-        child:SetAllPoints(protected.verticalBox)
+    FillX = function(self, child)
+        local x = child:GetUserData("xFill") or 0
+        child:SetPoint("RIGHT", protected.verticalBox, "RIGHT", x, 0)
+        return protected.verticalBox:GetWidth() + x
+    end,
+
+    FillY = function(self, child)
+        local y = child:GetUserData("yFill") or 0
+        local height = protected.verticalBox:GetHeight()
+
+        -- protected.content:SetHeight(height)
+        -- protected.horizontalBox:SetHeight(height)
+        child:SetPoint("BOTTOM", protected.verticalBox, "BOTTOM", 0, y)
+    end,
+
+    GetAvailableHeight = function(self)
+        return protected.verticalBox:GetHeight()
     end,
 
     GetAvailableWidth = function(self)
@@ -298,11 +318,7 @@ scripts = {
     end,
 
     OnSizeChanged = function(self)
-        if self.layoutRef == "Flow" then
-            self:DoLayout()
-        else
-            self:SetAnchors()
-        end
+        self:DoLayout()
     end,
 }
 
