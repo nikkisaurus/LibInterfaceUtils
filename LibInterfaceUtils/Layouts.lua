@@ -12,15 +12,16 @@ private.Fill = function(self)
 end
 
 private.Flow = function(self)
-    local usedWidth, usedHeight, rowHeight = 0, 0, 0, 0
+    local usedWidth, usedHeight, rowHeight, xOffsets = 0, 0, 0, 0
     local availableWidth = self:GetAvailableWidth()
     local spacingH = self:GetUserData("spacingH") or 0
     local spacingV = self:GetUserData("spacingV") or 0
 
+    local rowAnchor
     for id, child in pairs(self.children) do
         local xOffset = child:GetUserData("xOffset") or 0
         local yOffset = child:GetUserData("yOffset") or 0
-        local childWidth = child:GetWidth() + xOffset
+        local childWidth = child:GetWidth()
         local childHeight = child:GetHeight() - yOffset
         local pendingWidth = usedWidth + childWidth
         self:ParentChild(child)
@@ -30,19 +31,24 @@ private.Flow = function(self)
             child:SetPoint("TOPLEFT", xOffset, yOffset)
             usedWidth = childWidth
             rowHeight = childHeight
+            rowAnchor = child
         elseif pendingWidth > availableWidth then
-            usedHeight = usedHeight + rowHeight + yOffset + spacingV
-            child:SetPoint("LEFT", self.children[1], "LEFT", xOffset, 0)
+            usedHeight = usedHeight + rowHeight - yOffset + spacingV
+            child:SetPoint("LEFT", rowAnchor, "LEFT", xOffset, 0)
             child:SetPoint("TOP", 0, -usedHeight)
             usedWidth = childWidth
             rowHeight = childHeight
+            rowAnchor = child
         else
             child:SetPoint("TOPLEFT", self.children[id - 1], "TOPRIGHT", xOffset + spacingH, yOffset)
             usedWidth = pendingWidth + spacingH
             rowHeight = max(rowHeight, childHeight)
         end
+
+        xOffsets = xOffsets + xOffset
     end
 
+    usedWidth = usedWidth + xOffsets
     usedHeight = usedHeight + rowHeight
 
     self:MarkDirty(usedWidth, usedHeight)
@@ -72,13 +78,13 @@ private.List = function(self)
             child:SetPoint("TOPLEFT", xOffset, yOffset)
             usedWidth = childWidth
             usedHeight = childHeight
-            xOffsets = xOffsets + xOffset
         else
-            child:SetPoint("TOP", self.children[id - 1], "BOTTOM", 0, yOffset - spacingV)
-            child:SetPoint("LEFT", xOffset, yOffset - spacingV)
+            child:SetPoint("TOPLEFT", self.children[id - 1], "BOTTOMLEFT", xOffset, yOffset - spacingV)
             usedWidth = max(usedWidth, childWidth)
             usedHeight = usedHeight + childHeight + spacingV
         end
+
+        xOffsets = xOffsets + xOffset
 
         if child:GetUserData("fullWidth") then
             self:FillX(child)
@@ -96,6 +102,8 @@ private.List = function(self)
             break
         end
     end
+
+    usedWidth = usedWidth + xOffsets
 
     self:MarkDirty(usedWidth, usedHeight)
 end
