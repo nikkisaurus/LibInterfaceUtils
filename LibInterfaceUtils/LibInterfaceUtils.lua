@@ -28,7 +28,11 @@ function lib:CreateTestFrame()
 
     for i = 1, 50 do
         local button = frame:New("Button")
-        button:SetFullWidth(true)
+        if fastrandom(1, 10) > 5 then
+            button:SetFullWidth(true)
+        else
+            button:SetWidth(900)
+        end
         -- button:SetWidth(900)
         button:SetText(i)
         button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1), borderColor = CreateColor(1, 1, 1, 1) })
@@ -50,6 +54,12 @@ function lib:CreateTestFrame()
         end)
     end
 
+    C_Timer.After(10, function()
+        print("Updating")
+        frame:SetLayout("List")
+        frame:DoLayout()
+    end)
+
     frame:DoLayout()
 end
 
@@ -63,7 +73,6 @@ ContainerMethods = {
 
     New = function(self, objectType)
         local object = lib:New(objectType)
-        self:ParentChild(object)
         tinsert(self.children, object)
 
         return object
@@ -75,11 +84,11 @@ ContainerMethods = {
         end
     end,
 
-    SetLayout = function(self, func)
-        self.layoutFunc = func or private.List
+    SetLayout = function(self, layout, func)
+        self.layoutFunc = func or private[layout or "Fill"]
     end,
 
-    -- Required container methods: MarkDirty, ParentChild, SetFullAnchor
+    -- Required container methods: Fill, MarkDirty, ParentChild, SetFullAnchor
 }
 
 ObjectMethods = {

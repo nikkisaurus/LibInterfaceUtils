@@ -95,7 +95,7 @@ methods = {
         self:SetAnchors()
     end,
 
-    ParentChild = function(self, child)
+    ParentChild = function(self, child, parent)
         child:SetParent(protected.content)
     end,
 
@@ -126,8 +126,14 @@ methods = {
         end
     end,
 
-    SetFullAnchor = function(self, child, height)
-        child:SetPoint("TOPRIGHT", protected.verticalBox, "TOPRIGHT", 0, -height)
+    SetFullAnchor = function(self, child, x, y)
+        child:SetPoint("RIGHT", protected.verticalBox, "RIGHT", x, y)
+        return protected.verticalBox:GetWidth() + x
+    end,
+
+    Fill = function(self, child, x, y)
+        child:SetParent(protected.verticalBox)
+        child:SetAllPoints(protected.verticalBox)
     end,
 
     SetStatus = function(self, text)
