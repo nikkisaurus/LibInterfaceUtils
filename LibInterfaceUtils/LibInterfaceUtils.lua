@@ -24,23 +24,16 @@ function lib:CreateTestFrame()
     frame:SetTitle("Test Frame")
     frame:SetStatus("Loading...")
     frame:SetSpacing(5, 5)
-    for i = 1, 50 do
+    for i = 1, 49 do
         local button = frame:New("Button")
         button:SetText(i)
-        -- button:SetOffsets(10, -10, -10, 10)
-        -- button:SetOffsets(i == 1 and 0 or 5, i == 1 and 0 or -5)
-        -- if fastrandom(1, 10) > 5 then
-        --     -- button:SetFullWidth(true)
-        -- else
-        -- end
-        -- button:SetWidth(400)
-
-        if i == 50 then
-            button:SetFullHeight(true)
-        end
-
-        -- button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1), borderColor = CreateColor(1, 1, 1, 1) })
     end
+
+    local button = frame:New("Button")
+    button:SetText(50)
+    -- button:SetFillWidth(true)
+    button:SetFullWidth(true)
+    button:SetFullHeight(true)
 
     frame:DoLayout()
 end
@@ -83,6 +76,14 @@ ObjectMethods = {
         end
     end,
 
+    GetFillWidth = function(self)
+        return self:GetUserData("fillWidth")
+    end,
+
+    GetFullHeight = function(self)
+        return self:GetUserData("fullHeight")
+    end,
+
     GetFullWidth = function(self)
         return self:GetUserData("fullWidth")
     end,
@@ -111,6 +112,10 @@ ObjectMethods = {
         self:EnableMouse(isDraggable or false)
         self:SetMovable(isDraggable or false)
         self:RegisterForDrag(...)
+    end,
+
+    SetFillWidth = function(self, fillWidth)
+        self:SetUserData("fillWidth", fillWidth)
     end,
 
     SetFullHeight = function(self, isFullHeight)

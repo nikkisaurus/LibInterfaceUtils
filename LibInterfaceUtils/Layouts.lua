@@ -40,7 +40,7 @@ private.Flow = function(self)
             usedWidth = childWidth
             rowHeight = childHeight
             rowAnchor = child
-        elseif pendingWidth > availableWidth then
+        elseif pendingWidth > availableWidth or child:GetFullWidth() then
             usedHeight = usedHeight + rowHeight - yOffset + spacingV
             child:SetPoint("LEFT", rowAnchor, "LEFT", xOffset, 0)
             child:SetPoint("TOP", 0, -usedHeight)
@@ -55,7 +55,11 @@ private.Flow = function(self)
 
         xOffsets = xOffsets + xOffset
 
-        if child:GetUserData("fullHeight") then
+        if child:GetFullWidth() or child:GetFillWidth() then
+            self:FillX(child)
+        end
+
+        if child:GetFullHeight() then
             usedWidth = usedWidth + xOffsets
             usedHeight = usedHeight + rowHeight
 
@@ -112,11 +116,11 @@ private.List = function(self)
 
         xOffsets = xOffsets + xOffset
 
-        if child:GetUserData("fullWidth") then
+        if child:GetFullWidth() then
             self:FillX(child)
         end
 
-        if child:GetUserData("fullHeight") then
+        if child:GetFullHeight() then
             if usedHeight < availableHeight then
                 if not height then
                     child:SetUserData("height", rawChildHeight)

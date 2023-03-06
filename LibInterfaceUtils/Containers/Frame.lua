@@ -105,10 +105,6 @@ methods = {
 
     FillY = function(self, child)
         local y = child:GetUserData("yFill") or 0
-        local height = protected.verticalBox:GetHeight()
-
-        -- protected.content:SetHeight(height)
-        -- protected.horizontalBox:SetHeight(height)
         child:SetPoint("BOTTOM", protected.verticalBox, "BOTTOM", 0, y)
     end,
 
