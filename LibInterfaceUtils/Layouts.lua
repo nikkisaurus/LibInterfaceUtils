@@ -35,12 +35,14 @@ private.Flow = function(self)
         self:ParentChild(child)
         child:ClearAllPoints()
 
+        local isFullWidth = child:GetFullWidth() or child.widget.type == "Divider"
+
         if id == 1 then
             child:SetPoint("TOPLEFT", xOffset, yOffset)
             usedWidth = childWidth
             rowHeight = childHeight
             rowAnchor = child
-        elseif pendingWidth > availableWidth or child:GetFullWidth() then
+        elseif pendingWidth > availableWidth or isFullWidth then
             usedHeight = usedHeight + rowHeight - yOffset + spacingV
             child:SetPoint("LEFT", rowAnchor, "LEFT", xOffset, 0)
             child:SetPoint("TOP", 0, -usedHeight)
@@ -55,7 +57,7 @@ private.Flow = function(self)
 
         xOffsets = xOffsets + xOffset
 
-        if child:GetFullWidth() or child:GetFillWidth() then
+        if isFullWidth or child:GetFillWidth() then
             self:FillX(child)
         end
 
@@ -104,6 +106,8 @@ private.List = function(self)
         self:ParentChild(child)
         child:ClearAllPoints()
 
+        local isFullWidth = child:GetFullWidth() or child.widget.type == "Divider"
+
         if id == 1 then
             child:SetPoint("TOPLEFT", xOffset, yOffset)
             usedWidth = childWidth
@@ -116,7 +120,7 @@ private.List = function(self)
 
         xOffsets = xOffsets + xOffset
 
-        if child:GetFullWidth() then
+        if isFullWidth then
             self:FillX(child)
         end
 

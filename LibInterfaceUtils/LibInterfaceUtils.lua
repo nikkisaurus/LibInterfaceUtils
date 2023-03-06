@@ -27,6 +27,12 @@ function lib:CreateTestFrame()
     for i = 1, 49 do
         local button = frame:New("Button")
         button:SetText(i)
+
+        if i == 10 then
+            local divider = frame:New("Divider")
+            divider:SetHeight(10)
+            divider:SetColorTexture(1, 0, 0, 1)
+        end
     end
 
     local button = frame:New("Button")

@@ -3,5 +3,6 @@
     <Script file="Layouts.lua"/>
     <Script file="Containers/Frame.lua"/>
     <Script file="Widgets/Button.lua"/>
+    <Script file="Widgets/Divider.lua"/>
     <Include file="Widgets/Scrollbar.xml"/>
 </Ui>

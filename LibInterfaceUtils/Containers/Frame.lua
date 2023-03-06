@@ -321,13 +321,7 @@ scripts = {
         local w, h = self:GetSize()
         local width = self:GetUserData("width")
         local height = self:GetUserData("height")
-        if not width or not height then
-            self:SetUserData("width", w)
-            self:SetUserData("height", h)
-            return
-        end
-
-        if w ~= width or h ~= height then
+        if not width or not height or w ~= width or h ~= height then
             self:SetUserData("width", w)
             self:SetUserData("height", h)
             self:DoLayout()
