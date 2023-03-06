@@ -14,12 +14,12 @@ end
 private.Flow = function(self)
     local usedWidth, usedHeight, rowHeight, xOffsets = 0, 0, 0, 0
     local availableWidth = self:GetAvailableWidth()
-    local availableHeight = self:GetAvailableHeight()
+    local availableHeight = self:GetAvailableHeight() - 2
     local spacingH = self:GetUserData("spacingH") or 0
     local spacingV = self:GetUserData("spacingV") or 0
 
     local rowAnchor
-    for id, child in pairs(self.children) do
+    for id, child in ipairs(self.children) do
         -- Restore default height for fullHeight children so it doesn't get exponentially bigger, resulting in a scrollbar
         local height = child:GetUserData("height")
         if height then
@@ -89,7 +89,7 @@ private.List = function(self)
     local availableHeight = self:GetAvailableHeight()
     local spacingV = self:GetUserData("spacingV") or 0
 
-    for id, child in pairs(self.children) do
+    for id, child in ipairs(self.children) do
         -- Restore default height for fullHeight children so it doesn't get exponentially bigger, resulting in a scrollbar
         local height = child:GetUserData("height")
         if height then

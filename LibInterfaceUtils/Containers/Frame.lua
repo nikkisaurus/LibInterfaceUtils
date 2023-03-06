@@ -42,6 +42,9 @@ methods = {
         self:EnableResize(true, 300, 300, w * 0.8, h * 0.8)
 
         self:SetSize(300, 300)
+    end,
+
+    OnLayoutFinished = function(self)
         self:SetAnchors()
     end,
 
@@ -119,8 +122,6 @@ methods = {
     MarkDirty = function(self, usedWidth, height)
         protected.content:SetSize(usedWidth, height)
         protected.horizontalBox:SetHeight(height)
-
-        self:SetAnchors()
     end,
 
     ParentChild = function(self, child, parent)
@@ -131,6 +132,7 @@ methods = {
         local horizontalBar = protected.horizontalBar
         local verticalBar = protected.verticalBar
         local verticalBox = protected.verticalBox
+        local statusBar = protected.statusBar
 
         protected.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
         verticalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
@@ -141,8 +143,8 @@ methods = {
             verticalBar:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 2)
         else
             horizontalBar:Hide()
-            verticalBox:SetPoint("BOTTOM", protected.statusBar, "TOP", 0, 5)
-            verticalBar:SetPoint("BOTTOM", protected.statusBar, "TOP", 0, 2)
+            verticalBox:SetPoint("BOTTOM", statusBar, "TOP", 0, 5)
+            verticalBar:SetPoint("BOTTOM", statusBar, "TOP", 0, 2)
         end
 
         if verticalBar:HasScrollableExtent() then
@@ -311,10 +313,25 @@ scripts = {
 
     OnDragStop = function(self)
         self:StopMovingOrSizing()
+        self:SetAnchors()
     end,
 
-    OnSizeChanged = function(self)
-        self:DoLayout()
+    OnUpdate = function(self)
+        -- Using OnUpdate instead of OnSizeChanged to throttle the DoLayout calls and provide a more responsive experience
+        local w, h = self:GetSize()
+        local width = self:GetUserData("width")
+        local height = self:GetUserData("height")
+        if not width or not height then
+            self:SetUserData("width", w)
+            self:SetUserData("height", h)
+            return
+        end
+
+        if w ~= width or h ~= height then
+            self:SetUserData("width", w)
+            self:SetUserData("height", h)
+            self:DoLayout()
+        end
     end,
 }
 
@@ -402,7 +419,7 @@ local function creationFunc()
     horizontalBox:SetPoint("TOP", titleBar, "BOTTOM", 0, -5)
     horizontalBox:SetPoint("LEFT", 5, 0)
     horizontalBox:SetPoint("RIGHT", verticalBar, "LEFT", -5, 0)
-    horizontalBox:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 5)
+    -- horizontalBox:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 5)
     horizontalBox:SetScript("OnMouseWheel", nil)
 
     local content = CreateFrame("Frame", nil, horizontalBox, "ResizeLayoutFrame")

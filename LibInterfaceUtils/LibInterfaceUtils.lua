@@ -31,8 +31,9 @@ function lib:CreateTestFrame()
 
     local button = frame:New("Button")
     button:SetText(50)
+    button:SetWidth(900)
     -- button:SetFillWidth(true)
-    button:SetFullWidth(true)
+    -- button:SetFullWidth(true)
     button:SetFullHeight(true)
 
     frame:DoLayout()
