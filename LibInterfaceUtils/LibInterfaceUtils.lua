@@ -26,9 +26,10 @@ function lib:CreateTestFrame()
     frame:SetSpacing(5, 5)
     for i = 1, 50 do
         local button = frame:New("Button")
-        -- button:SetOffsets(i == 1 and 0 or 5, i == 1 and 0 or -5)
         button:SetText(i)
+        -- button:SetOffsets(i == 1 and 0 or 5, i == 1 and 0 or -5)
         if fastrandom(1, 10) > 5 then
+            button:SetOffsets(20, 0)
             button:SetFullWidth(true)
         else
             button:SetWidth(400)
@@ -111,9 +112,10 @@ ObjectMethods = {
         self:SetUserData("fullWidth", isFullWidth)
     end,
 
-    SetOffsets = function(self, xOffset, yOffset)
+    SetOffsets = function(self, xOffset, yOffset, fillOffset)
         self:SetUserData("xOffset", xOffset)
         self:SetUserData("yOffset", yOffset)
+        self:SetUserData("fillOffset", fillOffset)
     end,
 
     SetSpacing = function(self, spacingH, spacingV)

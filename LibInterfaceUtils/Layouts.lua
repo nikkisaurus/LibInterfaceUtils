@@ -9,7 +9,7 @@ private.Fill = function(self)
     end
 
     child:ClearAllPoints()
-    self:FillY(child, 0, 0)
+    self:FillY(child)
 end
 
 private.Flow = function(self)
@@ -67,18 +67,16 @@ private.List = function(self)
             usedHeight = childHeight
             xOffsets = xOffsets + xOffset
         else
-            child:SetPoint("TOPLEFT", self.children[id - 1], "BOTTOMLEFT", xOffset, yOffset - spacingV)
+            child:SetPoint("TOP", self.children[id - 1], "BOTTOM", 0, yOffset - spacingV)
+            child:SetPoint("LEFT", xOffset, yOffset - spacingV)
             usedWidth = max(usedWidth, childWidth)
             usedHeight = usedHeight + childHeight + spacingV
-            xOffsets = xOffsets + xOffset
         end
 
         if child:GetUserData("fullWidth") then
-            self:FillX(child)
+            self:FillX(child, child:GetUserData("fillOffset") or 0)
         end
     end
-
-    usedWidth = usedWidth + xOffsets
 
     self:MarkDirty(usedWidth, usedHeight)
 end

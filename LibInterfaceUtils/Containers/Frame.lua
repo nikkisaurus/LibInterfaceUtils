@@ -86,8 +86,8 @@ methods = {
         end
     end,
 
-    FillX = function(self, child, x, y)
-        child:SetPoint("RIGHT", protected.verticalBox, "RIGHT", x or 0, y or 0)
+    FillX = function(self, child, x)
+        child:SetPoint("RIGHT", protected.verticalBox, "RIGHT", x or 0, 0)
         return protected.verticalBox:GetWidth() + (x or 0)
     end,
 
