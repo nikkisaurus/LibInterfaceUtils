@@ -38,6 +38,8 @@ function lib:CreateTestFrame()
         button:SetCallback("OnClick", function()
             print("Clicked", i)
         end)
+
+        button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom()) })
     end
 
     -- GetAtlas = true,
@@ -59,6 +61,16 @@ function lib:CreateTestFrame()
     tex:SetCallback("OnMouseDown", function(...)
         print(...)
     end)
+
+    local texOverlay = lib:New("Texture")
+    texOverlay:SetColorTexture(1, 1, 1, 0.5)
+    texOverlay:SetParent(tex)
+    texOverlay:SetAllPoints(tex)
+    texOverlay:SetBlendMode("ADD")
+
+    -- Use this to verify issues with protected elements being shared
+    -- tex:Release()
+    -- local tex = frame:New("Texture")
 
     local button = frame:New("Button")
     button:SetText(50)
@@ -200,27 +212,30 @@ function private:CreateTexture(parent)
 
     local borders = {}
 
-    local top = parent:CreateTexture("%parentBorderTop", "BORDER")
+    local top = parent:CreateTexture("$parentBorderTop", "BORDER")
     top:SetPoint("TOPLEFT")
     top:SetPoint("TOPRIGHT")
     borders.top = top
 
-    local left = parent:CreateTexture("%parentBorderLeft", "BORDER")
+    local left = parent:CreateTexture("$parentBorderLeft", "BORDER")
     left:SetPoint("TOPLEFT")
     left:SetPoint("BOTTOMLEFT")
     borders.left = left
 
-    local right = parent:CreateTexture("%parentBorderRight", "BORDER")
+    local right = parent:CreateTexture("$parentBorderRight", "BORDER")
     right:SetPoint("TOPRIGHT")
     right:SetPoint("BOTTOMRIGHT")
     borders.right = right
 
-    local bottom = parent:CreateTexture("%parentBorderBottom", "BORDER")
+    local bottom = parent:CreateTexture("$parentBorderBottom", "BORDER")
     bottom:SetPoint("BOTTOMLEFT")
     bottom:SetPoint("BOTTOMRIGHT")
     borders.bottom = bottom
 
-    return bg, borders
+    local highlight = parent:CreateTexture("$parentHighlight", "HIGHLIGHT")
+    highlight:SetAllPoints(parent)
+
+    return bg, borders, highlight
 end
 
 function private:DrawBorders(borders, borderSize, borderColor)
@@ -336,10 +351,20 @@ function private:RegisterWidgetPool(objectType, creationFunc, resetterFunc)
     lib.pool[objectType].GetNumObjects = GetNumObjects
 end
 
-function private:SetBackdrop(bg, borders, backdrop)
+function private:SetBackdrop(bg, borders, highlight, backdrop)
     if bg then
         bg:SetColorTexture((backdrop and backdrop.bgColor or private.assets.colors.dimmedBackdrop):GetRGBA())
     end
+
+    if highlight then
+        if not backdrop or not backdrop.noHighlight then
+            highlight:SetColorTexture((backdrop and backdrop.highlightColor or private.assets.colors.highlight):GetRGBA())
+            highlight:SetBlendMode("ADD")
+        else
+            highlight:SetTexture()
+        end
+    end
+
     if borders then
         private:DrawBorders(borders, 1, (backdrop and backdrop.borderColor or private.assets.colors.black))
     end
@@ -366,6 +391,7 @@ private.assets = {
         backdrop = CreateColor(26 / 255, 26 / 255, 26 / 255, 1),
         black = CreateColor(0, 0, 0, 1),
         dimmedBackdrop = CreateColor(15 / 255, 15 / 255, 15 / 255, 0.8),
+        highlight = CreateColor(0.3, 0.3, 0.3, 1),
         uiGold = CreateColor(1, 0.82, 0, 1),
     },
 }
