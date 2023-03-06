@@ -1,17 +1,17 @@
 local addonName, private = ...
 local lib, minor = LibStub:GetLibrary(addonName)
+
 local objectType, version = "Frame", 1
--- if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
+if not lib or (lib.versions[objectType] or 0) >= version then
+    return
+end
 
 local frame
 local handlers, methods, protected, protectedScripts, scripts, templates
--- Required: MarkDirty, SetFullAnchor, ParentChild
 
 handlers = {
     OnAcquire = function(self, ...)
         -- Defaults
-        self:SetSize(300, 300)
-
         self:ApplyTemplate("default")
         self:SetTitle()
         self:SetStatus()
@@ -20,6 +20,9 @@ handlers = {
         self:EnableMovable(true, "LeftButton")
         local w, h = GetPhysicalScreenSize()
         self:EnableResize(true, 300, 300, w * 0.8, h * 0.8)
+
+        self:SetSize(300, 300)
+        self:SetAnchors()
     end,
 
     OnRelease = function(self, ...)
@@ -70,14 +73,43 @@ handlers = {
     end,
 
     MarkDirty = function(self, usedWidth, height)
-        protected.content:SetSize(usedWidth, height)
-        protected.horizontalBox:SetHeight(protected.content:GetHeight())
-        protected.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateQueued)
-        protected.verticalBox:FullUpdate(ScrollBoxConstants.UpdateQueued)
+        if usedWidth and height then
+            protected.content:SetSize(usedWidth, height)
+            protected.horizontalBox:SetHeight(protected.content:GetHeight())
+        end
+
+        self:SetAnchors()
     end,
 
     ParentChild = function(self, child)
         child:SetParent(protected.content)
+    end,
+
+    SetAnchors = function(self)
+        local horizontalBar = protected.horizontalBar
+        local verticalBar = protected.verticalBar
+        local verticalBox = protected.verticalBox
+
+        protected.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
+        verticalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
+
+        if horizontalBar:HasScrollableExtent() then
+            horizontalBar:Show()
+            verticalBox:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 5)
+            verticalBar:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 2)
+        else
+            horizontalBar:Hide()
+            verticalBox:SetPoint("BOTTOM", protected.statusBar, "TOP", 0, 5)
+            verticalBar:SetPoint("BOTTOM", protected.statusBar, "TOP", 0, 2)
+        end
+
+        if verticalBar:HasScrollableExtent() then
+            verticalBar:Show()
+            verticalBox:SetPoint("RIGHT", verticalBar, "LEFT", -5, 0)
+        else
+            verticalBar:Hide()
+            verticalBox:SetPoint("RIGHT", -5, 0)
+        end
     end,
 
     SetFullAnchor = function(self, child, height)
@@ -243,6 +275,10 @@ scripts = {
     OnDragStop = function(self)
         self:StopMovingOrSizing()
     end,
+
+    OnSizeChanged = function(self)
+        self:SetAnchors()
+    end,
 }
 
 templates = {
@@ -320,9 +356,10 @@ local function creationFunc()
     statusBar.text = statusBar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     statusBar.text:SetJustifyH("LEFT")
 
-    local horizontalBar = CreateFrame("EventFrame", nil, frame, "WowTrimHorizontalScrollBar")
-    horizontalBar:SetPoint("BOTTOMLEFT", statusBar, "TOPLEFT", 5, 5)
-    horizontalBar:SetPoint("BOTTOMRIGHT", statusBar, "TOPRIGHT", -5, 5)
+    local horizontalBar = CreateFrame("EventFrame", nil, frame, "LibInterfaceUtilsHorizontalScrollBar")
+    horizontalBar:SetPoint("BOTTOMLEFT", statusBar, "TOPLEFT", 2, 2)
+    horizontalBar:SetPoint("BOTTOMRIGHT", statusBar, "TOPRIGHT", -2, 2)
+    horizontalBar.Track.Thumb.Middle:SetTexture("Interface/buttons/white8x8")
 
     local horizontalBox = CreateFrame("Frame", nil, frame, "WowScrollBox")
     horizontalBox:SetPoint("TOP", titleBar, "BOTTOM", 0, -5)
@@ -338,10 +375,10 @@ local function creationFunc()
     horizontalView:SetPanExtent(50)
     horizontalView:SetHorizontal(true)
 
-    local verticalBar = CreateFrame("EventFrame", nil, frame, "WowTrimScrollBar")
-    verticalBar:SetPoint("TOP", titleBar, "BOTTOM", 0, -5)
-    verticalBar:SetPoint("RIGHT", -5, 0)
-    verticalBar:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 5)
+    local verticalBar = CreateFrame("EventFrame", nil, frame, "LibInterfaceUtilsVerticalScrollBar")
+    verticalBar:SetPoint("TOP", titleBar, "BOTTOM", 0, -2)
+    verticalBar:SetPoint("RIGHT", -2, 0)
+    verticalBar:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 2)
 
     local verticalBox = CreateFrame("Frame", nil, frame, "WowScrollBox")
     verticalBox:SetPoint("TOP", titleBar, "BOTTOM", 0, -5)
@@ -363,11 +400,15 @@ local function creationFunc()
     protected.borders = borders
     protected.close = titleBar.close
     protected.content = content
+    protected.horizontalBar = horizontalBar
     protected.horizontalBox = horizontalBox
+    -- protected.horizontalView = horizontalView
     protected.resizer = statusBar.resizer
     protected.statusBar = statusBar
     protected.titleBar = titleBar
+    protected.verticalBar = verticalBar
     protected.verticalBox = verticalBox
+    -- protected.verticalView = verticalView
 
     for protectedObject, scripts in pairs(protectedScripts) do
         local object = protected[protectedObject]
@@ -380,18 +421,3 @@ local function creationFunc()
 end
 
 private:RegisterObjectPool(objectType, creationFunc)
-
-function lib:TestFrame()
-    local frame = self:New("Frame")
-    frame:SetPoint("CENTER")
-    frame:SetSize(800, 600)
-
-    for i = 1, 50 do
-        local button = frame:New("Button")
-        -- button:SetFullWidth(true)
-        button:SetWidth(400)
-        button:SetText(i)
-    end
-
-    frame:DoLayout()
-end

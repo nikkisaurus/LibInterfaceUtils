@@ -5,20 +5,48 @@ if not lib then
     return
 end
 
+lib.pool = {}
+lib.versions = {}
+
+function lib:New(objectType)
+    local object = self.pool[objectType]:Acquire()
+    object:Fire("OnAcquire")
+    object.overrideForbidden = false
+
+    return object
+end
+
+function lib:CreateTestFrame()
+    local frame = self:New("Frame")
+    frame:SetPoint("CENTER")
+    frame:SetSize(800, 600)
+    frame:SetTitle("Test Frame")
+    frame:SetStatus("Loading...")
+
+    for i = 1, 50 do
+        local button = frame:New("Button")
+        -- button:SetFullWidth(true)
+        button:SetWidth(900)
+        button:SetText(i)
+    end
+
+    frame:DoLayout()
+end
+
 local ContainerMethods, ObjectMethods
 
 ContainerMethods = {
+    DoLayout = function(self)
+        self.layoutFunc(self)
+        self:Fire("OnLayoutFinished")
+    end,
+
     New = function(self, objectType)
         local object = lib:New(objectType)
         self:ParentChild(object)
         tinsert(self.children, object)
 
         return object
-    end,
-
-    DoLayout = function(self)
-        self.layoutFunc(self)
-        self:Fire("OnLayoutFinished")
     end,
 
     ReleaseChildren = function(self)
@@ -30,6 +58,8 @@ ContainerMethods = {
     SetLayout = function(self, func)
         self.layoutFunc = func or private.List
     end,
+
+    -- Required container methods: MarkDirty, ParentChild, SetFullAnchor
 }
 
 ObjectMethods = {
@@ -67,21 +97,6 @@ ObjectMethods = {
         self.userdata[key] = value
     end,
 }
-
-lib.pool = {}
-
-private.assets = {
-    colors = {
-        backdrop = CreateColor(26 / 255, 26 / 255, 26 / 255, 1),
-        black = CreateColor(0, 0, 0, 1),
-        dimmedBackdrop = CreateColor(15 / 255, 15 / 255, 15 / 255, 0.8),
-        uiGold = CreateColor(1, 0.82, 0, 1),
-    },
-}
-
-local function ForbiddenFunc(objectType, method)
-    error(format("Method '%s' for object type '%s' is forbidden.", method, objectType))
-end
 
 local function GetNumObjects(self)
     assert(self.EnumerateActive and self.EnumerateInactive, "Attempting to call GetNumObjects on a non-pool object.")
@@ -145,32 +160,8 @@ function private:DrawBorders(borders, borderSize, borderColor)
     end
 end
 
-private.List = function(self)
-    local height = 0
-    local usedWidth = 0
-    for _, child in pairs(self.children) do
-        child:SetPoint("TOPLEFT", 0, -height)
-        height = height + child:GetHeight()
-
-        if child:GetFullWidth() then
-            self:SetFullAnchor(child, height)
-        end
-        usedWidth = max(child:GetWidth(), usedWidth)
-    end
-
-    self:MarkDirty(usedWidth, height)
-end
-
 function private:GetObjectName(objectType)
     return addonName .. objectType .. (lib.pool[objectType]:GetNumObjects() + 1)
-end
-
-function lib:New(objectType)
-    local object = self.pool[objectType]:Acquire()
-    object:Fire("OnAcquire")
-    object.overrideForbidden = false
-
-    return object
 end
 
 function private:RegisterContainer(object, ...)
@@ -187,6 +178,8 @@ function private:RegisterObject(object, objectType, version, handlers, methods, 
     object.version = version
     object.userdata = {}
 
+    lib.versions[objectType] = version
+
     object = Mixin(object, ObjectMethods)
 
     if handlers then
@@ -200,7 +193,7 @@ function private:RegisterObject(object, objectType, version, handlers, methods, 
                 if object.overrideForbidden then
                     return original(...)
                 else
-                    ForbiddenFunc(objectType, method)
+                    error(format("Method '%s' for object type '%s' is forbidden.", method, objectType))
                 end
             end
         end
@@ -222,3 +215,12 @@ function private:RegisterObjectPool(objectType, creationFunc, resetterFunc)
     lib.pool[objectType]:SetResetDisallowedIfNew(true)
     lib.pool[objectType].GetNumObjects = GetNumObjects
 end
+
+private.assets = {
+    colors = {
+        backdrop = CreateColor(26 / 255, 26 / 255, 26 / 255, 1),
+        black = CreateColor(0, 0, 0, 1),
+        dimmedBackdrop = CreateColor(15 / 255, 15 / 255, 15 / 255, 0.8),
+        uiGold = CreateColor(1, 0.82, 0, 1),
+    },
+}

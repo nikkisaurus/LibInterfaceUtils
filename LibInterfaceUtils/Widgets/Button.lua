@@ -2,6 +2,7 @@ local addonName, private = ...
 local lib, minor = LibStub:GetLibrary(addonName)
 local objectType, version = "Button", 1
 
+local button
 local handlers, methods, protected, protectedScripts, scripts
 
 handlers = {
@@ -25,7 +26,7 @@ scripts = {
 }
 
 local function creationFunc()
-    local button = CreateFrame("Button", private:GetObjectName(objectType), UIParent, "UIPanelButtonTemplate")
+    button = CreateFrame("Button", private:GetObjectName(objectType), UIParent, "UIPanelButtonTemplate")
     button.overrideForbidden = true
 
     return private:RegisterObject(button, objectType, version, handlers, methods, scripts)
