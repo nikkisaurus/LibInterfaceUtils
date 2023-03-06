@@ -224,12 +224,12 @@ forbidden = {
     -- IsUserPlaced = true,
     -- Lower = true,
     -- Raise = true,
-    -- RegisterAllEvents = true,
-    -- RegisterEvent = true,
-    -- RegisterForDrag = true,
-    -- SetBackdrop = true,
-    -- SetBackdropBorderColor = true,
-    -- SetBackdropColor = true,
+    RegisterAllEvents = true,
+    RegisterEvent = true,
+    RegisterForDrag = true,
+    SetBackdrop = true,
+    SetBackdropBorderColor = true,
+    SetBackdropColor = true,
     -- SetClampedToScreen = true,
     -- SetClampRectInsets = true,
     -- SetDepth = true,
@@ -237,20 +237,14 @@ forbidden = {
     -- SetFrameStrata = true,
     -- SetHitRectInsets = true,
     -- SetID = true,
-    -- SetMaxResize = true,
-    -- SetMinResize = true,
+    SetMaxResize = true,
+    SetMinResize = true,
     SetMovable = true,
     SetResizable = true,
     SetScale = true,
-    -- SetScript = true,
-    -- SetSize = false,
-    -- SetToplevel = true,
-    -- SetUserPlaced = true,
-    -- StartMoving = true,
-    -- StartSizing = false,
-    -- StopMovingOrSizing = false,
-    -- UnregisterAllEvents = true,
-    -- UnregisterEvent = true,
+    SetScript = true,
+    UnregisterAllEvents = true,
+    UnregisterEvent = true,
 }
 
 protected = {}
@@ -413,7 +407,6 @@ local function creationFunc()
     horizontalBox:SetPoint("TOP", titleBar, "BOTTOM", 0, -5)
     horizontalBox:SetPoint("LEFT", 5, 0)
     horizontalBox:SetPoint("RIGHT", verticalBar, "LEFT", -5, 0)
-    -- horizontalBox:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 5)
     horizontalBox:SetScript("OnMouseWheel", nil)
 
     local content = CreateFrame("Frame", nil, horizontalBox, "ResizeLayoutFrame")

@@ -3,7 +3,12 @@ local lib, minor = LibStub:GetLibrary(addonName)
 local objectType, version = "Divider", 1
 
 local divider
-local methods, protected
+local maps, methods, protected
+
+maps = {
+    SetTexture = true,
+    SetVertexColor = true,
+}
 
 methods = {
     OnAcquire = function(self)
@@ -15,14 +20,6 @@ methods = {
         self:SetTexture([[INTERFACE\BUTTONS\WHITE8X8]])
         self:SetVertexColor(...)
     end,
-
-    SetTexture = function(self, texture)
-        protected.texture:SetTexture(texture)
-    end,
-
-    SetVertexColor = function(self, ...)
-        protected.texture:SetVertexColor(...)
-    end,
 }
 
 protected = {}
@@ -31,7 +28,7 @@ local function creationFunc()
     divider = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
     divider.overrideForbidden = true
 
-    local texture = divider:CreateTexture(nil, "BACKGROUND")
+    local texture = divider:CreateTexture(nil, "ARTWORK")
     texture:SetAllPoints(divider)
 
     protected.texture = texture
@@ -43,6 +40,8 @@ local function creationFunc()
         forbidden = {},
         callbackRegistry = {},
     }
+
+    private:MapMethods(divider, texture, maps)
 
     return private:RegisterWidget(widget, methods)
 end

@@ -5,4 +5,5 @@
     <Script file="Widgets/Button.lua"/>
     <Script file="Widgets/Divider.lua"/>
     <Include file="Widgets/Scrollbar.xml"/>
+    <Script file="Widgets/Texture.lua"/>
 </Ui>

@@ -33,14 +33,37 @@ function lib:CreateTestFrame()
             divider:SetHeight(10)
             divider:SetColorTexture(1, 0, 0, 1)
         end
+
+        button:SetCallback("OnClick", function()
+            print("Clicked", i)
+        end)
     end
+
+    -- GetAtlas = true,
+    -- SetAtlas = true,
+    -- SetBlendMode = true,
+    -- SetDrawLayer = true,
+    -- SetDesaturated = true,
+    -- SetDesaturation = true,
+    -- SetGradient = true,
+    -- SetMask = true,
+    -- SetRotation = true,
+    -- SetTexCoord = true,
+    -- SetTexture = true,
+    -- SetVertexColor = true,
+
+    local tex = frame:New("Texture")
+    tex:SetAtlas("raceicon128-bloodelf-female")
+    tex:EnableMouse(true)
+    tex:SetCallback("OnMouseDown", function(...)
+        print(...)
+    end)
 
     local button = frame:New("Button")
     button:SetText(50)
     button:SetWidth(900)
     -- button:SetFillWidth(true)
     -- button:SetFullWidth(true)
-    button:SetFullHeight(true)
 
     frame:DoLayout()
 end
@@ -214,6 +237,30 @@ end
 
 function private:GetObjectName(objectType)
     return addonName .. objectType .. (lib.pool[objectType]:GetNumObjects() + 1)
+end
+
+function private:MapMethods(parent, target, methods)
+    for method, _ in pairs(methods) do
+        parent[method] = function(self, ...)
+            target[method](target, ...)
+        end
+    end
+end
+
+function private:MapScripts(parent, target, scripts)
+    for script, _ in pairs(scripts) do
+        target:SetScript(script, function(self, ...)
+            local handler = parent:GetScript(script)
+            if handler then
+                handler(parent, ...)
+            end
+
+            local callback = parent.widget.callbacks[script]
+            if callback then
+                callback(parent, ...)
+            end
+        end)
+    end
 end
 
 function private:RegisterContainer(container, ...)
