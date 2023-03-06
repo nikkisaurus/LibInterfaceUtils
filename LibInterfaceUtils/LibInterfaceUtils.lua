@@ -26,13 +26,13 @@ function lib:CreateTestFrame()
     frame:SetSpacing(5, 5)
     for i = 1, 50 do
         local button = frame:New("Button")
-        button:SetOffsets(i == 1 and 0 or 5, i == 1 and 0 or -5)
+        -- button:SetOffsets(i == 1 and 0 or 5, i == 1 and 0 or -5)
         button:SetText(i)
-        -- if fastrandom(1, 10) > 5 then
-        --     button:SetFullWidth(true)
-        -- else
-        --     button:SetWidth(900)
-        -- end
+        if fastrandom(1, 10) > 5 then
+            button:SetFullWidth(true)
+        else
+            button:SetWidth(400)
+        end
         -- button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1), borderColor = CreateColor(1, 1, 1, 1) })
     end
 
@@ -65,7 +65,7 @@ ContainerMethods = {
         self.layoutRef = customFunc and "custom" or layout or "Flow"
     end,
 
-    -- Required container methods: Fill, GetAvailableWidth, MarkDirty, ParentChild, SetFullAnchor
+    -- Required container methods (relies on protected frames): FillX, FillY, GetAvailableWidth, MarkDirty, ParentChild
 }
 
 ObjectMethods = {

@@ -9,12 +9,12 @@ private.Fill = function(self)
     end
 
     child:ClearAllPoints()
-    self:Fill(child, 0, 0)
+    self:FillY(child, 0, 0)
 end
 
 private.Flow = function(self)
     local usedWidth, usedHeight, rowHeight = 0, 0, 0, 0
-    local availableWidth = self:GetAvailableWidth() - 10
+    local availableWidth = self:GetAvailableWidth()
     local spacingH = self:GetUserData("spacingH") or 0
     local spacingV = self:GetUserData("spacingV") or 0
 
@@ -71,6 +71,10 @@ private.List = function(self)
             usedWidth = max(usedWidth, childWidth)
             usedHeight = usedHeight + childHeight + spacingV
             xOffsets = xOffsets + xOffset
+        end
+
+        if child:GetUserData("fullWidth") then
+            self:FillX(child)
         end
     end
 

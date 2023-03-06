@@ -86,6 +86,16 @@ methods = {
         end
     end,
 
+    FillX = function(self, child, x, y)
+        child:SetPoint("RIGHT", protected.verticalBox, "RIGHT", x or 0, y or 0)
+        return protected.verticalBox:GetWidth() + (x or 0)
+    end,
+
+    FillY = function(self, child, x, y)
+        child:SetParent(protected.verticalBox)
+        child:SetAllPoints(protected.verticalBox)
+    end,
+
     GetAvailableWidth = function(self)
         return protected.verticalBox:GetWidth()
     end,
@@ -126,16 +136,6 @@ methods = {
             verticalBar:Hide()
             verticalBox:SetPoint("RIGHT", -5, 0)
         end
-    end,
-
-    SetFullAnchor = function(self, child, x, y)
-        child:SetPoint("RIGHT", protected.verticalBox, "RIGHT", x, y)
-        return protected.verticalBox:GetWidth() + x
-    end,
-
-    Fill = function(self, child, x, y)
-        child:SetParent(protected.verticalBox)
-        child:SetAllPoints(protected.verticalBox)
     end,
 
     SetStatus = function(self, text)
