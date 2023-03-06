@@ -24,6 +24,7 @@ function lib:CreateTestFrame()
     frame:SetTitle("Test Frame")
     frame:SetStatus("Loading...")
     frame:SetSpacing(5, 5)
+
     for i = 1, 49 do
         local button = frame:New("Button")
         button:SetText(i)
