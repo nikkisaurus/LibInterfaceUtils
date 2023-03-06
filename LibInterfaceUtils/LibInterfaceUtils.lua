@@ -18,47 +18,23 @@ end
 
 function lib:CreateTestFrame()
     local frame = self:New("Frame")
+    frame:SetLayout("List")
     frame:SetPoint("CENTER")
     frame:SetSize(800, 600)
     frame:SetTitle("Test Frame")
     frame:SetStatus("Loading...")
-    frame:SetCallback("OnHide", function(...)
-        print("Frame callback", ...)
-    end)
-
+    frame:SetSpacing(5, 5)
     for i = 1, 50 do
         local button = frame:New("Button")
-        if fastrandom(1, 10) > 5 then
-            button:SetFullWidth(true)
-        else
-            button:SetWidth(900)
-        end
-        -- button:SetWidth(900)
+        button:SetOffsets(i == 1 and 0 or 5, i == 1 and 0 or -5)
         button:SetText(i)
-        button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1), borderColor = CreateColor(1, 1, 1, 1) })
-        button:SetFont({ font = "GameFont_Gigantic", color = CreateColor(0, 1, 0, 1) })
-        -- button:SetDraggable(true, "LeftButton")
-        button:SetCallback("OnClick", function(...)
-            print("Testing click ", i, ...)
-        end)
-        button:SetCallback("OnDragStart", function(...)
-            button:StartMoving()
-            print("WHERE ARE WE GOING?")
-        end)
-        button:SetCallback("OnDragStop", function(...)
-            button:StopMovingOrSizing()
-            print("...")
-        end)
-        button:SetCallback("OnReceiveDrag", function(...)
-            frame:DoLayout()
-        end)
+        -- if fastrandom(1, 10) > 5 then
+        --     button:SetFullWidth(true)
+        -- else
+        --     button:SetWidth(900)
+        -- end
+        -- button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1), borderColor = CreateColor(1, 1, 1, 1) })
     end
-
-    C_Timer.After(10, function()
-        print("Updating")
-        frame:SetLayout("List")
-        frame:DoLayout()
-    end)
 
     frame:DoLayout()
 end
@@ -84,11 +60,12 @@ ContainerMethods = {
         end
     end,
 
-    SetLayout = function(self, layout, func)
-        self.layoutFunc = func or private[layout or "Fill"]
+    SetLayout = function(self, layout, customFunc)
+        self.layoutFunc = customFunc or private[layout or "Flow"]
+        self.layoutRef = customFunc and "custom" or layout or "Flow"
     end,
 
-    -- Required container methods: Fill, MarkDirty, ParentChild, SetFullAnchor
+    -- Required container methods: Fill, GetAvailableWidth, MarkDirty, ParentChild, SetFullAnchor
 }
 
 ObjectMethods = {
@@ -132,6 +109,16 @@ ObjectMethods = {
 
     SetFullWidth = function(self, isFullWidth)
         self:SetUserData("fullWidth", isFullWidth)
+    end,
+
+    SetOffsets = function(self, xOffset, yOffset)
+        self:SetUserData("xOffset", xOffset)
+        self:SetUserData("yOffset", yOffset)
+    end,
+
+    SetSpacing = function(self, spacingH, spacingV)
+        self:SetUserData("spacingH", spacingH)
+        self:SetUserData("spacingV", spacingV)
     end,
 
     SetUserData = function(self, key, value)

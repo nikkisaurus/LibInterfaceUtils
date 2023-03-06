@@ -56,15 +56,7 @@ protected = {}
 
 protectedScripts = {}
 
-scripts = {
-    OnClick = function(self, ...)
-        print("Do something first!")
-    end,
-
-    OnDoubleClick = function(self)
-        print("Woah slow down there Skippy")
-    end,
-}
+scripts = {}
 
 local function creationFunc()
     button = CreateFrame("Button", private:GetObjectName(objectType), UIParent)

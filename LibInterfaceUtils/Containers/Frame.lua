@@ -86,11 +86,13 @@ methods = {
         end
     end,
 
+    GetAvailableWidth = function(self)
+        return protected.verticalBox:GetWidth()
+    end,
+
     MarkDirty = function(self, usedWidth, height)
-        if usedWidth and height then
-            protected.content:SetSize(usedWidth, height)
-            protected.horizontalBox:SetHeight(protected.content:GetHeight())
-        end
+        protected.content:SetSize(usedWidth, height)
+        protected.horizontalBox:SetHeight(height)
 
         self:SetAnchors()
     end,
@@ -250,11 +252,6 @@ protectedScripts = {
         OnMouseUp = function(self)
             frame:StopMovingOrSizing()
         end,
-
-        OnSizeChanged = function(self)
-            protected.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
-            protected.verticalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
-        end,
     },
 
     horizontalBox = {
@@ -301,7 +298,11 @@ scripts = {
     end,
 
     OnSizeChanged = function(self)
-        self:SetAnchors()
+        if self.layoutRef == "Flow" then
+            self:DoLayout()
+        else
+            self:SetAnchors()
+        end
     end,
 }
 
