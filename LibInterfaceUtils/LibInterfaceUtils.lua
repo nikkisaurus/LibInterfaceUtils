@@ -18,7 +18,7 @@ end
 
 function lib:CreateTestFrame()
     local frame = self:New("Frame")
-    frame:SetLayout("List")
+    -- frame:SetLayout("List")
     frame:SetPoint("CENTER")
     frame:SetSize(800, 600)
     frame:SetTitle("Test Frame")
@@ -27,15 +27,15 @@ function lib:CreateTestFrame()
     for i = 1, 50 do
         local button = frame:New("Button")
         button:SetText(i)
-        button:SetOffsets(10, -10, -10, 10)
+        -- button:SetOffsets(10, -10, -10, 10)
         -- button:SetOffsets(i == 1 and 0 or 5, i == 1 and 0 or -5)
-        if fastrandom(1, 10) > 5 then
-            -- button:SetFullWidth(true)
-        else
-        end
-        button:SetWidth(400)
+        -- if fastrandom(1, 10) > 5 then
+        --     -- button:SetFullWidth(true)
+        -- else
+        -- end
+        -- button:SetWidth(400)
 
-        if i == 10 then
+        if i == 50 then
             button:SetFullHeight(true)
         end
 

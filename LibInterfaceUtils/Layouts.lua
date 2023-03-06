@@ -14,15 +14,23 @@ end
 private.Flow = function(self)
     local usedWidth, usedHeight, rowHeight, xOffsets = 0, 0, 0, 0
     local availableWidth = self:GetAvailableWidth()
+    local availableHeight = self:GetAvailableHeight()
     local spacingH = self:GetUserData("spacingH") or 0
     local spacingV = self:GetUserData("spacingV") or 0
 
     local rowAnchor
     for id, child in pairs(self.children) do
+        -- Restore default height for fullHeight children so it doesn't get exponentially bigger, resulting in a scrollbar
+        local height = child:GetUserData("height")
+        if height then
+            child:SetHeight(height)
+        end
+
         local xOffset = child:GetUserData("xOffset") or 0
         local yOffset = child:GetUserData("yOffset") or 0
         local childWidth = child:GetWidth()
-        local childHeight = child:GetHeight() - yOffset
+        local rawChildHeight = child:GetHeight()
+        local childHeight = rawChildHeight - yOffset
         local pendingWidth = usedWidth + childWidth
         self:ParentChild(child)
         child:ClearAllPoints()
@@ -46,6 +54,24 @@ private.Flow = function(self)
         end
 
         xOffsets = xOffsets + xOffset
+
+        if child:GetUserData("fullHeight") then
+            usedWidth = usedWidth + xOffsets
+            usedHeight = usedHeight + rowHeight
+
+            if usedHeight < availableHeight then
+                if not height then
+                    child:SetUserData("height", rawChildHeight)
+                end
+                local extra = availableHeight - usedHeight
+                child:SetHeight(rawChildHeight + extra)
+                usedHeight = usedHeight + extra
+            end
+
+            self:MarkDirty(usedWidth, usedHeight)
+
+            return
+        end
     end
 
     usedWidth = usedWidth + xOffsets
