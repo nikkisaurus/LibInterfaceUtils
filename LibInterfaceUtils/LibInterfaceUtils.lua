@@ -22,12 +22,32 @@ function lib:CreateTestFrame()
     frame:SetSize(800, 600)
     frame:SetTitle("Test Frame")
     frame:SetStatus("Loading...")
+    frame:SetCallback("OnHide", function(...)
+        print("Frame callback", ...)
+    end)
 
     for i = 1, 50 do
         local button = frame:New("Button")
-        -- button:SetFullWidth(true)
-        button:SetWidth(900)
+        button:SetFullWidth(true)
+        -- button:SetWidth(900)
         button:SetText(i)
+        button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1), borderColor = CreateColor(1, 1, 1, 1) })
+        button:SetFont({ font = "GameFont_Gigantic", color = CreateColor(0, 1, 0, 1) })
+        -- button:SetDraggable(true, "LeftButton")
+        button:SetCallback("OnClick", function(...)
+            print("Testing click ", i, ...)
+        end)
+        button:SetCallback("OnDragStart", function(...)
+            button:StartMoving()
+            print("WHERE ARE WE GOING?")
+        end)
+        button:SetCallback("OnDragStop", function(...)
+            button:StopMovingOrSizing()
+            print("...")
+        end)
+        button:SetCallback("OnReceiveDrag", function(...)
+            frame:DoLayout()
+        end)
     end
 
     frame:DoLayout()
@@ -37,7 +57,7 @@ local ContainerMethods, ObjectMethods
 
 ContainerMethods = {
     DoLayout = function(self)
-        self.layoutFunc(self)
+        self:layoutFunc()
         self:Fire("OnLayoutFinished")
     end,
 
@@ -63,9 +83,11 @@ ContainerMethods = {
 }
 
 ObjectMethods = {
-    Fire = function(self, handler, ...)
-        if self[handler] then
-            self[handler](self, ...)
+    Fire = function(self, script, ...)
+        if self:HasScript(script) then
+            self:GetScript(script)(self, ...)
+        elseif self[script] then
+            self[script](self, ...)
         end
     end,
 
@@ -74,7 +96,7 @@ ObjectMethods = {
     end,
 
     GetUserData = function(self, key)
-        return self.userdata[key]
+        return self.widget.userdata[key]
     end,
 
     Release = function(self)
@@ -83,10 +105,20 @@ ObjectMethods = {
             wipe(self.children)
         end
 
-        lib.pool[self.type]:Release(self)
+        lib.pool[self.widget.type]:Release(self)
 
         self:Fire("OnRelease")
-        wipe(self.userdata)
+        wipe(self.widget.userdata)
+    end,
+
+    SetCallback = function(self, script, handler)
+        self.widget.callbacks[script] = handler
+    end,
+
+    SetDraggable = function(self, isDraggable, ...)
+        self:EnableMouse(isDraggable or false)
+        self:SetMovable(isDraggable or false)
+        self:RegisterForDrag(...)
     end,
 
     SetFullWidth = function(self, isFullWidth)
@@ -94,7 +126,7 @@ ObjectMethods = {
     end,
 
     SetUserData = function(self, key, value)
-        self.userdata[key] = value
+        self.widget.userdata[key] = value
     end,
 }
 
@@ -164,56 +196,101 @@ function private:GetObjectName(objectType)
     return addonName .. objectType .. (lib.pool[objectType]:GetNumObjects() + 1)
 end
 
-function private:RegisterContainer(object, ...)
-    object.children = {}
+function private:RegisterContainer(container, ...)
+    container.object.children = {}
+    container.object = Mixin(container.object, ContainerMethods)
+    container.object:SetLayout()
 
-    object = Mixin(object, ContainerMethods)
-    object:SetLayout()
-
-    return private:RegisterObject(object, ...)
+    return private:RegisterWidget(container, ...)
 end
 
-function private:RegisterObject(object, objectType, version, handlers, methods, scripts)
-    object.type = objectType
-    object.version = version
-    object.userdata = {}
+function private:RegisterWidget(widget, methods, scripts)
+    widget.callbacks = {}
+    widget.userdata = {}
 
-    lib.versions[objectType] = version
+    lib.versions[widget.type] = widget.version
 
-    object = Mixin(object, ObjectMethods)
-
-    if handlers then
-        object = Mixin(object, handlers)
-    end
+    widget.object.widget = widget
+    widget.object = Mixin(widget.object, ObjectMethods)
 
     if methods then
-        for method, _ in pairs(methods) do
-            local original = object[method]
-            object[method] = function(...)
-                if object.overrideForbidden then
-                    return original(...)
+        widget.object = Mixin(widget.object, methods)
+    end
+
+    local registry = widget.callbackRegistry
+
+    if scripts then
+        for script, handler in pairs(scripts) do
+            assert(widget.object:HasScript(script), format("Script '%s' does not exist for object type '%s'.", script, widget.type))
+
+            widget.object:SetScript(script, function(...)
+                handler(...)
+
+                if registry and registry[script] and widget.callbacks[script] then
+                    widget.callbacks[script](...)
+                end
+            end)
+        end
+    end
+
+    if registry then
+        for script, _ in pairs(registry) do
+            if widget.object:HasScript(script) and not widget.object:GetScript(script) then
+                widget.object:SetScript(script, function(...)
+                    if widget.callbacks[script] then
+                        widget.callbacks[script](...)
+                    end
+                end)
+            end
+        end
+    end
+
+    if widget.forbidden then
+        for method, _ in pairs(widget.forbidden) do
+            local originalMethod = widget.object[method]
+
+            widget.object[method] = function(...)
+                if widget.object.overrideForbidden then
+                    return originalMethod(...)
                 else
-                    error(format("Method '%s' for object type '%s' is forbidden.", method, objectType))
+                    error(format("Method '%s' for object type '%s' is forbidden.", method, widget.type))
                 end
             end
         end
     end
 
-    if scripts then
-        for script, handler in pairs(scripts) do
-            assert(object:HasScript(script), format("Script '%s' does not exist for object type '%s'.", script, objectType))
-
-            object:SetScript(script, handler)
-        end
-    end
-
-    return object
+    return widget.object
 end
 
-function private:RegisterObjectPool(objectType, creationFunc, resetterFunc)
+function private:RegisterWidgetPool(objectType, creationFunc, resetterFunc)
     lib.pool[objectType] = CreateObjectPool(creationFunc, resetterFunc or Resetter)
     lib.pool[objectType]:SetResetDisallowedIfNew(true)
     lib.pool[objectType].GetNumObjects = GetNumObjects
+end
+
+function private:SetBackdrop(bg, borders, backdrop)
+    if bg then
+        bg:SetColorTexture((backdrop and backdrop.bgColor or private.assets.colors.dimmedBackdrop):GetRGBA())
+    end
+    if borders then
+        private:DrawBorders(borders, 1, (backdrop and backdrop.borderColor or private.assets.colors.black))
+    end
+end
+
+function private:SetFont(fontString, font)
+    if not font then
+        return
+    end
+
+    if type(font.font) == "string" then
+        fontString:SetFontObject(_G[font.font])
+    elseif type(font.font) == "table" then
+        fontString:SetFont(unpack(font.font))
+    end
+
+    if font.color then
+        fontString:SetTextColor(font.color:GetRGBA())
+    end
 end
 
 private.assets = {

@@ -7,9 +7,29 @@ if not lib or (lib.versions[objectType] or 0) >= version then
 end
 
 local frame
-local handlers, methods, protected, protectedScripts, scripts, templates
+local callbackRegistry, methods, forbidden, protected, protectedScripts, scripts, templates
 
-handlers = {
+callbackRegistry = {
+    -- OnChar = true,
+    OnDragStart = true,
+    OnDragStop = true,
+    OnEnter = true,
+    -- OnEvent = true,
+    OnHide = true,
+    -- OnKeyDown = true,
+    -- OnKeyUp = true,
+    -- OnLoad = true,
+    OnLeave = true,
+    OnMouseDown = true,
+    OnMouseUp = true,
+    -- OnMouseWheel = true,
+    OnReceiveDrag = true,
+    OnShow = true,
+    OnSizeChanged = true,
+    -- OnUpdate = true,
+}
+
+methods = {
     OnAcquire = function(self, ...)
         -- Defaults
         self:ApplyTemplate("default")
@@ -17,7 +37,7 @@ handlers = {
         self:SetStatus()
 
         self:SetClampedToScreen(true)
-        self:EnableMovable(true, "LeftButton")
+        self:SetDraggable(true, "LeftButton")
         local w, h = GetPhysicalScreenSize()
         self:EnableResize(true, 300, 300, w * 0.8, h * 0.8)
 
@@ -49,12 +69,6 @@ handlers = {
         protected.statusBar.text:SetPoint("BOTTOM", -template.statusBar.padding, template.statusBar.padding)
 
         self:SetUserData("template", template)
-    end,
-
-    EnableMovable = function(self, enabled, ...)
-        self:EnableMouse(enabled or false)
-        self:SetMovable(enabled or false)
-        self:RegisterForDrag(...)
     end,
 
     EnableResize = function(self, enabled, minWidth, minHeight, maxWidth, maxHeight)
@@ -137,7 +151,7 @@ handlers = {
     end,
 }
 
-methods = {
+forbidden = {
     CreateFontString = true,
     -- CreateTexture = true,
     -- DisableDrawLayer = true,
@@ -199,8 +213,8 @@ methods = {
     -- SetID = true,
     -- SetMaxResize = true,
     -- SetMinResize = true,
-    -- SetMovable = true,
-    -- SetResizable = true,
+    SetMovable = true,
+    SetResizable = true,
     SetScale = true,
     -- SetScript = true,
     -- SetSize = false,
@@ -268,6 +282,10 @@ protectedScripts = {
 }
 
 scripts = {
+    OnShow = function(self)
+        print("Frame show")
+    end,
+
     OnDragStart = function(self)
         self:StartMoving()
     end,
@@ -417,7 +435,15 @@ local function creationFunc()
         end
     end
 
-    return private:RegisterContainer(frame, objectType, version, handlers, methods, scripts)
+    local widget = {
+        object = frame,
+        type = objectType,
+        version = version,
+        forbidden = forbidden,
+        callbackRegistry = callbackRegistry,
+    }
+
+    return private:RegisterContainer(widget, methods, scripts)
 end
 
-private:RegisterObjectPool(objectType, creationFunc)
+private:RegisterWidgetPool(objectType, creationFunc)

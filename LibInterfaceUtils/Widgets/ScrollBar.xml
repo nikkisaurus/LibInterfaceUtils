@@ -29,7 +29,7 @@
                         </KeyValues>
                         <Layers>
                             <Layer level="BACKGROUND">
-                                <Texture parentKey="Main" file="INTERFACE/FRAMEGENERAL/UI-BACKGROUND-ROCK"/>
+                                <Texture parentKey="Main"/>
                                 <Texture parentKey="Begin" hidden="true"/>
                                 <Texture parentKey="Middle" hidden="true"/>
                                 <Texture parentKey="End" hidden="true"/>
@@ -126,7 +126,7 @@
                 self.Track.Thumb:SetPoint("TOPLEFT")
                 self.Track.Thumb:SetPoint("BOTTOMLEFT")
                 
-                self.Track.Thumb.Main:SetDesaturated(true)
+                self.Track.Thumb.Main:SetColorTexture(0.3, 0.3, 0.3, 1)
                 self.Forward.Texture:SetTexCoord(1, 0, 1, 0)
                 self:OnLoad()
             </OnLoad>
@@ -153,7 +153,7 @@
                         </KeyValues>
                         <Layers>
                             <Layer level="BACKGROUND">
-                                <Texture parentKey="Main" file="INTERFACE/FRAMEGENERAL/UI-BACKGROUND-ROCK"/>
+                                <Texture parentKey="Main"/>
                                 <Texture parentKey="Begin" hidden="true"/>
                                 <Texture parentKey="Middle" hidden="true"/>
                                 <Texture parentKey="End" hidden="true"/>
@@ -249,7 +249,7 @@
                 self.Track.Thumb:SetPoint("TOPLEFT")
                 self.Track.Thumb:SetPoint("TOPRIGHT")
                 
-                self.Track.Thumb.Main:SetDesaturated(true)
+                self.Track.Thumb.Main:SetColorTexture(0.3, 0.3, 0.3, 1)
                 self.Back.Texture:SetTexCoord(0, 0, 1, 0, 0, 1, 1, 1)
                 self.Forward.Texture:SetTexCoord(1, 0, 0, 0, 1, 1, 0, 1)
                 self:OnLoad()

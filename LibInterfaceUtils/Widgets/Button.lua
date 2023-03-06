@@ -3,16 +3,53 @@ local lib, minor = LibStub:GetLibrary(addonName)
 local objectType, version = "Button", 1
 
 local button
-local handlers, methods, protected, protectedScripts, scripts
+local callbackRegistry, methods, forbidden, protected, protectedScripts, scripts
 
-handlers = {
-    OnAcquire = function(self)
-        self:SetSize(100, 20)
-    end,
+callbackRegistry = {
+    -- OnChar = true,
+    OnClick = true,
+    OnDoubleClick = true,
+    OnDragStart = true,
+    OnDragStop = true,
+    OnEnter = true,
+    -- OnEvent = true,
+    OnHide = true,
+    -- OnKeyDown = true,
+    -- OnKeyUp = true,
+    OnLeave = true,
+    -- OnLoad = true,
+    OnMouseDown = true,
+    OnMouseUp = true,
+    -- OnMouseWheel = true,
+    OnReceiveDrag = true,
+    OnShow = true,
+    OnSizeChanged = true,
+    -- OnUpdate = true,
+    PostClick = true,
+    PreClick = true,
 }
 
+forbidden = {}
+
 methods = {
-    -- SetPoint = true,
+    OnAcquire = function(self)
+        self:SetSize(100, 20)
+        self:SetBackdrop()
+        self:SetDraggable()
+        self:EnableMouse(true) -- this gets disabeld during SetDraggable
+    end,
+
+    SetFont = function(self, ...)
+        private:SetFont(protected.text, ...)
+    end,
+
+    SetBackdrop = function(self, ...)
+        private:SetBackdrop(protected.bg, protected.borders, ...)
+    end,
+
+    SetText = function(self, text)
+        protected.text:SetText(text)
+    end,
 }
 
 protected = {}
@@ -20,16 +57,38 @@ protected = {}
 protectedScripts = {}
 
 scripts = {
-    OnClick = function(self)
-        print("Clicked")
+    OnClick = function(self, ...)
+        print("Do something first!")
+    end,
+
+    OnDoubleClick = function(self)
+        print("Woah slow down there Skippy")
     end,
 }
 
 local function creationFunc()
-    button = CreateFrame("Button", private:GetObjectName(objectType), UIParent, "UIPanelButtonTemplate")
+    button = CreateFrame("Button", private:GetObjectName(objectType), UIParent)
     button.overrideForbidden = true
 
-    return private:RegisterObject(button, objectType, version, handlers, methods, scripts)
+    local bg, borders = private:CreateTexture(button)
+    bg:SetAllPoints(button)
+
+    local text = button:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    text:SetAllPoints(button)
+
+    protected.bg = bg
+    protected.borders = borders
+    protected.text = text
+
+    local widget = {
+        object = button,
+        type = objectType,
+        version = version,
+        forbidden = forbidden,
+        callbackRegistry = callbackRegistry,
+    }
+
+    return private:RegisterWidget(widget, methods, scripts)
 end
 
-private:RegisterObjectPool(objectType, creationFunc)
+private:RegisterWidgetPool(objectType, creationFunc)

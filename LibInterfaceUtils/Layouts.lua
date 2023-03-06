@@ -5,6 +5,7 @@ private.List = function(self)
     local height = 0
     local usedWidth = 0
     for _, child in pairs(self.children) do
+        child:ClearAllPoints()
         child:SetPoint("TOPLEFT", 0, -height)
         height = height + child:GetHeight()
 
