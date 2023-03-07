@@ -14,7 +14,7 @@ function private.Fill(self)
     self:Fill(child)
 end
 
-private.Flow = function(self)
+function private.Flow(self)
     local usedWidth, usedHeight, rowHeight, xOffsets = 0, 0, 0, 0
     local availableWidth = self:GetAvailableWidth()
     local availableHeight = self:GetAvailableHeight() - 2
@@ -89,7 +89,7 @@ private.Flow = function(self)
     self:MarkDirty(usedWidth, usedHeight)
 end
 
-private.List = function(self)
+function private.List(self)
     local usedWidth, usedHeight, xOffsets = 0, 0, 0
     local availableHeight = self:GetAvailableHeight()
     local spacingV = self:GetUserData("spacingV") or 0

@@ -60,3 +60,8 @@ function lib:CreateTestFrame()
 
     frame:DoLayout()
 end
+
+SLASH_LIBINTERFACEUTILS1 = "/liu"
+SlashCmdList["LIBINTERFACEUTILS"] = function()
+    lib:CreateTestFrame()
+end
