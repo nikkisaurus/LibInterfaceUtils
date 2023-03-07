@@ -247,7 +247,7 @@ local methods = {
 
         self.titleBar:SetHeight(max(self.titleBar.title:GetStringHeight() + (template.titleBar.padding * 2), 20))
 
-        local closeSize = self.titleBar:GetHeight() - template.titleBar.padding
+        local closeSize = self.titleBar:GetHeight() - (template.titleBar.padding / 2)
         self.titleBar.close:SetSize(closeSize, closeSize)
         self.titleBar.close:SetPoint("RIGHT", -template.titleBar.padding, 0)
 
@@ -308,7 +308,9 @@ local function creationFunc()
     frame.titleBar.title = frame.titleBar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.titleBar.title:SetAllPoints(frame.titleBar)
 
-    frame.titleBar.close = CreateFrame("Button", nil, frame.titleBar, "UIPanelCloseButton")
+    frame.titleBar.close = CreateFrame("Button", nil, frame.titleBar)
+    frame.titleBar.close:SetNormalAtlas("PlayerDeadBlip")
+    frame.titleBar.close:SetHighlightAtlas("PlayerDeadBlip", "ADD")
     frame.titleBar.close:SetScript("OnClick", childScripts.close.OnClick)
 
     frame.statusBar = CreateFrame("Frame", nil, frame)
