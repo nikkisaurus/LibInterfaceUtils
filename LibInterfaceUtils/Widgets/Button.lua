@@ -1,11 +1,18 @@
 local addonName, private = ...
 local lib, minor = LibStub:GetLibrary(addonName)
+
 local objectType, version = "Button", 1
+if not lib or (lib.versions[objectType] or 0) >= version then
+    return
+end
 
-local button
-local callbackRegistry, methods, protected
+local defaults = {
+    backdrop = {
+        highlightEnabled = true,
+    },
+}
 
-callbackRegistry = {
+local registry = {
     OnClick = true,
     OnDoubleClick = true,
     OnDragStart = true,
@@ -22,50 +29,35 @@ callbackRegistry = {
     PreClick = true,
 }
 
-methods = {
+local methods = {
     OnAcquire = function(self)
-        self:SetSize(100, 20)
-        self:SetBackdrop()
-        self:SetDraggable()
+        self:SetNormalFontObject(GameFontNormal)
+        self:SetHighlightFontObject(GameFontHighlight)
+        self:SetDisabledFontObject(GameFontDisable)
         self:SetPushedTextOffset(1, -1)
-        self:EnableMouse(true) -- this gets disabeld during SetDraggable
+        self:SetText("")
+
+        self:SetSize(100, 20)
+        self:SetDraggable()
+        self:EnableMouse(true) -- this gets disabled during SetDraggable
+
+        self:SetBackdrop(defaults.backdrop)
     end,
 
-    SetFont = function(self, ...)
-        private:SetFont(protected.text, ...)
-    end,
-
-    SetBackdrop = function(self, ...)
-        private:SetBackdrop(protected.bg, protected.borders, protected.highlight, ...)
-    end,
-
-    SetPushedTextOffset = function(self, ...)
-        self:SetUserData("pushedOffset", x and y and { x, y })
+    SetBackdrop = function(self, backdrop)
+        private:SetBackdrop(self, CreateFromMixins(defaults.backdrop, backdrop or {}))
     end,
 }
 
-protected = {}
-
 local function creationFunc()
-    button = CreateFrame("Button", private:GetObjectName(objectType), UIParent)
-    button.overrideForbidden = true
-
-    local bg, borders, highlight = private:CreateTexture(button)
-    bg:SetAllPoints(button)
-
-    button:SetNormalFontObject(GameFontHighlight)
-    button:SetText("")
-
-    protected.bg = bg
-    protected.borders = borders
-    protected.highlight = highlight
+    local button = CreateFrame("Button", private:GetObjectName(objectType), UIParent)
+    button = private:CreateTextures(button)
 
     local widget = {
         object = button,
         type = objectType,
         version = version,
-        forbidden = {},
-        callbackRegistry = callbackRegistry,
+        registry = registry,
     }
 
     return private:RegisterWidget(widget, methods)

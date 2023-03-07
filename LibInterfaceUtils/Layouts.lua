@@ -1,7 +1,10 @@
 local addonName, private = ...
 local lib, minor = LibStub:GetLibrary(addonName)
+if not lib then
+    return
+end
 
-private.Fill = function(self)
+function private.Fill(self)
     local child = self.children[1]
     if not child then
         return

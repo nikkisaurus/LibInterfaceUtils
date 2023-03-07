@@ -6,10 +6,20 @@ if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
 
-local frame
-local callbackRegistry, methods, forbidden, protected, protectedScripts, scripts, templates
+local forbidden = {
+    CreateFontString = true,
+    RegisterAllEvents = true,
+    RegisterEvent = true,
+    SetBackdrop = true,
+    SetBackdropBorderColor = true,
+    SetBackdropColor = true,
+    SetScale = true,
+    SetScript = true,
+    UnregisterAllEvents = true,
+    UnregisterEvent = true,
+}
 
-callbackRegistry = {
+local registry = {
     OnDragStart = true,
     OnDragStop = true,
     OnEnter = true,
@@ -22,9 +32,133 @@ callbackRegistry = {
     OnSizeChanged = true,
 }
 
-methods = {
+local templates = {
+    default = {
+        frame = {
+            bgColor = private.assets.colors.elvBackdrop,
+        },
+        statusBar = {
+            bgColor = private.assets.colors.elvTransparent,
+            padding = 4,
+        },
+        titleBar = {
+            bgColor = private.assets.colors.elvTransparent,
+            padding = 4,
+        },
+    },
+    transparent = {
+        frame = {
+            bgColor = private.assets.colors.elvTransparent,
+        },
+        statusBar = {
+            bgColor = private.assets.colors.elvTransparent,
+            padding = 4,
+        },
+        titleBar = {
+            bgColor = private.assets.colors.elvTransparent,
+            padding = 4,
+        },
+    },
+}
+
+local childScripts = {
+    close = {
+        OnClick = function(self)
+            local frame = self.widget.object
+            frame:Release()
+        end,
+    },
+
+    content = {
+        OnMouseDown = function(self)
+            local frame = self.widget.object
+            if frame:IsMovable() then
+                frame:StartMoving()
+            end
+        end,
+
+        OnMouseUp = function(self)
+            local frame = self.widget.object
+            if frame:IsMovable() then
+                frame:StopMovingOrSizing()
+            end
+        end,
+    },
+
+    horizontalBox = {
+        OnMouseDown = function(self)
+            local frame = self.widget.object
+            if frame:IsMovable() then
+                frame:StartMoving()
+            end
+        end,
+
+        OnMouseUp = function(self)
+            local frame = self.widget.object
+            if frame:IsMovable() then
+                frame:StopMovingOrSizing()
+            end
+        end,
+    },
+
+    resizer = {
+        OnMouseDown = function(self)
+            local frame = self.widget.object
+            if frame:IsResizable() then
+                frame:StartSizing()
+            end
+        end,
+
+        OnMouseUp = function(self)
+            local frame = self.widget.object
+            if frame:IsResizable() then
+                frame:StopMovingOrSizing()
+            end
+        end,
+    },
+
+    verticalBox = {
+        OnMouseDown = function(self)
+            local frame = self.widget.object
+            if frame:IsMovable() then
+                frame:StartMoving()
+            end
+        end,
+
+        OnMouseUp = function(self)
+            local frame = self.widget.object
+            if frame:IsMovable() then
+                frame:StopMovingOrSizing()
+            end
+        end,
+    },
+}
+
+local scripts = {
+    OnDragStart = function(self)
+        self:StartMoving()
+    end,
+
+    OnDragStop = function(self)
+        self:StopMovingOrSizing()
+        self:SetScrollAnchors()
+    end,
+
+    OnUpdate = function(self)
+        -- Using OnUpdate instead of OnSizeChanged to throttle the DoLayout calls and provide a more responsive experience
+        local w, h = self:GetSize()
+        local width = self:GetUserData("width")
+        local height = self:GetUserData("height")
+        if not width or not height or w ~= width or h ~= height then
+            self:SetUserData("width", w)
+            self:SetUserData("height", h)
+            self:DoLayout()
+        end
+    end,
+}
+
+local methods = {
     OnAcquire = function(self, ...)
-        -- Defaults
         self:ApplyTemplate("default")
         self:SetTitle()
         self:SetStatus()
@@ -33,38 +167,25 @@ methods = {
         self:SetDraggable(true, "LeftButton")
         local w, h = GetPhysicalScreenSize()
         self:EnableResize(true, 300, 300, w * 0.8, h * 0.8)
+        self:SetFrameStrata("DIALOG")
 
         self:SetSize(300, 300)
     end,
 
     OnLayoutFinished = function(self)
-        self:SetAnchors()
-    end,
-
-    OnRelease = function(self, ...)
-        print("Released", ...)
+        self:SetScrollAnchors()
     end,
 
     ApplyTemplate = function(self, templateName)
         local template = templates[templateName]
         assert(template, "Invalid argument for Frame:ApplyTemplate(template): template")
 
-        -- Set frame background and borders
-        protected.bg:SetColorTexture(template.bgColor:GetRGBA())
-        private:DrawBorders(protected.borders, template.borderSize, template.borderColor)
-
-        -- Set titleBar background and borders
-        protected.titleBar.bg:SetColorTexture(template.titleBar.bgColor:GetRGBA())
-        private:DrawBorders(protected.titleBar.borders, template.titleBar.borderSize, template.titleBar.borderColor)
-
-        -- Set statusBar background and borders
-        protected.statusBar.bg:SetColorTexture(template.statusBar.bgColor:GetRGBA())
-        private:DrawBorders(protected.statusBar.borders, template.statusBar.borderSize, template.statusBar.borderColor)
-        protected.statusBar.text:SetPoint("TOPLEFT", template.statusBar.padding, -template.statusBar.padding)
-        protected.statusBar.text:SetPoint("RIGHT", protected.statusBar.resizer, "LEFT", -template.statusBar.padding, 0)
-        protected.statusBar.text:SetPoint("BOTTOM", -template.statusBar.padding, template.statusBar.padding)
+        private:SetBackdrop(self, template.frame)
+        private:SetBackdrop(self.statusBar, template.statusBar)
+        private:SetBackdrop(self.titleBar, template.titleBar)
 
         self:SetUserData("template", template)
+        self:SetAnchors()
     end,
 
     EnableResize = function(self, enabled, minWidth, minHeight, maxWidth, maxHeight)
@@ -76,9 +197,9 @@ methods = {
             assert(type(maxHeight) == "number", "Invalid argument for Frame:EnableResize(enabled, minWidth, minHeight, maxWidth, maxHeight): maxHeight")
 
             self:SetResizeBounds(minWidth, minHeight, maxWidth, maxHeight)
-            protected.resizer:Show()
+            self.statusBar.resizer:Show()
         else
-            protected.resizer:Hide()
+            self.statusBar.resizer:Hide()
         end
     end,
 
@@ -88,46 +209,64 @@ methods = {
         local xFill = child:GetUserData("xFill")
         local yFill = child:GetUserData("yFill")
 
-        child:SetParent(protected.verticalBox)
+        child:SetParent(self.verticalBox)
         child:SetPoint("TOPLEFT", xOffset, yOffset)
         child:SetPoint("BOTTOMRIGHT", xFill, yFill)
     end,
 
     FillX = function(self, child)
         local x = child:GetUserData("xFill") or 0
-        child:SetPoint("RIGHT", protected.verticalBox, "RIGHT", x, 0)
-        return protected.verticalBox:GetWidth() + x
+        child:SetPoint("RIGHT", self.verticalBox, "RIGHT", x, 0)
+        return self.verticalBox:GetWidth() + x
     end,
 
     FillY = function(self, child)
         local y = child:GetUserData("yFill") or 0
-        child:SetPoint("BOTTOM", protected.verticalBox, "BOTTOM", 0, y)
+        child:SetPoint("BOTTOM", self.verticalBox, "BOTTOM", 0, y)
     end,
 
     GetAvailableHeight = function(self)
-        return protected.verticalBox:GetHeight()
+        return self.verticalBox:GetHeight()
     end,
 
     GetAvailableWidth = function(self)
-        return protected.verticalBox:GetWidth()
+        return self.verticalBox:GetWidth()
     end,
 
     MarkDirty = function(self, usedWidth, height)
-        protected.content:SetSize(usedWidth, height)
-        protected.horizontalBox:SetHeight(height)
+        self.content:SetSize(usedWidth, height)
+        self.horizontalBox:SetHeight(height)
     end,
 
     ParentChild = function(self, child, parent)
-        child:SetParent(protected.content)
+        child:SetParent(self.content)
     end,
 
     SetAnchors = function(self)
-        local horizontalBar = protected.horizontalBar
-        local verticalBar = protected.verticalBar
-        local verticalBox = protected.verticalBox
-        local statusBar = protected.statusBar
+        local template = self:GetUserData("template")
 
-        protected.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
+        self.titleBar:SetHeight(max(self.titleBar.title:GetStringHeight() + (template.titleBar.padding * 2), 20))
+
+        local closeSize = self.titleBar:GetHeight() - template.titleBar.padding
+        self.titleBar.close:SetSize(closeSize, closeSize)
+        self.titleBar.close:SetPoint("RIGHT", -template.titleBar.padding, 0)
+
+        self.titleBar.title:SetPoint("TOPLEFT", template.titleBar.padding, -template.titleBar.padding)
+        self.titleBar.title:SetPoint("RIGHT", self.titleBar.close, "LEFT", -template.titleBar.padding, 0)
+        self.titleBar.title:SetPoint("BOTTOM", 0, template.titleBar.padding)
+
+        self.statusBar.text:SetPoint("TOPLEFT", template.statusBar.padding, -template.statusBar.padding)
+        self.statusBar.text:SetPoint("RIGHT", self.statusBar.resizer, "LEFT", -template.statusBar.padding, 0)
+        self.statusBar.text:SetPoint("BOTTOM", -template.statusBar.padding, template.statusBar.padding)
+    end,
+
+    SetScrollAnchors = function(self)
+        local horizontalBar = self.horizontalBar
+        local verticalBar = self.verticalBar
+        local verticalBox = self.verticalBox
+        local statusBar = self.statusBar
+
+        self.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
         verticalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
 
         if horizontalBar:HasScrollableExtent() then
@@ -150,257 +289,107 @@ methods = {
     end,
 
     SetStatus = function(self, text)
-        protected.statusBar.text:SetText(text or "")
+        self.statusBar.text:SetText(text or "")
     end,
 
     SetTitle = function(self, text)
-        local template = self:GetUserData("template")
-
-        protected.titleBar.title:SetText(text or "")
-        protected.titleBar:SetHeight(max(protected.titleBar.title:GetStringHeight() + (template.titleBar.padding * 2), 20))
-
-        -- Set titleBar element points
-        local size = protected.titleBar:GetHeight() - template.titleBar.padding
-        protected.titleBar.close:SetSize(size, size)
-        protected.titleBar.close:SetPoint("RIGHT", -template.titleBar.padding, 0)
-
-        protected.titleBar.title:SetPoint("TOPLEFT", template.titleBar.padding, -template.titleBar.padding)
-        protected.titleBar.title:SetPoint("RIGHT", protected.titleBar.close, "LEFT", -template.titleBar.padding, 0)
-        protected.titleBar.title:SetPoint("BOTTOM", 0, template.titleBar.padding)
-    end,
-}
-
-forbidden = {
-    CreateFontString = true,
-    RegisterAllEvents = true,
-    RegisterEvent = true,
-    SetBackdrop = true,
-    SetBackdropBorderColor = true,
-    SetBackdropColor = true,
-    SetScale = true,
-    SetScript = true,
-    UnregisterAllEvents = true,
-    UnregisterEvent = true,
-}
-
-protected = {}
-
-protectedScripts = {
-    close = {
-        OnClick = function(self)
-            frame:Release()
-        end,
-    },
-
-    content = {
-        OnMouseDown = function(self)
-            frame:StartMoving()
-        end,
-
-        OnMouseUp = function(self)
-            frame:StopMovingOrSizing()
-        end,
-    },
-
-    horizontalBox = {
-        OnMouseDown = function(self)
-            frame:StartMoving()
-        end,
-
-        OnMouseUp = function(self)
-            frame:StopMovingOrSizing()
-        end,
-    },
-
-    resizer = {
-        OnMouseDown = function(self)
-            frame:StartSizing()
-        end,
-        OnMouseUp = function(self)
-            frame:StopMovingOrSizing()
-        end,
-    },
-
-    verticalBox = {
-        OnMouseDown = function(self)
-            frame:StartMoving()
-        end,
-
-        OnMouseUp = function(self)
-            frame:StopMovingOrSizing()
-        end,
-    },
-}
-
-scripts = {
-    OnShow = function(self)
-        print("Frame show")
-    end,
-
-    OnDragStart = function(self)
-        self:StartMoving()
-    end,
-
-    OnDragStop = function(self)
-        self:StopMovingOrSizing()
+        self.titleBar.title:SetText(text or "")
         self:SetAnchors()
     end,
-
-    OnUpdate = function(self)
-        -- Using OnUpdate instead of OnSizeChanged to throttle the DoLayout calls and provide a more responsive experience
-        local w, h = self:GetSize()
-        local width = self:GetUserData("width")
-        local height = self:GetUserData("height")
-        if not width or not height or w ~= width or h ~= height then
-            self:SetUserData("width", w)
-            self:SetUserData("height", h)
-            self:DoLayout()
-        end
-    end,
-}
-
-templates = {
-    default = {
-        bgColor = private.assets.colors.backdrop,
-        borderColor = private.assets.colors.black,
-        borderSize = 1,
-        statusBar = {
-            bgColor = private.assets.colors.dimmedBackdrop,
-            borderColor = private.assets.colors.black,
-            borderSize = 1,
-            padding = 4,
-        },
-        titleBar = {
-            bgColor = private.assets.colors.dimmedBackdrop,
-            borderColor = private.assets.colors.black,
-            borderSize = 1,
-            padding = 4,
-        },
-    },
-    transparent = {
-        bgColor = private.assets.colors.dimmedBackdrop,
-        borderColor = private.assets.colors.black,
-        borderSize = 1,
-        statusBar = {
-            bgColor = private.assets.colors.dimmedBackdrop,
-            borderColor = private.assets.colors.black,
-            borderSize = 1,
-            padding = 4,
-        },
-        titleBar = {
-            bgColor = private.assets.colors.dimmedBackdrop,
-            borderColor = private.assets.colors.black,
-            borderSize = 1,
-            padding = 4,
-        },
-    },
 }
 
 local function creationFunc()
-    frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
-    frame:SetFrameStrata("DIALOG")
-    frame.overrideForbidden = true
+    local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
+    frame.titleBar = CreateFrame("Frame", nil, frame)
+    frame.titleBar:SetPoint("TOPLEFT")
+    frame.titleBar:SetPoint("TOPRIGHT")
+    frame.titleBar.frame = frame
 
-    local bg, borders = private:CreateTexture(frame)
-    bg:SetAllPoints(frame)
+    frame.titleBar.title = frame.titleBar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    frame.titleBar.title:SetAllPoints(frame.titleBar)
 
-    local titleBar = CreateFrame("Frame", nil, frame)
-    titleBar:SetPoint("TOPLEFT")
-    titleBar:SetPoint("TOPRIGHT")
+    frame.titleBar.close = CreateFrame("Button", nil, frame.titleBar, "UIPanelCloseButton")
+    frame.titleBar.close:SetScript("OnClick", childScripts.close.OnClick)
 
-    titleBar.bg, titleBar.borders = private:CreateTexture(titleBar)
-    titleBar.bg:SetAllPoints(titleBar)
+    frame.statusBar = CreateFrame("Frame", nil, frame)
+    frame.statusBar:SetPoint("BOTTOMLEFT")
+    frame.statusBar:SetPoint("BOTTOMRIGHT")
+    frame.statusBar:SetHeight(20)
 
-    titleBar.title = titleBar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    titleBar.title:SetAllPoints(titleBar)
+    frame.statusBar.resizer = CreateFrame("Button", nil, frame.statusBar)
+    frame.statusBar.resizer:SetNormalTexture([[INTERFACE\CHATFRAME\UI-CHATIM-SIZEGRABBER-DOWN]])
+    frame.statusBar.resizer:SetHighlightTexture([[INTERFACE\CHATFRAME\UI-CHATIM-SIZEGRABBER-HIGHLIGHT]])
+    frame.statusBar.resizer:SetPoint("BOTTOMRIGHT", 0, 0)
+    frame.statusBar.resizer:SetSize(16, 16)
+    frame.statusBar.resizer:EnableMouse(true)
+    frame.statusBar.resizer:SetScript("OnMouseDown", childScripts.resizer.OnMouseDown)
+    frame.statusBar.resizer:SetScript("OnMouseUp", childScripts.resizer.OnMouseUp)
 
-    titleBar.close = CreateFrame("Button", nil, titleBar, "UIPanelCloseButton")
+    frame.statusBar.text = frame.statusBar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    frame.statusBar.text:SetJustifyH("LEFT")
 
-    local statusBar = CreateFrame("Frame", nil, frame)
-    statusBar:SetPoint("BOTTOMLEFT")
-    statusBar:SetPoint("BOTTOMRIGHT")
-    statusBar:SetHeight(20)
+    frame.horizontalBar = CreateFrame("EventFrame", nil, frame, "LibInterfaceUtilsHorizontalScrollBar")
+    frame.horizontalBar:SetPoint("BOTTOMLEFT", frame.statusBar, "TOPLEFT", 2, 2)
+    frame.horizontalBar:SetPoint("BOTTOMRIGHT", frame.statusBar, "TOPRIGHT", -2, 2)
+    frame.horizontalBar.Track.Thumb.Middle:SetTexture("Interface/buttons/white8x8")
 
-    statusBar.bg, statusBar.borders = private:CreateTexture(statusBar)
-    statusBar.bg:SetAllPoints(statusBar)
+    frame.horizontalBox = CreateFrame("Frame", nil, frame, "WowScrollBox")
+    frame.horizontalBox:SetPoint("TOP", frame.titleBar, "BOTTOM", 0, -5)
+    frame.horizontalBox:SetPoint("LEFT", 5, 0)
+    frame.horizontalBox:SetPoint("RIGHT", verticalBar, "LEFT", -5, 0)
+    frame.horizontalBox:SetScript("OnMouseWheel", nil)
+    frame.horizontalBox:SetScript("OnMouseDown", childScripts.horizontalBox.OnMouseDown)
+    frame.horizontalBox:SetScript("OnMouseUp", childScripts.horizontalBox.OnMouseUp)
 
-    statusBar.resizer = CreateFrame("Button", nil, statusBar)
-    statusBar.resizer:SetNormalTexture([[INTERFACE\CHATFRAME\UI-CHATIM-SIZEGRABBER-DOWN]])
-    statusBar.resizer:SetHighlightTexture([[INTERFACE\CHATFRAME\UI-CHATIM-SIZEGRABBER-HIGHLIGHT]])
-    statusBar.resizer:SetPoint("BOTTOMRIGHT", 0, 0)
-    statusBar.resizer:SetSize(16, 16)
-    statusBar.resizer:EnableMouse(true)
+    frame.content = CreateFrame("Frame", nil, frame.horizontalBox, "ResizeLayoutFrame")
+    frame.content.scrollable = true
+    frame.content:SetScript("OnMouseDown", childScripts.content.OnMouseDown)
+    frame.content:SetScript("OnMouseUp", childScripts.content.OnMouseUp)
 
-    statusBar.text = statusBar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    statusBar.text:SetJustifyH("LEFT")
+    frame.horizontalView = CreateScrollBoxLinearView()
+    frame.horizontalView:SetPanExtent(50)
+    frame.horizontalView:SetHorizontal(true)
 
-    local horizontalBar = CreateFrame("EventFrame", nil, frame, "LibInterfaceUtilsHorizontalScrollBar")
-    horizontalBar:SetPoint("BOTTOMLEFT", statusBar, "TOPLEFT", 2, 2)
-    horizontalBar:SetPoint("BOTTOMRIGHT", statusBar, "TOPRIGHT", -2, 2)
-    horizontalBar.Track.Thumb.Middle:SetTexture("Interface/buttons/white8x8")
+    frame.verticalBar = CreateFrame("EventFrame", nil, frame, "LibInterfaceUtilsVerticalScrollBar")
+    frame.verticalBar:SetPoint("TOP", frame.titleBar, "BOTTOM", 0, -2)
+    frame.verticalBar:SetPoint("RIGHT", -2, 0)
+    frame.verticalBar:SetPoint("BOTTOM", frame.horizontalBar, "TOP", 0, 2)
 
-    local horizontalBox = CreateFrame("Frame", nil, frame, "WowScrollBox")
-    horizontalBox:SetPoint("TOP", titleBar, "BOTTOM", 0, -5)
-    horizontalBox:SetPoint("LEFT", 5, 0)
-    horizontalBox:SetPoint("RIGHT", verticalBar, "LEFT", -5, 0)
-    horizontalBox:SetScript("OnMouseWheel", nil)
+    frame.verticalBox = CreateFrame("Frame", nil, frame, "WowScrollBox")
+    frame.verticalBox:SetPoint("TOP", frame.titleBar, "BOTTOM", 0, -5)
+    frame.verticalBox:SetPoint("LEFT", 5, 0)
+    frame.verticalBox:SetPoint("RIGHT", frame.verticalBar, "LEFT", -5, 0)
+    frame.verticalBox:SetPoint("BOTTOM", frame.horizontalBar, "TOP", 0, 5)
+    frame.verticalBox:SetScript("OnMouseDown", childScripts.verticalBox.OnMouseDown)
+    frame.verticalBox:SetScript("OnMouseUp", childScripts.verticalBox.OnMouseUp)
 
-    local content = CreateFrame("Frame", nil, horizontalBox, "ResizeLayoutFrame")
-    content.scrollable = true
+    frame.horizontalBox:SetParent(frame.verticalBox)
+    frame.horizontalBox:SetAllPoints(frame.verticalBox)
+    frame.horizontalBox.scrollable = true
 
-    local horizontalView = CreateScrollBoxLinearView()
-    horizontalView:SetPanExtent(50)
-    horizontalView:SetHorizontal(true)
+    frame.verticalView = CreateScrollBoxLinearView()
+    frame.verticalView:SetPanExtent(50)
 
-    local verticalBar = CreateFrame("EventFrame", nil, frame, "LibInterfaceUtilsVerticalScrollBar")
-    verticalBar:SetPoint("TOP", titleBar, "BOTTOM", 0, -2)
-    verticalBar:SetPoint("RIGHT", -2, 0)
-    verticalBar:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 2)
+    ScrollUtil.InitScrollBoxWithScrollBar(frame.horizontalBox, frame.horizontalBar, frame.horizontalView)
+    ScrollUtil.InitScrollBoxWithScrollBar(frame.verticalBox, frame.verticalBar, frame.verticalView)
 
-    local verticalBox = CreateFrame("Frame", nil, frame, "WowScrollBox")
-    verticalBox:SetPoint("TOP", titleBar, "BOTTOM", 0, -5)
-    verticalBox:SetPoint("LEFT", 5, 0)
-    verticalBox:SetPoint("RIGHT", verticalBar, "LEFT", -5, 0)
-    verticalBox:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 5)
-
-    horizontalBox:SetParent(verticalBox)
-    horizontalBox:SetAllPoints(verticalBox)
-    horizontalBox.scrollable = true
-
-    local verticalView = CreateScrollBoxLinearView()
-    verticalView:SetPanExtent(50)
-
-    ScrollUtil.InitScrollBoxWithScrollBar(horizontalBox, horizontalBar, horizontalView)
-    ScrollUtil.InitScrollBoxWithScrollBar(verticalBox, verticalBar, verticalView)
-
-    protected.bg = bg
-    protected.borders = borders
-    protected.close = titleBar.close
-    protected.content = content
-    protected.horizontalBar = horizontalBar
-    protected.horizontalBox = horizontalBox
-    -- protected.horizontalView = horizontalView
-    protected.resizer = statusBar.resizer
-    protected.statusBar = statusBar
-    protected.titleBar = titleBar
-    protected.verticalBar = verticalBar
-    protected.verticalBox = verticalBox
-    -- protected.verticalView = verticalView
-
-    for protectedObject, scripts in pairs(protectedScripts) do
-        local object = protected[protectedObject]
-        for script, handler in pairs(scripts) do
-            object:SetScript(script, handler)
-        end
-    end
+    frame = private:CreateTextures(frame)
+    frame.titleBar = private:CreateTextures(frame.titleBar)
+    frame.statusBar = private:CreateTextures(frame.statusBar)
 
     local widget = {
         object = frame,
         type = objectType,
         version = version,
         forbidden = forbidden,
-        callbackRegistry = callbackRegistry,
+        callbackRegistry = registry,
     }
+
+    frame.titleBar.close.widget = widget
+    frame.content.widget = widget
+    frame.horizontalBox.widget = widget
+    frame.statusBar.resizer.widget = widget
+    frame.verticalBox.widget = widget
 
     return private:RegisterContainer(widget, methods, scripts)
 end

@@ -1,16 +1,19 @@
 local addonName, private = ...
 local lib, minor = LibStub:GetLibrary(addonName)
+
 local objectType, version = "Divider", 1
+if not lib or (lib.versions[objectType] or 0) >= version then
+    return
+end
 
-local divider
-local maps, methods, protected
-
-maps = {
-    SetTexture = true,
-    SetVertexColor = true,
+local maps = {
+    methods = {
+        SetTexture = true,
+        SetVertexColor = true,
+    },
 }
 
-methods = {
+local methods = {
     OnAcquire = function(self)
         self:SetSize(300, 1)
         self:SetTexture()
@@ -22,26 +25,19 @@ methods = {
     end,
 }
 
-protected = {}
-
 local function creationFunc()
-    divider = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
-    divider.overrideForbidden = true
+    local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
 
-    local texture = divider:CreateTexture(nil, "ARTWORK")
-    texture:SetAllPoints(divider)
-
-    protected.texture = texture
+    local texture = frame:CreateTexture(nil, "ARTWORK")
+    texture:SetAllPoints(frame)
 
     local widget = {
-        object = divider,
+        object = frame,
         type = objectType,
         version = version,
-        forbidden = {},
-        callbackRegistry = {},
     }
 
-    private:MapMethods(divider, texture, maps)
+    private:Map(frame, texture, maps)
 
     return private:RegisterWidget(widget, methods)
 end

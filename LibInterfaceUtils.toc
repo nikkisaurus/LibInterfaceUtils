@@ -13,3 +13,6 @@
 # ## X-Wago-ID: 
 
 LibInterfaceUtils/embeds.xml
+#@debug@
+Tests/tests.lua
+#@end-debug@

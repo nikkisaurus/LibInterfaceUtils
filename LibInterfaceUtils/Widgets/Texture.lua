@@ -1,36 +1,38 @@
 local addonName, private = ...
 local lib, minor = LibStub:GetLibrary(addonName)
+
 local objectType, version = "Texture", 1
+if not lib or (lib.versions[objectType] or 0) >= version then
+    return
+end
 
-local texture
-local mapMethods, methods, mapScripts, protected
-
-mapMethods = {
-    EnableMouse = true,
-    SetAtlas = true,
-    SetBlendMode = true,
-    SetDrawLayer = true,
-    SetDesaturated = true,
-    SetDesaturation = true,
-    SetGradient = true,
-    SetHorizTile = true,
-    SetMask = true,
-    SetRotation = true,
-    SetTexCoord = true,
-    SetTexture = true,
-    SetVertexColor = true,
+local maps = {
+    methods = {
+        EnableMouse = true,
+        SetAtlas = true,
+        SetBlendMode = true,
+        SetDrawLayer = true,
+        SetDesaturated = true,
+        SetDesaturation = true,
+        SetGradient = true,
+        SetHorizTile = true,
+        SetMask = true,
+        SetRotation = true,
+        SetTexCoord = true,
+        SetTexture = true,
+        SetVertexColor = true,
+    },
+    scripts = {
+        OnEnter = true,
+        OnHide = true,
+        OnLeave = true,
+        OnMouseDown = true,
+        OnMouseUp = true,
+        OnShow = true,
+    },
 }
 
-mapScripts = {
-    OnEnter = true,
-    OnHide = true,
-    OnLeave = true,
-    OnMouseDown = true,
-    OnMouseUp = true,
-    OnShow = true,
-}
-
-methods = {
+local methods = {
     OnAcquire = function(self)
         self:SetSize(100, 100)
         self:SetTexture()
@@ -43,27 +45,19 @@ methods = {
     end,
 }
 
-protected = {}
-
 local function creationFunc()
-    texture = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
-    texture.overrideForbidden = true
+    local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
 
-    local tex = texture:CreateTexture(nil, "BACKGROUND")
-    tex:SetAllPoints(texture)
-
-    protected.texture = tex
+    local texture = frame:CreateTexture(nil, "BACKGROUND")
+    texture:SetAllPoints(frame)
 
     local widget = {
-        object = texture,
+        object = frame,
         type = objectType,
         version = version,
-        forbidden = {},
-        callbackRegistry = {},
     }
 
-    private:MapMethods(texture, tex, mapMethods)
-    private:MapScripts(texture, tex, mapScripts)
+    private:Map(frame, texture, maps)
 
     return private:RegisterWidget(widget, methods)
 end
