@@ -6,7 +6,7 @@ end
 
 function lib:CreateTestFrame()
     local frame = self:New("Frame")
-    -- frame:SetLayout("List")
+    frame:SetLayout("List")
     frame:SetPoint("CENTER")
     frame:SetSize(800, 600)
     frame:SetTitle("Test Frame")
@@ -42,15 +42,15 @@ function lib:CreateTestFrame()
         texOverlay:Release()
     end)
 
-    local tex2 = frame:New("Texture")
-    tex2:SetAtlas("CreditsScreen-Keyart-9")
-    tex2:SetFullWidth(true)
-    tex2:SetFullHeight(true)
-
     local button = frame:New("Button")
     -- local button = lib:New("Button")
     button:SetText(50)
     button:SetWidth(900)
+
+    local tex2 = frame:New("Texture")
+    tex2:SetAtlas("CreditsScreen-Keyart-9")
+    tex2:SetFullWidth(true)
+    tex2:SetFullHeight(true)
 
     -- button:SetParent(tex2) -- Do not do this; should be added to a container
     -- button:SetPoint("CENTER", tex2, "CENTER") -- Note that if it's not properly parented, scrollboxes won't take this into account

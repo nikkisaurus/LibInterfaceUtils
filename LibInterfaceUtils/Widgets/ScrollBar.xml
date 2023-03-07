@@ -5,6 +5,7 @@
             <Frame parentKey="Background" useParentLevel="true" setAllPoints="true">
                 <Layers>
                     <Layer level="ARTWORK">
+                        <Texture parentKey="Main"/>
                         <Texture parentKey="Begin" atlas="Minimal_SliderBar_Left" hidden="true"/>
                         <Texture parentKey="Middle" atlas="_Minimal_SliderBar_Middle" hidden="true"/>
                         <Texture parentKey="End" atlas="Minimal_SliderBar_Right" hidden="true"/>
@@ -23,9 +24,9 @@
                             <KeyValue key="overBeginTexture" value="UI-ScrollBar-Knob-MouseOver-EndCap-Left" type="string"/>
                             <KeyValue key="overMiddleTexture" value="_GM_BehaviorMessage_Bottom_OuterShadow" type="string"/>
                             <KeyValue key="overEndTexture" value="UI-ScrollBar-Knob-MouseOver-EndCap-Right" type="string"/>
-                            <KeyValue key="disabledBeginTexture" value="UI-ScrollBar-Knob-EndCap-Left-Disabled" type="string"/>
+                            <KeyValue key="disabledBeginTexture" value="UI-ScrollBar-Knob-EndCap-Left" type="string"/>
                             <KeyValue key="disabledMiddleTexture" value="_GM_BehaviorMessage_Bottom_OuterShadow" type="string"/>
-                            <KeyValue key="disabledEndTexture" value="UI-ScrollBar-Knob-EndCap-Right-Disabled" type="string"/>
+                            <KeyValue key="disabledEndTexture" value="UI-ScrollBar-Knob-EndCap-Right" type="string"/>
                         </KeyValues>
                         <Layers>
                             <Layer level="BACKGROUND">
@@ -50,8 +51,8 @@
                 <KeyValues>
                     <KeyValue key="direction" value="ScrollControllerMixin.Directions.Decrease" type="global"/>
                     <KeyValue key="mouseDownSoundKitID" value="SOUNDKIT.U_CHAT_SCROLL_BUTTON" type="global"/>
-                    <KeyValue key="upTexture" value="CovenantSanctum-Renown-Arrow" type="string"/>
-                    <KeyValue key="downTexture" value="CovenantSanctum-Renown-Arrow-Depressed" type="string"/>
+                    <KeyValue key="upTexture" value="CovenantSanctum-Renown-Arrow-Disabled" type="string"/>
+                    <KeyValue key="downTexture" value="CovenantSanctum-Renown-Arrow-Disabled" type="string"/>
                     <KeyValue key="disabledTexture" value="CovenantSanctum-Renown-Arrow-Disabled" type="string"/>
                 </KeyValues>
                 <Layers>
@@ -85,10 +86,10 @@
                 <KeyValues>
                     <KeyValue key="direction" value="ScrollControllerMixin.Directions.Increase" type="global"/>
                     <KeyValue key="mouseDownSoundKitID" value="SOUNDKIT.U_CHAT_SCROLL_BUTTON" type="global"/>
-                    <KeyValue key="upTexture" value="CovenantSanctum-Renown-Arrow" type="string"/>
-                    <KeyValue key="downTexture" value="CovenantSanctum-Renown-Arrow-Depressed" type="string"/>
-                    <KeyValue key="pushed" value="CovenantSanctum-Renown-Arrow" type="stDing"/>
-                    <KeyValue key="disabledTexture" value="CovenantSanctum-Renown-Arrow-disabled" type="string"/>
+                    <KeyValue key="upTexture" value="CovenantSanctum-Renown-Arrow-Disabled" type="string"/>
+                    <KeyValue key="downTexture" value="CovenantSanctum-Renown-Arrow-Disabled" type="string"/>
+                    <KeyValue key="pushed" value="CovenantSanctum-Renown-Arrow-Disabled" type="stDing"/>
+                    <KeyValue key="disabledTexture" value="CovenantSanctum-Renown-Arrow-Disabled" type="string"/>
                 </KeyValues>
                 <Layers>
                     <Layer level="BACKGROUND">
@@ -120,6 +121,7 @@
                 background:SetPoint("TOPLEFT", self.Back, "TOPRIGHT", 4, -4)
                 background:SetPoint("BOTTOMRIGHT", self.Forward, "BOTTOMLEFT", -4, 4)
                 background:SetColorTexture(0.03, 0.03, 0.03, 1)
+                self.Background.Main = background
 
                 self.Track:SetPoint("TOPLEFT", background, "TOPRIGHT", -1, -1)
                 self.Track:SetPoint("BOTTOMRIGHT", background, "BOTTOMLEFT", 1, 1)
@@ -136,6 +138,13 @@
     <EventFrame name="LibInterfaceUtilsVerticalScrollBar" inherits="VerticalScrollBarTemplate" virtual="true">
         <Size x="16" y="560"/>
         <Frames>
+            <Frame parentKey="Background" useParentLevel="true" setAllPoints="true">
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <Texture parentKey="Main"/>
+                    </Layer>
+                </Layers>
+            </Frame>
             <Frame parentKey="Track" enableMouse="true">
                 <Frames>
                     <EventButton parentKey="Thumb" inherits="WowTrimScrollBarThumbScripts" enableMouse="true">
@@ -147,9 +156,9 @@
                             <KeyValue key="overBeginTexture" value="UI-ScrollBar-Knob-MouseOver-EndCap-Top" type="string"/>
                             <KeyValue key="overMiddleTexture" value="!GM_BehaviorMessage_Left_InnerShadow" type="string"/>
                             <KeyValue key="overEndTexture" value="UI-ScrollBar-Knob-MouseOver-EndCap-Bottom" type="string"/>
-                            <KeyValue key="disabledBeginTexture" value="UI-ScrollBar-Knob-EndCap-Top-Disabled" type="string"/>
+                            <KeyValue key="disabledBeginTexture" value="UI-ScrollBar-Knob-EndCap-Top" type="string"/>
                             <KeyValue key="disabledMiddleTexture" value="!GM_BehaviorMessage_Left_InnerShadow" type="string"/>
-                            <KeyValue key="disabledEndTexture" value="UI-ScrollBar-Knob-EndCap-Bottom-Disabled" type="string"/>
+                            <KeyValue key="disabledEndTexture" value="UI-ScrollBar-Knob-EndCap-Bottom" type="string"/>
                         </KeyValues>
                         <Layers>
                             <Layer level="BACKGROUND">
@@ -174,8 +183,8 @@
                 <KeyValues>
                     <KeyValue key="direction" value="ScrollControllerMixin.Directions.Decrease" type="global"/>
                     <KeyValue key="mouseDownSoundKitID" value="SOUNDKIT.U_CHAT_SCROLL_BUTTON" type="global"/>
-                    <KeyValue key="upTexture" value="CovenantSanctum-Renown-Arrow" type="string"/>
-                    <KeyValue key="downTexture" value="CovenantSanctum-Renown-Arrow-Depressed" type="string"/>
+                    <KeyValue key="upTexture" value="CovenantSanctum-Renown-Arrow-Disabled" type="string"/>
+                    <KeyValue key="downTexture" value="CovenantSanctum-Renown-Arrow-Disabled" type="string"/>
                     <KeyValue key="disabledTexture" value="CovenantSanctum-Renown-Arrow-Disabled" type="string"/>
                 </KeyValues>
                 <Layers>
@@ -209,8 +218,8 @@
                 <KeyValues>
                     <KeyValue key="direction" value="ScrollControllerMixin.Directions.Increase" type="global"/>
                     <KeyValue key="mouseDownSoundKitID" value="SOUNDKIT.U_CHAT_SCROLL_BUTTON" type="global"/>
-                    <KeyValue key="upTexture" value="CovenantSanctum-Renown-Arrow" type="string"/>
-                    <KeyValue key="downTexture" value="CovenantSanctum-Renown-Arrow-Depressed" type="string"/>
+                    <KeyValue key="upTexture" value="CovenantSanctum-Renown-Arrow-Disabled" type="string"/>
+                    <KeyValue key="downTexture" value="CovenantSanctum-Renown-Arrow-Disabled" type="string"/>
                     <KeyValue key="disabledTexture" value="CovenantSanctum-Renown-Arrow-Disabled" type="string"/>
                 </KeyValues>
                 <Layers>
@@ -243,6 +252,7 @@
                 background:SetPoint("TOPLEFT", self.Back, "BOTTOMLEFT", 4, -4)
                 background:SetPoint("BOTTOMRIGHT", self.Forward, "TOPRIGHT", -4, 4)
                 background:SetColorTexture(0.03, 0.03, 0.03, 1)
+                self.Background.Main = background
 
                 self.Track:SetPoint("TOPLEFT", background, "TOPLEFT", 1, -1)
                 self.Track:SetPoint("BOTTOMRIGHT", background, "BOTTOMRIGHT", -1, 1)

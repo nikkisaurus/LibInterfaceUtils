@@ -45,6 +45,18 @@ local templates = {
             bgColor = private.assets.colors.elvTransparent,
             padding = 4,
         },
+        scrollBars = {
+            vertical = {
+                bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                thumbColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                texture = private.assets.blankTexture,
+            },
+            horizontal = {
+                bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                thumbColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                texture = private.assets.blankTexture,
+            },
+        },
     },
     transparent = {
         frame = {
@@ -57,6 +69,18 @@ local templates = {
         titleBar = {
             bgColor = private.assets.colors.elvTransparent,
             padding = 4,
+        },
+        scrollBars = {
+            vertical = {
+                bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                thumbColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                texture = private.assets.blankTexture,
+            },
+            horizontal = {
+                bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                thumbColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                texture = private.assets.blankTexture,
+            },
         },
     },
 }
@@ -183,6 +207,17 @@ local methods = {
         private:SetBackdrop(self, template.frame)
         private:SetBackdrop(self.statusBar, template.statusBar)
         private:SetBackdrop(self.titleBar, template.titleBar)
+
+        self.horizontalBar.Track.Thumb.Main:SetVertexColor(template.scrollBars.horizontal.thumbColor:GetRGBA())
+        self.horizontalBar.Back.Texture:SetVertexColor(template.scrollBars.horizontal.thumbColor:GetRGBA())
+        self.horizontalBar.Forward.Texture:SetVertexColor(template.scrollBars.horizontal.thumbColor:GetRGBA())
+
+        self.verticalBar.Track.Thumb.Main:SetVertexColor(template.scrollBars.vertical.thumbColor:GetRGBA())
+        self.verticalBar.Back.Texture:SetVertexColor(template.scrollBars.vertical.thumbColor:GetRGBA())
+        self.verticalBar.Forward.Texture:SetVertexColor(template.scrollBars.vertical.thumbColor:GetRGBA())
+
+        -- self.horizontalBar.Background.Main:SetColorTexture(template.scrollBars.horizontal.bgColor:GetRGBA())
+        -- self.verticalBar.Background.Main:SetColorTexture(template.scrollBars.vertical.bgColor:GetRGBA())
 
         self:SetUserData("template", template)
         self:SetAnchors()
