@@ -45,18 +45,7 @@ local templates = {
             bgColor = private.assets.colors.elvTransparent,
             padding = 4,
         },
-        scrollBars = {
-            vertical = {
-                bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
-                thumbColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
-                texture = private.assets.blankTexture,
-            },
-            horizontal = {
-                bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
-                thumbColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
-                texture = private.assets.blankTexture,
-            },
-        },
+        flair = private.assets.colors.lightest,
     },
     transparent = {
         frame = {
@@ -70,18 +59,7 @@ local templates = {
             bgColor = private.assets.colors.elvTransparent,
             padding = 4,
         },
-        scrollBars = {
-            vertical = {
-                bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
-                thumbColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
-                texture = private.assets.blankTexture,
-            },
-            horizontal = {
-                bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
-                thumbColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
-                texture = private.assets.blankTexture,
-            },
-        },
+        flair = private.assets.colors.lightest,
     },
 }
 
@@ -183,7 +161,7 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self, ...)
-        self:ApplyTemplate("default")
+        self:ApplyTemplate("transparent")
         self:SetTitle()
         self:SetStatus()
 
@@ -208,13 +186,16 @@ local methods = {
         private:SetBackdrop(self.statusBar, template.statusBar)
         private:SetBackdrop(self.titleBar, template.titleBar)
 
-        self.horizontalBar.Track.Thumb.Main:SetVertexColor(template.scrollBars.horizontal.thumbColor:GetRGBA())
-        self.horizontalBar.Back.Texture:SetVertexColor(template.scrollBars.horizontal.thumbColor:GetRGBA())
-        self.horizontalBar.Forward.Texture:SetVertexColor(template.scrollBars.horizontal.thumbColor:GetRGBA())
+        self.horizontalBar.Track.Thumb.Main:SetVertexColor(template.flair:GetRGBA())
+        self.horizontalBar.Back.Texture:SetVertexColor(template.flair:GetRGBA())
+        self.horizontalBar.Forward.Texture:SetVertexColor(template.flair:GetRGBA())
 
-        self.verticalBar.Track.Thumb.Main:SetVertexColor(template.scrollBars.vertical.thumbColor:GetRGBA())
-        self.verticalBar.Back.Texture:SetVertexColor(template.scrollBars.vertical.thumbColor:GetRGBA())
-        self.verticalBar.Forward.Texture:SetVertexColor(template.scrollBars.vertical.thumbColor:GetRGBA())
+        self.verticalBar.Track.Thumb.Main:SetVertexColor(template.flair:GetRGBA())
+        self.verticalBar.Back.Texture:SetVertexColor(template.flair:GetRGBA())
+        self.verticalBar.Forward.Texture:SetVertexColor(template.flair:GetRGBA())
+
+        self.titleBar.close:GetNormalTexture():SetVertexColor(template.flair:GetRGBA())
+        self.titleBar.close:GetHighlightTexture():SetVertexColor(private.assets.colors.dimmedWhite:GetRGBA())
 
         -- self.horizontalBar.Background.Main:SetColorTexture(template.scrollBars.horizontal.bgColor:GetRGBA())
         -- self.verticalBar.Background.Main:SetColorTexture(template.scrollBars.vertical.bgColor:GetRGBA())
