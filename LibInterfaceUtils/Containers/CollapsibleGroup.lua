@@ -25,6 +25,8 @@ local childScripts = {
                 frame.container:Show()
             end
 
+            frame:DoLayout()
+
             local parent = frame:GetUserData("parent")
             if parent then
                 parent:DoLayout()

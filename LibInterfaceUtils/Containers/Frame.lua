@@ -294,6 +294,7 @@ local methods = {
     MarkDirty = function(self, usedWidth, height)
         self.content:SetSize(usedWidth, height)
         self.horizontalBox:SetHeight(height)
+        self:SetScrollAnchors()
     end,
 
     ParentChild = function(self, child, parent)
