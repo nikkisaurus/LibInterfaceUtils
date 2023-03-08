@@ -23,6 +23,16 @@ local function Resetter(_, self)
 end
 
 local ContainerMethods = {
+    AddChild = function(self, object)
+        local parent = object:GetUserData("parent")
+        if parent then
+            parent:ReleaseChild(object)
+        end
+        tinsert(self.children, object)
+        object:SetUserData("parent", self)
+        self:DoLayout()
+    end,
+
     DoLayout = function(self)
         self:layoutFunc()
         self:Fire("OnLayoutFinished")
@@ -34,6 +44,21 @@ local ContainerMethods = {
         object:SetUserData("parent", self)
 
         return object
+    end,
+
+    ReleaseChild = function(self, object)
+        local remove
+        for id, child in ipairs(self.children) do
+            if child == object then
+                remove = id
+                break
+            end
+        end
+
+        print(remove)
+
+        tremove(self.children, remove)
+        self:DoLayout()
     end,
 
     ReleaseChildren = function(self)
@@ -85,13 +110,7 @@ local ObjectMethods = {
 
         local parent = self:GetUserData("parent")
         if parent then
-            for id, child in ipairs(parent.children) do
-                if child == self then
-                    tremove(parent.children, id)
-                    parent:DoLayout()
-                    break
-                end
-            end
+            parent:ReleaseChild(self)
         end
 
         self:Fire("OnRelease")

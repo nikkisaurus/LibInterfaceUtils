@@ -45,7 +45,28 @@ local templates = {
             bgColor = private.assets.colors.elvTransparent,
             padding = 4,
         },
-        flair = private.assets.colors.lightest,
+        scrollBars = {
+            vertical = {
+                track = {
+                    texture = private.assets.blankTexture,
+                    color = private.assets.colors.lightWhite,
+                },
+                background = {
+                    texture = false,
+                    color = private.assets.colors.lightWhite,
+                },
+            },
+            horizontal = {
+                track = {
+                    texture = private.assets.blankTexture,
+                    color = private.assets.colors.dimmedBlack,
+                },
+                background = {
+                    texture = false,
+                    color = private.assets.colors.dimmedBlack,
+                },
+            },
+        },
     },
     transparent = {
         frame = {
@@ -59,7 +80,28 @@ local templates = {
             bgColor = private.assets.colors.elvTransparent,
             padding = 4,
         },
-        flair = private.assets.colors.lightest,
+        scrollBars = {
+            vertical = {
+                track = {
+                    texture = private.assets.blankTexture,
+                    color = private.assets.colors.lightWhite,
+                },
+                background = {
+                    texture = false,
+                    color = private.assets.colors.dimmedBlack,
+                },
+            },
+            horizontal = {
+                track = {
+                    texture = private.assets.blankTexture,
+                    color = private.assets.colors.lightWhite,
+                },
+                background = {
+                    texture = false,
+                    color = private.assets.colors.dimmedBlack,
+                },
+            },
+        },
     },
 }
 
@@ -186,19 +228,19 @@ local methods = {
         private:SetBackdrop(self.statusBar, template.statusBar)
         private:SetBackdrop(self.titleBar, template.titleBar)
 
-        self.horizontalBar.Track.Thumb.Main:SetVertexColor(template.flair:GetRGBA())
-        self.horizontalBar.Back.Texture:SetVertexColor(template.flair:GetRGBA())
-        self.horizontalBar.Forward.Texture:SetVertexColor(template.flair:GetRGBA())
+        self.verticalBar.Track.Thumb.Main:SetTexture(template.scrollBars.vertical.track.texture)
+        self.verticalBar.Track.Thumb.Main:SetVertexColor(template.scrollBars.vertical.track.color:GetRGBA())
+        self.verticalBar.Back.Texture:SetVertexColor(template.scrollBars.vertical.track.color:GetRGBA())
+        self.verticalBar.Forward.Texture:SetVertexColor(template.scrollBars.vertical.track.color:GetRGBA())
+        self.verticalBar.Background.Main:SetTexture(template.scrollBars.vertical.background.texture)
+        self.verticalBar.Background.Main:SetVertexColor(template.scrollBars.vertical.background.color:GetRGBA())
 
-        self.verticalBar.Track.Thumb.Main:SetVertexColor(template.flair:GetRGBA())
-        self.verticalBar.Back.Texture:SetVertexColor(template.flair:GetRGBA())
-        self.verticalBar.Forward.Texture:SetVertexColor(template.flair:GetRGBA())
-
-        self.titleBar.close:GetNormalTexture():SetVertexColor(template.flair:GetRGBA())
-        self.titleBar.close:GetHighlightTexture():SetVertexColor(private.assets.colors.dimmedWhite:GetRGBA())
-
-        -- self.horizontalBar.Background.Main:SetColorTexture(template.scrollBars.horizontal.bgColor:GetRGBA())
-        -- self.verticalBar.Background.Main:SetColorTexture(template.scrollBars.vertical.bgColor:GetRGBA())
+        self.horizontalBar.Track.Thumb.Main:SetTexture(template.scrollBars.horizontal.track.texture)
+        self.horizontalBar.Track.Thumb.Main:SetVertexColor(template.scrollBars.horizontal.track.color:GetRGBA())
+        self.horizontalBar.Back.Texture:SetVertexColor(template.scrollBars.horizontal.track.color:GetRGBA())
+        self.horizontalBar.Forward.Texture:SetVertexColor(template.scrollBars.horizontal.track.color:GetRGBA())
+        self.horizontalBar.Background.Main:SetTexture(template.scrollBars.horizontal.background.texture)
+        self.horizontalBar.Background.Main:SetVertexColor(template.scrollBars.horizontal.background.color:GetRGBA())
 
         self:SetUserData("template", template)
         self:SetAnchors()

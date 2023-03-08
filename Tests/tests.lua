@@ -47,10 +47,19 @@ function lib:CreateTestFrame()
     button:SetText(50)
     button:SetWidth(900)
 
+    local f = lib:New("Frame")
+    f:SetPoint("CENTER")
+    f:SetSize(500, 500)
+
     local tex2 = frame:New("Texture")
     tex2:SetAtlas("CreditsScreen-Keyart-9")
     tex2:SetFullWidth(true)
     tex2:SetFullHeight(true)
+    tex2:SetPoint("CENTER")
+
+    C_Timer.After(10, function()
+        f:AddChild(tex2)
+    end)
 
     -- button:SetParent(tex2) -- Do not do this; should be added to a container
     -- button:SetPoint("CENTER", tex2, "CENTER") -- Note that if it's not properly parented, scrollboxes won't take this into account
