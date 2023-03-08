@@ -17,17 +17,17 @@ function lib:CreateTestFrame()
     frame:SetStatus("Loading...")
     frame:SetSpacing(5, 5)
 
-    local group = frame:New("Group")
+    local group = frame:New("CollapsibleGroup")
     -- group:SetLayout("List")
     group:SetFullWidth(true)
     group:SetLabel("Group")
     -- group:SetLabelFont(GameFontNormalHuge, CreateColor(0, 1, 0, 1))
     -- group:SetLabelFont(GameFontNormalHuge)
-    group:EnableBackdrop(true)
+    -- group:EnableHeaderBackdrop(true, { bgEnabled = false })
+    group:EnableBackdrop(true, { bgEnabled = true })
     -- group:SetBackdrop({
-    --     bgEnabled = false,
     --     -- bgEnabled = true,
-    --     -- bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom()),
+    --     bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom()),
     --     -- bordersEnabled = true,
     --     -- bordersColor = CreateColor(fastrandom(), fastrandom(), fastrandom()),
     -- })
@@ -65,7 +65,7 @@ function lib:CreateTestFrame()
         texOverlay:Release()
     end)
 
-    local button = group:New("Button")
+    local button = frame:New("Button")
     -- local button = lib:New("Button")
     button:SetText(50)
     -- button:SetWidth(900)
