@@ -4,6 +4,7 @@
     <Script file="Layouts.lua"/>
     <Script file="Registry.lua"/>
     <Script file="Containers/Frame.lua"/>
+    <Script file="Containers/Group.lua"/>
     <Script file="Widgets/Button.lua"/>
     <Script file="Widgets/Divider.lua"/>
     <Include file="Widgets/Scrollbar.xml"/>

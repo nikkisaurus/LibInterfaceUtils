@@ -10,6 +10,7 @@ function private.Fill(self)
         return
     end
 
+    self:ParentChild(child)
     child:ClearAllPoints()
     self:Fill(child)
 end
@@ -49,7 +50,7 @@ function private.Flow(self)
             usedHeight = usedHeight + rowHeight - yOffset + spacingV
             child:SetPoint("LEFT", rowAnchor, "LEFT", xOffset, 0)
             child:SetPoint("TOP", 0, -usedHeight)
-            usedWidth = childWidth
+            usedWidth = isFullWidth and availableWidth or childWidth
             rowHeight = childHeight
             rowAnchor = child
         else
@@ -64,7 +65,7 @@ function private.Flow(self)
             self:FillX(child)
         end
 
-        if child:GetFullHeight() then
+        if child:GetFullHeight() and self.widget.type ~= "Group" then
             usedWidth = usedWidth + xOffsets
             usedHeight = usedHeight + rowHeight
 
@@ -127,7 +128,7 @@ function private.List(self)
             self:FillX(child)
         end
 
-        if child:GetFullHeight() then
+        if child:GetFullHeight() and self.widget.type ~= "Group" then
             if usedHeight < availableHeight then
                 if not height then
                     child:SetUserData("height", rawChildHeight)

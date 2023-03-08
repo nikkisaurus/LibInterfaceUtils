@@ -35,6 +35,11 @@ local ContainerMethods = {
 
     DoLayout = function(self)
         self:layoutFunc()
+        for _, child in ipairs(self.children) do
+            if child.DoLayout then
+                child:DoLayout()
+            end
+        end
         self:Fire("OnLayoutFinished")
     end,
 
@@ -72,7 +77,7 @@ local ContainerMethods = {
         self.layoutRef = customFunc and "custom" or layout or "Flow"
     end,
 
-    -- Required container methods (relies on protected frames): Fill, FillX, FillY, GetAvailableWidth, MarkDirty, ParentChild
+    -- Required container methods (relies on protected frames): Fill, FillX, FillY, GetAvailableHeight, GetAvailableWidth, MarkDirty, ParentChild
 }
 
 local ObjectMethods = {

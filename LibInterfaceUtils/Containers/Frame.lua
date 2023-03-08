@@ -442,7 +442,7 @@ local function creationFunc()
         type = objectType,
         version = version,
         forbidden = forbidden,
-        callbackRegistry = registry,
+        registry = registry,
     }
 
     frame.titleBar.close.widget = widget

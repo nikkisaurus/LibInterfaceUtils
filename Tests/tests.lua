@@ -5,6 +5,10 @@ if not lib then
 end
 
 function lib:CreateTestFrame()
+    -- local loner = self:New("Button")
+    -- loner:SetPoint("TOP")
+    -- loner:SetFullWidth(true)
+
     local frame = self:New("Frame")
     frame:SetLayout("List")
     frame:SetPoint("CENTER")
@@ -13,8 +17,23 @@ function lib:CreateTestFrame()
     frame:SetStatus("Loading...")
     frame:SetSpacing(5, 5)
 
+    local group = frame:New("Group")
+    -- group:SetLayout("List")
+    group:SetFullWidth(true)
+    group:SetLabel("Group")
+    -- group:SetLabelFont(GameFontNormalHuge, CreateColor(0, 1, 0, 1))
+    -- group:SetLabelFont(GameFontNormalHuge)
+    group:EnableBackdrop(true)
+    -- group:SetBackdrop({
+    --     bgEnabled = false,
+    --     -- bgEnabled = true,
+    --     -- bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom()),
+    --     -- bordersEnabled = true,
+    --     -- bordersColor = CreateColor(fastrandom(), fastrandom(), fastrandom()),
+    -- })
+
     for i = 1, 49 do
-        local button = frame:New("Button")
+        local button = group:New("Button")
         button:SetText(i)
         button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom()) })
         button:SetCallback("OnClick", function()
@@ -22,13 +41,17 @@ function lib:CreateTestFrame()
         end)
 
         if i == 10 then
-            local divider = frame:New("Divider")
+            local divider = group:New("Divider")
             divider:SetHeight(10)
             divider:SetColorTexture(1, 0, 0, 1)
         end
     end
 
-    local tex = frame:New("Texture")
+    local divider = group:New("Divider")
+    divider:SetHeight(10)
+    divider:SetColorTexture(0, 1, 0, 1)
+
+    local tex = group:New("Texture")
     tex:SetAtlas("raceicon128-bloodelf-female")
 
     local texOverlay = lib:New("Texture")
@@ -42,14 +65,17 @@ function lib:CreateTestFrame()
         texOverlay:Release()
     end)
 
-    local button = frame:New("Button")
+    local button = group:New("Button")
     -- local button = lib:New("Button")
     button:SetText(50)
-    button:SetWidth(900)
+    -- button:SetWidth(900)
+    button:SetFullWidth(true)
+    -- button:SetFillWidth(true)
+    -- button:SetFullHeight(true)
 
-    local f = lib:New("Frame")
-    f:SetPoint("CENTER")
-    f:SetSize(500, 500)
+    -- local f = lib:New("Frame")
+    -- f:SetPoint("CENTER")
+    -- f:SetSize(500, 500)
 
     local tex2 = frame:New("Texture")
     tex2:SetAtlas("CreditsScreen-Keyart-9")
@@ -58,14 +84,11 @@ function lib:CreateTestFrame()
     tex2:SetPoint("CENTER")
 
     C_Timer.After(10, function()
-        f:AddChild(tex2)
+        -- f:AddChild(tex2)
     end)
 
     -- button:SetParent(tex2) -- Do not do this; should be added to a container
     -- button:SetPoint("CENTER", tex2, "CENTER") -- Note that if it's not properly parented, scrollboxes won't take this into account
-    -- button:SetFillWidth(true)
-    -- button:SetFullWidth(true)
-    -- button:SetFullHeight(true)
 
     frame:DoLayout()
 end

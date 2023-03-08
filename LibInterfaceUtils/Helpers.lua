@@ -159,3 +159,8 @@ function private:SetFont(fontString, font)
         fontString:SetTextColor(font.color:GetRGBA())
     end
 end
+
+function private:strcheck(str)
+    -- Validates string exists and is not empty
+    return str and str ~= ""
+end
