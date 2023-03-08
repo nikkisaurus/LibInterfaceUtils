@@ -8,6 +8,7 @@
     <Script file="Containers/Group.lua"/>
     <Script file="Widgets/Button.lua"/>
     <Script file="Widgets/Divider.lua"/>
+    <Script file="Widgets/Label.lua"/>
     <Include file="Widgets/Scrollbar.xml"/>
     <Script file="Widgets/Texture.lua"/>
 </Ui>

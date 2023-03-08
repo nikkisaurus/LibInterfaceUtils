@@ -17,6 +17,21 @@ function lib:CreateTestFrame()
     frame:SetStatus("Loading...")
     frame:SetSpacing(5, 5)
 
+    for k, v in pairs({ "TOP", "TOPLEFT", "TOPRIGHT", "LEFT", "RIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "BOTTOM" }) do
+        local label = frame:New("Label")
+        label:SetFullWidth(true)
+        label:SetText("Ad proident anim mollit excepteur ex deserunt non amet sit quis proident esse excepteur pariatur. Ea reprehenderit anim adipisicing irure exercitation. Incididunt in deserunt ipsum in sit do elit amet ad. Culpa pariatur aute cupidatat eiusmod cillum sit minim sint nostrud. Consequat labore exercitation ut elit aliqua minim. Amet eiusmod sint magna ex qui irure aute.")
+        label:SetIcon(134400, nil, nil, v)
+    end
+
+    for k, v in pairs({ "TOP", "TOPLEFT", "TOPRIGHT", "LEFT", "RIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "BOTTOM" }) do
+        local label = frame:New("Label")
+        label:SetFullWidth(true)
+        label:SetWordWrap(false)
+        label:SetText("Ad proident anim mollit excepteur ex deserunt non amet sit quis proident esse excepteur pariatur. Ea reprehenderit anim adipisicing irure exercitation. Incididunt in deserunt ipsum in sit do elit amet ad. Culpa pariatur aute cupidatat eiusmod cillum sit minim sint nostrud. Consequat labore exercitation ut elit aliqua minim. Amet eiusmod sint magna ex qui irure aute.")
+        label:SetIcon(134400, nil, nil, v)
+    end
+
     local group = frame:New("CollapsibleGroup")
     -- group:SetLayout("List")
     group:SetFullWidth(true)
