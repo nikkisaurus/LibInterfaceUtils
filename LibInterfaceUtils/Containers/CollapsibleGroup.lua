@@ -37,7 +37,7 @@ local childScripts = {
 
 local methods = {
     OnAcquire = function(self)
-        self:SetUserData("collapsed", false)
+        self:SetUserData("collapsed", true)
         self:SetSize(500, 300)
         self:EnableHeaderBackdrop(true)
         self:SetBackdrop()
@@ -88,11 +88,7 @@ local methods = {
     end,
 
     MarkDirty = function(self, _, height)
-        if self:GetUserData("collapsed") then
-            self:SetHeight(self.header:GetHeight())
-        else
-            self:SetHeight(height + self.header:GetHeight() + 9)
-        end
+        self:SetHeight(height + self.header:GetHeight() + (self:GetUserData("collapsed") and 0 or 9))
     end,
 
     ParentChild = function(self, child, parent)

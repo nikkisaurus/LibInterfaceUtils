@@ -291,10 +291,9 @@ local methods = {
         return self.verticalBox:GetWidth()
     end,
 
-    MarkDirty = function(self, usedWidth, height)
-        self.content:SetSize(usedWidth, height)
-        self.horizontalBox:SetHeight(height)
-        self:SetScrollAnchors()
+    MarkDirty = function(self, usedWidth, usedHeight)
+        self.content:SetSize(usedWidth, usedHeight)
+        self.horizontalBox:SetHeight(usedHeight)
     end,
 
     ParentChild = function(self, child, parent)

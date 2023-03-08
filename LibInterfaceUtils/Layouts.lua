@@ -22,6 +22,11 @@ function private.Flow(self)
     local spacingH = self:GetUserData("spacingH") or 0
     local spacingV = self:GetUserData("spacingV") or 0
 
+    if self:GetUserData("collapsed") then
+        self:MarkDirty(nil, usedHeight)
+        return
+    end
+
     local rowAnchor
     for id, child in ipairs(self.children) do
         -- Restore default height for fullHeight children so it doesn't get exponentially bigger, resulting in a scrollbar
@@ -94,6 +99,11 @@ function private.List(self)
     local usedWidth, usedHeight, xOffsets = 0, 0, 0
     local availableHeight = self:GetAvailableHeight()
     local spacingV = self:GetUserData("spacingV") or 0
+
+    if self:GetUserData("collapsed") then
+        self:MarkDirty(nil, usedHeight)
+        return
+    end
 
     for id, child in ipairs(self.children) do
         -- Restore default height for fullHeight children so it doesn't get exponentially bigger, resulting in a scrollbar
