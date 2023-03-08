@@ -193,7 +193,7 @@ local scripts = {
         local w, h = self:GetSize()
         local width = self:GetUserData("width")
         local height = self:GetUserData("height")
-        if not width or not height or private:round(w) ~= private:round(width) or private:round(h) ~= private:round(height) then
+        if not width or not height or w ~= width or h ~= height then
             self:SetUserData("width", w)
             self:SetUserData("height", h)
             self:DoLayout()
@@ -319,6 +319,7 @@ local methods = {
     end,
 
     SetScrollAnchors = function(self)
+        local content = self.content
         local horizontalBar = self.horizontalBar
         local verticalBar = self.verticalBar
         local verticalBox = self.verticalBox
@@ -327,7 +328,7 @@ local methods = {
         self.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
         verticalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
 
-        if horizontalBar:HasScrollableExtent() then
+        if content:GetWidth() > verticalBox:GetWidth() then
             horizontalBar:Show()
             verticalBox:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 5)
             verticalBar:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 2)
@@ -337,7 +338,7 @@ local methods = {
             verticalBar:SetPoint("BOTTOM", statusBar, "TOP", 0, 2)
         end
 
-        if verticalBar:HasScrollableExtent() then
+        if content:GetHeight() > verticalBox:GetHeight() then
             verticalBar:Show()
             verticalBox:SetPoint("RIGHT", verticalBar, "LEFT", -5, 0)
         else
