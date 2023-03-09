@@ -117,7 +117,7 @@ local defaultBackdrop = {
 
     highlightEnabled = false,
     highlightTexture = private.assets.blankTexture,
-    highlightColor = private.assets.colors.light,
+    highlightColor = private.assets.colors.normal,
     highlightBlendMode = "ADD",
 }
 

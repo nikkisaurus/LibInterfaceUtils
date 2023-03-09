@@ -10,7 +10,9 @@ local defaults = {
     backdrop = {
         bgEnabled = false,
     },
-    headerBackdrop = {},
+    headerBackdrop = {
+        highlightEnabled = true,
+    },
 }
 
 local registry = {
