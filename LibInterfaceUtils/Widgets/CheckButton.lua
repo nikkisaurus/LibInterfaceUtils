@@ -44,8 +44,8 @@ local methods = {
         self:SetJustifyH("LEFT")
         self:SetJustifyV("MIDDLE")
         self:SetWordWrap(true)
-        self:SetAutoWidth(true)
         self:SetCheckAlignment("TOPLEFT")
+        self:SetAutoWidth(true)
         self:SetStyle()
         self:SetText()
         self:SetChecked()
@@ -91,6 +91,7 @@ local methods = {
 
     SetAutoWidth = function(self, isAutoWidth)
         self:SetUserData("autoWidth", isAutoWidth)
+        self:SetAnchors()
     end,
 
     SetCheckAlignment = function(self, point)

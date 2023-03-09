@@ -28,20 +28,7 @@ local childScripts = {
     header = {
         OnClick = function(self)
             local frame = self.widget.object
-            local collapsed = not frame:GetUserData("collapsed")
-            frame:SetUserData("collapsed", collapsed)
-            if collapsed then
-                frame.container:Hide()
-            else
-                frame.container:Show()
-            end
-
-            frame:DoLayout()
-
-            local parent = frame:GetUserData("parent")
-            if parent then
-                parent:DoLayout()
-            end
+            frame:Collapse(not frame:GetUserData("collapsed"))
         end,
     },
 }
@@ -53,6 +40,22 @@ local methods = {
         self:SetBackdrop()
         self:SetLabel()
         self:SetLabelFont(GameFontNormal)
+    end,
+
+    Collapse = function(self, collapsed)
+        self:SetUserData("collapsed", collapsed)
+        if collapsed then
+            self.container:Hide()
+        else
+            self.container:Show()
+        end
+
+        self:DoLayout()
+
+        local parent = self:GetUserData("parent")
+        if parent then
+            parent:DoLayout()
+        end
     end,
 
     EnableBackdrop = function(self, isEnabled, backdrop)

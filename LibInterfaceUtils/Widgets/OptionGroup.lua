@@ -36,6 +36,10 @@ local methods = {
             for id, option in ipairs(info) do
                 local checkButton = self:New("CheckButton")
                 options[id] = checkButton
+                if option.width then
+                    checkButton:SetAutoWidth(false)
+                    checkButton:SetWidth(option.width)
+                end
                 checkButton:SetFullWidth(option.fullWidth)
                 checkButton:SetCheckAlignment("LEFT")
                 checkButton:SetLabel(option.label)

@@ -117,14 +117,12 @@
         </Frames>
         <Scripts>
             <OnLoad>
-                local background = self:CreateTexture(nil, "BACKGROUND")
-                background:SetPoint("TOPLEFT", self.Back, "TOPRIGHT", 4, -4)
-                background:SetPoint("BOTTOMRIGHT", self.Forward, "BOTTOMLEFT", -4, 4)
-                background:SetColorTexture(0.03, 0.03, 0.03, 1)
-                self.Background.Main = background
+                self.Background.Main:SetPoint("TOPLEFT", self.Back, "TOPRIGHT", 4, -4)
+                self.Background.Main:SetPoint("BOTTOMRIGHT", self.Forward, "BOTTOMLEFT", -4, 4)
+                self.Background.Main:SetColorTexture(0.03, 0.03, 0.03, 1)
 
-                self.Track:SetPoint("TOPLEFT", background, "TOPRIGHT", -1, -1)
-                self.Track:SetPoint("BOTTOMRIGHT", background, "BOTTOMLEFT", 1, 1)
+                self.Track:SetPoint("TOPLEFT", self.Background.Main, "TOPRIGHT", -1, -1)
+                self.Track:SetPoint("BOTTOMRIGHT", self.Background.Main, "BOTTOMLEFT", 1, 1)
                 self.Track.Thumb:SetPoint("TOPLEFT")
                 self.Track.Thumb:SetPoint("BOTTOMLEFT")
                 
@@ -138,7 +136,13 @@
     <EventFrame name="LibInterfaceUtilsVerticalScrollBar" inherits="VerticalScrollBarTemplate" virtual="true">
         <Size x="16" y="560"/>
         <Frames>
-            <Frame parentKey="Background" useParentLevel="true" setAllPoints="true"/>
+            <Frame parentKey="Background" useParentLevel="true">
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <Texture parentKey="Main"/>
+                    </Layer>
+                </Layers>
+            </Frame>
             <Frame parentKey="Track" enableMouse="true">
                 <Frames>
                     <EventButton parentKey="Thumb" inherits="WowTrimScrollBarThumbScripts" enableMouse="true">
@@ -242,14 +246,12 @@
         </Frames>
         <Scripts>
             <OnShow>
-                local background = self:CreateTexture(nil, "BACKGROUND")
-                background:SetPoint("TOPLEFT", self.Back, "BOTTOMLEFT", 4, -4)
-                background:SetPoint("BOTTOMRIGHT", self.Forward, "TOPRIGHT", -4, 4)
-                background:SetColorTexture(0.03, 0.03, 0.03, 1)
-                self.Background.Main = background
-
-                self.Track:SetPoint("TOPLEFT", background, "TOPLEFT", 1, -1)
-                self.Track:SetPoint("BOTTOMRIGHT", background, "BOTTOMRIGHT", -1, 1)
+                self.Background.Main:SetPoint("TOPLEFT", self.Back, "BOTTOMLEFT", 4, -4)
+                self.Background.Main:SetPoint("BOTTOMRIGHT", self.Forward, "TOPRIGHT", -4, 4)
+                self.Background.Main:SetColorTexture(0.03, 0.03, 0.03, 1)
+                
+                self.Track:SetPoint("TOPLEFT", self.Background.Main, "TOPLEFT", 1, -1)
+                self.Track:SetPoint("BOTTOMRIGHT", self.Background.Main, "BOTTOMRIGHT", -1, 1)
                 self.Track.Thumb:SetPoint("TOPLEFT")
                 self.Track.Thumb:SetPoint("TOPRIGHT")
                 

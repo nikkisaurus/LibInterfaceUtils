@@ -113,6 +113,30 @@ function lib:CreateTestFrame()
         },
     })
 
+    local bunchaOptions = frame:New("CollapsibleGroup")
+    bunchaOptions:SetFullWidth(true)
+    bunchaOptions:SetLabel("Select multiple options")
+    bunchaOptions:EnableBackdrop(true, { bgEnabled = true })
+
+    local checkGroup3 = bunchaOptions:New("OptionGroup")
+    checkGroup3:SetFullWidth(true)
+    checkGroup3:SetSpacing(5, 5)
+    checkGroup3:EnableBackdrop()
+    local info = {}
+    for i = 1, 50 do
+        tinsert(info, {
+
+            label = "Option " .. i,
+            -- fullWidth = true,
+            width = 150,
+            func = function()
+                print("option ", i)
+                print(checkGroup3:GetSelected())
+            end,
+        })
+    end
+    checkGroup3:SetInfo(info)
+
     local group = frame:New("CollapsibleGroup")
     -- group:SetLayout("List")
     group:SetFullWidth(true)
@@ -150,8 +174,13 @@ function lib:CreateTestFrame()
         label:SetIcon(134400, nil, nil, v)
     end
 
+    local buttongroup = frame:New("CollapsibleGroup")
+    buttongroup:SetFullWidth(true)
+    buttongroup:SetLabel("Yay colors")
+    buttongroup:Collapse(true)
+
     for i = 1, 49 do
-        local button = frame:New("Button")
+        local button = buttongroup:New("Button")
         button:SetText(i)
         button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom()) })
         button:SetCallback("OnClick", function()
@@ -159,7 +188,7 @@ function lib:CreateTestFrame()
         end)
 
         if i == 10 then
-            local divider = frame:New("Divider")
+            local divider = buttongroup:New("Divider")
             divider:SetHeight(10)
             divider:SetColorTexture(1, 0, 0, 1)
         end
@@ -213,5 +242,6 @@ end
 
 SLASH_LIBINTERFACEUTILS1 = "/liu"
 SlashCmdList["LIBINTERFACEUTILS"] = function()
+    print("New")
     lib:CreateTestFrame()
 end

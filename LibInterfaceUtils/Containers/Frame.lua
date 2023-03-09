@@ -84,7 +84,7 @@ local templates = {
             vertical = {
                 track = {
                     texture = private.assets.blankTexture,
-                    color = private.assets.colors.dimmedWhite,
+                    color = private.assets.colors.bright,
                 },
                 background = {
                     enabled = false,
@@ -93,7 +93,7 @@ local templates = {
             horizontal = {
                 track = {
                     texture = private.assets.blankTexture,
-                    color = private.assets.colors.dimmedWhite,
+                    color = private.assets.colors.bright,
                 },
                 background = {
                     enabled = false,
@@ -232,12 +232,10 @@ local methods = {
         if template.scrollBars.vertical.background.enabled then
             self.verticalBar.Background.Main:SetTexture(template.scrollBars.vertical.background.texture)
             self.verticalBar.Background.Main:SetVertexColor(template.scrollBars.vertical.background.color:GetRGBA())
-            self.verticalBar.Background:Show()
+            self.verticalBar.Background.Main:Show()
         else
-            self.verticalBar.Background:Hide()
+            self.verticalBar.Background.Main:Hide()
         end
-
-        FUCK = self.verticalBar.Background.Main
 
         self.horizontalBar.Track.Thumb.Main:SetTexture(template.scrollBars.horizontal.track.texture)
         self.horizontalBar.Track.Thumb.Main:SetVertexColor(template.scrollBars.horizontal.track.color:GetRGBA())
@@ -401,7 +399,6 @@ local function creationFunc()
     frame.horizontalBar = CreateFrame("EventFrame", nil, frame, "LibInterfaceUtilsHorizontalScrollBar")
     frame.horizontalBar:SetPoint("BOTTOMLEFT", frame.statusBar, "TOPLEFT", 2, 2)
     frame.horizontalBar:SetPoint("BOTTOMRIGHT", frame.statusBar, "TOPRIGHT", -2, 2)
-    frame.horizontalBar.Track.Thumb.Middle:SetTexture("Interface/buttons/white8x8")
 
     frame.horizontalBox = CreateFrame("Frame", nil, frame, "WowScrollBox")
     frame.horizontalBox:SetPoint("TOP", frame.titleBar, "BOTTOM", 0, -5)

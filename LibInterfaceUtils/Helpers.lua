@@ -14,6 +14,7 @@ private.assets = {
         light = CreateColor(0.2, 0.2, 0.2, 1),
         lighter = CreateColor(0.25, 0.25, 0.25, 1),
         lightest = CreateColor(0.3, 0.3, 0.3, 1),
+        bright = CreateColor(0.75, 0.75, 0.75, 1),
 
         dimmedBlack = CreateColor(0, 0, 0, 0.25),
         lightBlack = CreateColor(0, 0, 0, 0.5),
