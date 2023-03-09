@@ -32,16 +32,29 @@ local maps = {
     },
 }
 
+local registry = {
+    OnEnter = true,
+    OnHide = true,
+    OnLeave = true,
+    OnMouseDown = true,
+    OnMouseUp = true,
+    OnShow = true,
+}
+
 local methods = {
     OnAcquire = function(self)
         self:SetSize(100, 100)
         self:SetTexture()
-        self:EnableMouse()
+        self:SetInteractible()
     end,
 
     SetColorTexture = function(self, ...)
         self:SetTexture([[INTERFACE\BUTTONS\WHITE8X8]])
         self:SetVertexColor(...)
+    end,
+
+    SetInteractible = function(self, isInteractible)
+        self:EnableMouse(isInteractible or false)
     end,
 }
 
@@ -55,6 +68,7 @@ local function creationFunc()
         object = frame,
         type = objectType,
         version = version,
+        registry = registry,
     }
 
     private:Map(frame, texture, maps)

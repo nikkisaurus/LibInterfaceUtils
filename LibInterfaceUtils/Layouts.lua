@@ -16,7 +16,7 @@ function private.Fill(self)
 end
 
 function private.Flow(self)
-    local usedWidth, usedHeight, rowHeight, xOffsets = 0, 0, 0, 0
+    local usedWidth, usedHeight, maxWidth, rowHeight, xOffsets = 0, 0, 0, 0, 0
     local availableWidth = self:GetAvailableWidth()
     local availableHeight = self:GetAvailableHeight() - 2
     local spacingH = self:GetUserData("spacingH") or 0
@@ -44,11 +44,12 @@ function private.Flow(self)
         self:ParentChild(child)
         child:ClearAllPoints()
 
-        local isFullWidth = child:GetFullWidth() or child.widget.type == "Divider"
+        local isFullWidth = child:GetFullWidth() or (child.widget.type == "Divider" or child.widget.type == "Header")
 
         if id == 1 then
             child:SetPoint("TOPLEFT", xOffset, yOffset)
             usedWidth = childWidth
+            maxWidth = childWidth
             rowHeight = childHeight
             rowAnchor = child
         elseif pendingWidth > availableWidth or isFullWidth then
@@ -56,11 +57,13 @@ function private.Flow(self)
             child:SetPoint("LEFT", rowAnchor, "LEFT", xOffset, 0)
             child:SetPoint("TOP", 0, -usedHeight)
             usedWidth = isFullWidth and availableWidth or childWidth
+            maxWidth = max(usedWidth, maxWidth)
             rowHeight = childHeight
             rowAnchor = child
         else
             child:SetPoint("TOPLEFT", self.children[id - 1], "TOPRIGHT", xOffset + spacingH, yOffset)
             usedWidth = pendingWidth + spacingH
+            maxWidth = max(usedWidth, maxWidth)
             rowHeight = max(rowHeight, childHeight)
         end
 
@@ -73,6 +76,7 @@ function private.Flow(self)
         if child:GetFullHeight() and self.widget.type ~= "Group" then
             usedWidth = usedWidth + xOffsets
             usedHeight = usedHeight + rowHeight
+            maxWidth = max(usedWidth, maxWidth)
 
             if usedHeight < availableHeight then
                 if not height then
@@ -83,16 +87,21 @@ function private.Flow(self)
                 usedHeight = usedHeight + extra
             end
 
-            self:MarkDirty(usedWidth, usedHeight)
+            self:MarkDirty(maxWidth, usedHeight)
 
             return
+        end
+
+        if child.DoLayout then
+            child:DoLayout()
         end
     end
 
     usedWidth = usedWidth + xOffsets
     usedHeight = usedHeight + rowHeight
+    maxWidth = max(usedWidth, maxWidth)
 
-    self:MarkDirty(usedWidth, usedHeight)
+    self:MarkDirty(maxWidth, usedHeight)
 end
 
 function private.List(self)
@@ -120,7 +129,7 @@ function private.List(self)
         self:ParentChild(child)
         child:ClearAllPoints()
 
-        local isFullWidth = child:GetFullWidth() or child.widget.type == "Divider"
+        local isFullWidth = child:GetFullWidth() or (child.widget.type == "Divider" or child.widget.type == "Header")
 
         if id == 1 then
             child:SetPoint("TOPLEFT", xOffset, yOffset)
@@ -148,6 +157,10 @@ function private.List(self)
                 usedHeight = usedHeight + extra
             end
             break
+        end
+
+        if child.DoLayout then
+            child:DoLayout()
         end
     end
 

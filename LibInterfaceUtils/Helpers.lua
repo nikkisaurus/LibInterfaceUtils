@@ -39,6 +39,17 @@ private.assets = {
     },
 }
 
+private.points = {
+    TOP = { "BOTTOM", 0, -1, true },
+    TOPLEFT = { "TOPRIGHT", 1, 0, false },
+    TOPRIGHT = { "TOPLEFT", -1, 0, false },
+    LEFT = { "RIGHT", 1, 0, false },
+    RIGHT = { "LEFT", -1, 0, false },
+    BOTTOMLEFT = { "BOTTOMRIGHT", 1, 0, false },
+    BOTTOMRIGHT = { "BOTTOMLEFT", -1, 0, false },
+    BOTTOM = { "TOP", 0, 1, true },
+}
+
 function private:CreateTextures(parent)
     parent.bg = parent:CreateTexture("$parentBackground", "BACKGROUND")
     parent.bg:SetAllPoints(parent)

@@ -13,6 +13,17 @@ local defaults = {
     headerBackdrop = {},
 }
 
+local registry = {
+    OnEnter = true,
+    OnHide = true,
+    OnLeave = true,
+    OnMouseDown = true,
+    OnMouseUp = true,
+    OnReceiveDrag = true,
+    OnShow = true,
+    OnSizeChanged = true,
+}
+
 local childScripts = {
     header = {
         OnClick = function(self)
@@ -37,7 +48,6 @@ local childScripts = {
 
 local methods = {
     OnAcquire = function(self)
-        self:SetUserData("collapsed", true)
         self:SetSize(500, 300)
         self:EnableHeaderBackdrop(true)
         self:SetBackdrop()
@@ -144,6 +154,7 @@ local function creationFunc()
         object = frame,
         type = objectType,
         version = version,
+        registry = registry,
     }
 
     frame.header.widget = widget

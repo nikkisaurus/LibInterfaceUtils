@@ -293,7 +293,7 @@ local methods = {
 
     MarkDirty = function(self, usedWidth, usedHeight)
         self.content:SetSize(usedWidth, usedHeight)
-        self.horizontalBox:SetHeight(usedHeight)
+        self.horizontalBox:SetSize(usedWidth, usedHeight)
     end,
 
     ParentChild = function(self, child, parent)

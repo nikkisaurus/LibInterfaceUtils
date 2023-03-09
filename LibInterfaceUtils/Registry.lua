@@ -47,6 +47,7 @@ local ContainerMethods = {
         local object = lib:New(objectType)
         tinsert(self.children, object)
         object:SetUserData("parent", self)
+        self:DoLayout()
 
         return object
     end,

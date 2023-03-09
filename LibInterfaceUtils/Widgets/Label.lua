@@ -8,21 +8,20 @@ end
 
 local maps = {
     methods = {
+        EnableMouse = true,
         SetJustifyH = true,
         SetJustifyV = true,
         SetWordWrap = true,
     },
 }
 
-local points = {
-    TOP = { "BOTTOM", 0, -1, true },
-    TOPLEFT = { "TOPRIGHT", 1, 0, false },
-    TOPRIGHT = { "TOPLEFT", -1, 0, false },
-    LEFT = { "RIGHT", 1, 0, false },
-    RIGHT = { "LEFT", -1, 0, false },
-    BOTTOMLEFT = { "BOTTOMRIGHT", 1, 0, false },
-    BOTTOMRIGHT = { "BOTTOMLEFT", -1, 0, false },
-    BOTTOM = { "TOP", 0, 1, true },
+local registry = {
+    OnEnter = true,
+    OnHide = true,
+    OnLeave = true,
+    OnMouseDown = true,
+    OnMouseUp = true,
+    OnShow = true,
 }
 
 local scripts = {
@@ -40,6 +39,7 @@ local methods = {
         self:SetWordWrap(true)
         self:SetIcon()
         self:SetText()
+        self:SetInteractible()
     end,
 
     SetAnchors = function(self)
@@ -52,10 +52,10 @@ local methods = {
 
         if hasIcon then
             self.icon:SetPoint(iconPoint)
-            self.label:SetPoint(iconPoint, self.icon, points[iconPoint][1], points[iconPoint][2] * 5, points[iconPoint][3] * 5)
-            self.label:SetPoint(points[iconPoint][1], -(points[iconPoint][2] * 5), -(points[iconPoint][3] * 5))
+            self.label:SetPoint(iconPoint, self.icon, private.points[iconPoint][1], private.points[iconPoint][2] * 5, private.points[iconPoint][3] * 5)
+            self.label:SetPoint(private.points[iconPoint][1], -(private.points[iconPoint][2] * 5), -(private.points[iconPoint][3] * 5))
 
-            if points[iconPoint][3] ~= 0 then
+            if private.points[iconPoint][3] ~= 0 then
                 self.label:SetPoint("LEFT")
                 self.label:SetPoint("RIGHT")
                 self.label:SetWidth(self:GetWidth())
@@ -93,6 +93,10 @@ local methods = {
         self:SetAnchors()
     end,
 
+    SetInteractible = function(self, isInteractible)
+        self:EnableMouse(isInteractible or false)
+    end,
+
     SetText = function(self, text)
         self.label:SetText(text or "")
         self:SetAnchors()
@@ -114,6 +118,7 @@ local function creationFunc()
         object = frame,
         type = objectType,
         version = version,
+        registry = registry,
     }
 
     private:Map(frame, frame.label, maps)

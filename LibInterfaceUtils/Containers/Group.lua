@@ -13,6 +13,17 @@ local defaults = {
     },
 }
 
+local registry = {
+    OnEnter = true,
+    OnHide = true,
+    OnLeave = true,
+    OnMouseDown = true,
+    OnMouseUp = true,
+    OnReceiveDrag = true,
+    OnShow = true,
+    OnSizeChanged = true,
+}
+
 local methods = {
     OnAcquire = function(self)
         self:SetSize(500, 300)
@@ -107,6 +118,7 @@ local function creationFunc()
         object = frame,
         type = objectType,
         version = version,
+        registry = registry,
     }
 
     return private:RegisterContainer(widget, methods)

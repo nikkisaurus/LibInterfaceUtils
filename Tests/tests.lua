@@ -10,27 +10,15 @@ function lib:CreateTestFrame()
     -- loner:SetFullWidth(true)
 
     local frame = self:New("Frame")
-    frame:SetLayout("List")
+    -- frame:SetLayout("List")
     frame:SetPoint("CENTER")
     frame:SetSize(800, 600)
     frame:SetTitle("Test Frame")
     frame:SetStatus("Loading...")
     frame:SetSpacing(5, 5)
-
-    for k, v in pairs({ "TOP", "TOPLEFT", "TOPRIGHT", "LEFT", "RIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "BOTTOM" }) do
-        local label = frame:New("Label")
-        label:SetFullWidth(true)
-        label:SetText("Ad proident anim mollit excepteur ex deserunt non amet sit quis proident esse excepteur pariatur. Ea reprehenderit anim adipisicing irure exercitation. Incididunt in deserunt ipsum in sit do elit amet ad. Culpa pariatur aute cupidatat eiusmod cillum sit minim sint nostrud. Consequat labore exercitation ut elit aliqua minim. Amet eiusmod sint magna ex qui irure aute.")
-        label:SetIcon(134400, nil, nil, v)
-    end
-
-    for k, v in pairs({ "TOP", "TOPLEFT", "TOPRIGHT", "LEFT", "RIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "BOTTOM" }) do
-        local label = frame:New("Label")
-        label:SetFullWidth(true)
-        label:SetWordWrap(false)
-        label:SetText("Ad proident anim mollit excepteur ex deserunt non amet sit quis proident esse excepteur pariatur. Ea reprehenderit anim adipisicing irure exercitation. Incididunt in deserunt ipsum in sit do elit amet ad. Culpa pariatur aute cupidatat eiusmod cillum sit minim sint nostrud. Consequat labore exercitation ut elit aliqua minim. Amet eiusmod sint magna ex qui irure aute.")
-        label:SetIcon(134400, nil, nil, v)
-    end
+    local toggle = frame:New("CheckButton")
+    toggle:SetLabel("Click me eserunt ipsum in sit do elit amet ad. Culpa pariatur aute cupidatat eiusmod cillum sit minim sint nostrud")
+    -- toggle:SetFullWidth(true)
 
     local group = frame:New("CollapsibleGroup")
     -- group:SetLayout("List")
@@ -47,8 +35,30 @@ function lib:CreateTestFrame()
     --     -- bordersColor = CreateColor(fastrandom(), fastrandom(), fastrandom()),
     -- })
 
+    for k, v in pairs({ "TOP", "TOPLEFT", "TOPRIGHT", "LEFT", "RIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "BOTTOM" }) do
+        local label = group:New("Label")
+        label:SetFullWidth(true)
+        label:SetText("Ad proident anim mollit excepteur ex deserunt non amet sit quis proident esse excepteur pariatur. Ea reprehenderit anim adipisicing irure exercitation. Incididunt in deserunt ipsum in sit do elit amet ad. Culpa pariatur aute cupidatat eiusmod cillum sit minim sint nostrud. Consequat labore exercitation ut elit aliqua minim. Amet eiusmod sint magna ex qui irure aute.")
+        label:SetIcon(134400, nil, nil, v)
+        -- label:SetCallback("OnMouseDown", function()
+        --     print("Hi label")
+        -- end)
+    end
+
+    local header = group:New("Header")
+    header:SetText("WHAT happens if I make this a longer header in hopes that it would either wrap or see how the strikethrough works out?? I guess we'll see.")
+    -- header:SetStyle("STRIKETHROUGH")
+
+    for k, v in pairs({ "TOP", "TOPLEFT", "TOPRIGHT", "LEFT", "RIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "BOTTOM" }) do
+        local label = group:New("Label")
+        label:SetFullWidth(true)
+        label:SetWordWrap(false)
+        label:SetText("Ad proident anim mollit excepteur ex deserunt non amet sit quis proident esse excepteur pariatur. Ea reprehenderit anim adipisicing irure exercitation. Incididunt in deserunt ipsum in sit do elit amet ad. Culpa pariatur aute cupidatat eiusmod cillum sit minim sint nostrud. Consequat labore exercitation ut elit aliqua minim. Amet eiusmod sint magna ex qui irure aute.")
+        label:SetIcon(134400, nil, nil, v)
+    end
+
     for i = 1, 49 do
-        local button = group:New("Button")
+        local button = frame:New("Button")
         button:SetText(i)
         button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom()) })
         button:SetCallback("OnClick", function()
@@ -56,17 +66,17 @@ function lib:CreateTestFrame()
         end)
 
         if i == 10 then
-            local divider = group:New("Divider")
+            local divider = frame:New("Divider")
             divider:SetHeight(10)
             divider:SetColorTexture(1, 0, 0, 1)
         end
     end
 
-    local divider = group:New("Divider")
+    local divider = frame:New("Divider")
     divider:SetHeight(10)
     divider:SetColorTexture(0, 1, 0, 1)
 
-    local tex = group:New("Texture")
+    local tex = frame:New("Texture")
     tex:SetAtlas("raceicon128-bloodelf-female")
 
     local texOverlay = lib:New("Texture")
@@ -75,8 +85,8 @@ function lib:CreateTestFrame()
     texOverlay:SetAllPoints(tex)
     texOverlay:SetBlendMode("ADD")
 
-    tex:EnableMouse(true)
-    tex:SetCallback("OnMouseDown", function(...)
+    texOverlay:SetInteractible(true)
+    texOverlay:SetCallback("OnMouseDown", function(...)
         texOverlay:Release()
     end)
 
