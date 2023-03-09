@@ -138,13 +138,7 @@
     <EventFrame name="LibInterfaceUtilsVerticalScrollBar" inherits="VerticalScrollBarTemplate" virtual="true">
         <Size x="16" y="560"/>
         <Frames>
-            <Frame parentKey="Background" useParentLevel="true" setAllPoints="true">
-                <Layers>
-                    <Layer level="ARTWORK">
-                        <Texture parentKey="Main"/>
-                    </Layer>
-                </Layers>
-            </Frame>
+            <Frame parentKey="Background" useParentLevel="true" setAllPoints="true"/>
             <Frame parentKey="Track" enableMouse="true">
                 <Frames>
                     <EventButton parentKey="Thumb" inherits="WowTrimScrollBarThumbScripts" enableMouse="true">

@@ -84,21 +84,19 @@ local templates = {
             vertical = {
                 track = {
                     texture = private.assets.blankTexture,
-                    color = private.assets.colors.lightWhite,
+                    color = private.assets.colors.dimmedWhite,
                 },
                 background = {
-                    texture = false,
-                    color = private.assets.colors.dimmedBlack,
+                    enabled = false,
                 },
             },
             horizontal = {
                 track = {
                     texture = private.assets.blankTexture,
-                    color = private.assets.colors.lightWhite,
+                    color = private.assets.colors.dimmedWhite,
                 },
                 background = {
-                    texture = false,
-                    color = private.assets.colors.dimmedBlack,
+                    enabled = false,
                 },
             },
         },
@@ -203,10 +201,6 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self, ...)
-        self:ApplyTemplate("transparent")
-        self:SetTitle()
-        self:SetStatus()
-
         self:SetClampedToScreen(true)
         self:SetDraggable(true, "LeftButton")
         local w, h = GetPhysicalScreenSize()
@@ -214,6 +208,9 @@ local methods = {
         self:SetFrameStrata("DIALOG")
 
         self:SetSize(300, 300)
+        self:ApplyTemplate("transparent")
+        self:SetTitle()
+        self:SetStatus()
     end,
 
     OnLayoutFinished = function(self)
@@ -232,15 +229,27 @@ local methods = {
         self.verticalBar.Track.Thumb.Main:SetVertexColor(template.scrollBars.vertical.track.color:GetRGBA())
         self.verticalBar.Back.Texture:SetVertexColor(template.scrollBars.vertical.track.color:GetRGBA())
         self.verticalBar.Forward.Texture:SetVertexColor(template.scrollBars.vertical.track.color:GetRGBA())
-        self.verticalBar.Background.Main:SetTexture(template.scrollBars.vertical.background.texture)
-        self.verticalBar.Background.Main:SetVertexColor(template.scrollBars.vertical.background.color:GetRGBA())
+        if template.scrollBars.vertical.background.enabled then
+            self.verticalBar.Background.Main:SetTexture(template.scrollBars.vertical.background.texture)
+            self.verticalBar.Background.Main:SetVertexColor(template.scrollBars.vertical.background.color:GetRGBA())
+            self.verticalBar.Background:Show()
+        else
+            self.verticalBar.Background:Hide()
+        end
+
+        FUCK = self.verticalBar.Background.Main
 
         self.horizontalBar.Track.Thumb.Main:SetTexture(template.scrollBars.horizontal.track.texture)
         self.horizontalBar.Track.Thumb.Main:SetVertexColor(template.scrollBars.horizontal.track.color:GetRGBA())
         self.horizontalBar.Back.Texture:SetVertexColor(template.scrollBars.horizontal.track.color:GetRGBA())
         self.horizontalBar.Forward.Texture:SetVertexColor(template.scrollBars.horizontal.track.color:GetRGBA())
-        self.horizontalBar.Background.Main:SetTexture(template.scrollBars.horizontal.background.texture)
-        self.horizontalBar.Background.Main:SetVertexColor(template.scrollBars.horizontal.background.color:GetRGBA())
+        if template.scrollBars.horizontal.background.enabled then
+            self.horizontalBar.Background.Main:SetTexture(template.scrollBars.horizontal.background.texture)
+            self.horizontalBar.Background.Main:SetVertexColor(template.scrollBars.horizontal.background.color:GetRGBA())
+            self.horizontalBar.Background.Main:Show()
+        else
+            self.horizontalBar.Background.Main:Hide()
+        end
 
         self:SetUserData("template", template)
         self:SetAnchors()

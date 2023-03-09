@@ -11,6 +11,7 @@
     <Script file="Widgets/Divider.lua"/>
     <Script file="Widgets/Header.lua"/>
     <Script file="Widgets/Label.lua"/>
+    <Script file="Widgets/OptionGroup.lua"/>
     <Include file="Widgets/Scrollbar.xml"/>
     <Script file="Widgets/Texture.lua"/>
 </Ui>

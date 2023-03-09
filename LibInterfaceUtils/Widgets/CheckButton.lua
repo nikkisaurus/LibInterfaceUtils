@@ -46,8 +46,13 @@ local methods = {
         self:SetWordWrap(true)
         self:SetAutoWidth(true)
         self:SetCheckAlignment("TOPLEFT")
+        self:SetStyle()
         self:SetText()
         self:SetChecked()
+    end,
+
+    GetChecked = function(self)
+        return self:GetUserData("checked")
     end,
 
     SetAnchors = function(self)
@@ -121,17 +126,28 @@ local methods = {
         self.label:SetFontObject(fontObject)
         self.label:SetTextColor((color or private.assets.colors.white):GetRGBA())
     end,
+
+    SetStyle = function(self, style)
+        if style == "radio" then
+            self.checkBox:SetAtlas("perks-radio-background")
+            self.checked:SetAtlas("perks-radio-dot")
+            self.checked:ClearAllPoints()
+            self.checked:SetSize(12, 12)
+            self.checked:SetPoint("CENTER", self.checkBox, "CENTER", 0, -1)
+        else
+            self.checkBox:SetAtlas("perks-checkbox")
+            self.checked:SetAtlas("perks-icon-checkmark")
+        end
+    end,
 }
 
 local function creationFunc()
     local button = CreateFrame("CheckButton", private:GetObjectName(objectType), UIParent)
 
     button.checkBox = button:CreateTexture(nil, "ARTWORK")
-    button.checkBox:SetAtlas("checkbox-minimal")
-    button.checkBox:SetSize(16, 16)
+    button.checkBox:SetSize(12, 12)
 
     button.checked = button:CreateTexture(nil, "ARTWORK")
-    button.checked:SetAtlas("checkmark-minimal")
     button.checked:SetAllPoints(button.checkBox)
 
     button.label = button:CreateFontString(nil, "OVERLAY", "GameFontHighlight")

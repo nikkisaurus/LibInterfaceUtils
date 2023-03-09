@@ -16,9 +16,102 @@ function lib:CreateTestFrame()
     frame:SetTitle("Test Frame")
     frame:SetStatus("Loading...")
     frame:SetSpacing(5, 5)
+
     local toggle = frame:New("CheckButton")
     toggle:SetLabel("Click me eserunt ipsum in sit do elit amet ad. Culpa pariatur aute cupidatat eiusmod cillum sit minim sint nostrud")
     -- toggle:SetFullWidth(true)
+
+    local checkGroup = frame:New("OptionGroup")
+    checkGroup:SetFullWidth(true)
+    checkGroup:SetLabel("Select an option")
+    -- checkGroup:EnableBackdrop(true, { bgEnabled = true })
+    checkGroup:SetMultiselect()
+    checkGroup:SetInfo({
+        {
+            label = "Option 1",
+            func = function()
+                print("option ", 1)
+                print(checkGroup:GetSelected())
+            end,
+        },
+        {
+            label = "Option 2",
+            func = function()
+                print("option ", 2)
+                print(checkGroup:GetSelected())
+            end,
+        },
+        {
+            label = "Option 3",
+            func = function()
+                print("option ", 3)
+                print(checkGroup:GetSelected())
+            end,
+        },
+        {
+            label = "Option 4",
+            func = function()
+                print("option ", 4)
+                print(checkGroup:GetSelected())
+            end,
+        },
+        {
+            label = "Option 5",
+            func = function()
+                print("option ", 5)
+                print(checkGroup:GetSelected())
+            end,
+        },
+    })
+
+    local checkGroup2 = frame:New("OptionGroup")
+    checkGroup2:SetFullWidth(true)
+    checkGroup2:SetSpacing(5, 5)
+    checkGroup2:SetLabel("Select multiple options")
+    -- checkGroup:EnableBackdrop(true, { bgEnabled = true })
+    -- checkGroup2:SetMultiselect()
+    checkGroup2:SetInfo({
+        {
+            label = "Option 1",
+            fullWidth = true,
+            func = function()
+                print("option ", 1)
+                print(checkGroup2:GetSelected())
+            end,
+        },
+        {
+            label = "Option 2",
+            fullWidth = true,
+            func = function()
+                print("option ", 2)
+                print(checkGroup2:GetSelected())
+            end,
+        },
+        {
+            label = "Option 3",
+            fullWidth = true,
+            func = function()
+                print("option ", 3)
+                print(checkGroup2:GetSelected())
+            end,
+        },
+        {
+            label = "Option 4",
+            fullWidth = true,
+            func = function()
+                print("option ", 4)
+                print(checkGroup2:GetSelected())
+            end,
+        },
+        {
+            label = "Option 5",
+            fullWidth = true,
+            func = function()
+                print("option ", 5)
+                print(checkGroup2:GetSelected())
+            end,
+        },
+    })
 
     local group = frame:New("CollapsibleGroup")
     -- group:SetLayout("List")
