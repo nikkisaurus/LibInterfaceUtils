@@ -117,12 +117,14 @@
         </Frames>
         <Scripts>
             <OnLoad>
-                self.Background.Main:SetPoint("TOPLEFT", self.Back, "TOPRIGHT", 4, -4)
-                self.Background.Main:SetPoint("BOTTOMRIGHT", self.Forward, "BOTTOMLEFT", -4, 4)
-                self.Background.Main:SetColorTexture(0.03, 0.03, 0.03, 1)
+                local background = self:CreateTexture(nil, "BACKGROUND")
+                background:SetPoint("TOPLEFT", self.Back, "TOPRIGHT", 4, -4)
+                background:SetPoint("BOTTOMRIGHT", self.Forward, "BOTTOMLEFT", -4, 4)
+                background:SetColorTexture(0.03, 0.03, 0.03, 1)
+                self.Background.Main = background
 
-                self.Track:SetPoint("TOPLEFT", self.Background.Main, "TOPRIGHT", -1, -1)
-                self.Track:SetPoint("BOTTOMRIGHT", self.Background.Main, "BOTTOMLEFT", 1, 1)
+                self.Track:SetPoint("TOPLEFT", background, "TOPRIGHT", -1, -1)
+                self.Track:SetPoint("BOTTOMRIGHT", background, "BOTTOMLEFT", 1, 1)
                 self.Track.Thumb:SetPoint("TOPLEFT")
                 self.Track.Thumb:SetPoint("BOTTOMLEFT")
                 
@@ -139,7 +141,14 @@
             <Frame parentKey="Background" useParentLevel="true">
                 <Layers>
                     <Layer level="ARTWORK">
-                        <Texture parentKey="Main"/>
+                        <Texture parentKey="Main">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativeKey="$parent.Back" relativePoint="BOTTOMLEFT" x="4" y="-4"/>
+                                <Anchor point="BOTTOMRIGHT" relativeKey="$parent.Forward" relativePoint="TOPRIGHT" x="-4" y="4"/>
+                            </Anchors>
+                            <Color r="0.03" g="0.03" b="0.03" a="1"/>
+
+                        </Texture>
                     </Layer>
                 </Layers>
             </Frame>

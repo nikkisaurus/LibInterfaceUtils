@@ -83,10 +83,12 @@ local ContainerMethods = {
 
 local ObjectMethods = {
     Fire = function(self, script, ...)
-        if self:HasScript(script) then
+        if self:HasScript(script) and self:GetScript(script) then
             self:GetScript(script)(self, ...)
         elseif self[script] then
             self[script](self, ...)
+        elseif self.target and self.target:HasScript(script) and self.target:GetScript(script) then
+            self.target:GetScript(script)(self.target, ...)
         end
     end,
 
@@ -170,17 +172,21 @@ function private:Map(parent, target, maps)
     if maps.methods then
         for method, _ in pairs(maps.methods) do
             parent[method] = function(self, ...)
-                target[method](target, ...)
+                return target[method](target, ...)
             end
         end
     end
 
     if maps.scripts then
-        for script, _ in pairs(maps.scripts) do
+        for script, func in pairs(maps.scripts) do
             target:SetScript(script, function(self, ...)
-                local handler = parent:GetScript(script)
+                local handler = parent:HasScript(script) and parent:GetScript(script)
                 if handler then
                     handler(parent, ...)
+                end
+
+                if type(func) == "function" then
+                    func(parent, ...)
                 end
 
                 local callback = parent.widget.callbacks[script]
@@ -190,6 +196,8 @@ function private:Map(parent, target, maps)
             end)
         end
     end
+
+    parent.target = target
 end
 
 function private:RegisterContainer(container, ...)

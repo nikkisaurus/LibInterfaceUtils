@@ -9,6 +9,7 @@
     <Script file="Widgets/Button.lua"/>
     <Script file="Widgets/CheckButton.lua"/>
     <Script file="Widgets/Divider.lua"/>
+    <Script file="Widgets/EditBox.lua"/>
     <Script file="Widgets/Header.lua"/>
     <Script file="Widgets/Label.lua"/>
     <Script file="Widgets/OptionGroup.lua"/>
