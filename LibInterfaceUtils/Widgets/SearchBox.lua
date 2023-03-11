@@ -1,7 +1,7 @@
 local addonName, private = ...
 local lib, minor = LibStub:GetLibrary(addonName)
 
-local objectType, version = "EditBox", 1
+local objectType, version = "SearchBox", 1
 if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
@@ -37,7 +37,6 @@ local maps = {
         OnEditFocusLost = true,
         OnEnterPressed = function(self)
             self:ClearFocus()
-            self.widget.object.button:Hide()
         end,
         OnEscapePressed = function(self)
             self:ClearFocus()
@@ -46,10 +45,8 @@ local maps = {
         OnTabPressed = true,
         OnTextChanged = function(self, userInput)
             local frame = self.widget.object
-            if userInput and frame:GetUserData("enableButton") then
+            if userInput then
                 frame.button:Show()
-            elseif not frame:GetUserData("enableButton") then
-                frame.button:Hide()
             end
         end,
         OnTextSet = function(self)
@@ -61,7 +58,13 @@ local maps = {
 local childScripts = {
     button = {
         OnClick = function(self)
-            self.widget.object:Fire("OnEnterPressed")
+            local widget = self.widget
+            widget.object.editbox:SetText("")
+            self:Hide()
+
+            if widget.callbacks.OnEditCleared then
+                widget.callbacks.OnEditCleared(widget.object)
+            end
         end,
     },
 }
@@ -85,13 +88,9 @@ local methods = {
         self:SetFontObject("GameFontHighlight")
         self:SetBackdrop()
         self:SetSize(300, 25)
-        self:EnableButton(true)
-    end,
-
-    EnableButton = function(self, isEnabled)
-        self:SetUserData("enableButton", isEnabled)
-        self.button:Hide()
         self:SetTextInsets()
+        self:SetText("")
+        self.button:Hide()
     end,
 
     HasLabel = function(self)
@@ -109,7 +108,8 @@ local methods = {
         end
 
         self.editbox:SetPoint("RIGHT")
-        self.button:SetPoint("RIGHT")
+        self.icon:SetPoint("LEFT", 4, 0)
+        self.button:SetPoint("RIGHT", -4, 0)
         self:SetEditHeight(self.editbox:GetHeight())
     end,
 
@@ -119,7 +119,8 @@ local methods = {
 
     SetEditHeight = function(self, height)
         self.editbox:SetHeight(height)
-        self.button:SetSize(height * 2, height)
+        self.icon:SetSize(height / 2, height / 2)
+        self.button:SetSize(height / 2, height / 2)
         self:SetHeight(height + (self:HasLabel() and (self.label:GetStringHeight() + 5) or 0))
         self:SetTextInsets()
     end,
@@ -140,7 +141,7 @@ local methods = {
     end,
 
     SetTextInsets = function(self, left, right, top, bottom)
-        self.editbox:SetTextInsets(left or 6, (right or 6) + (self:GetUserData("enableButton") and self.button:GetWidth() or 0), top or 6, bottom or 6)
+        self.editbox:SetTextInsets((left or 6) + self.icon:GetWidth() + 4, (right or 6) + self.button:GetWidth() + 4, top or 6, bottom or 6)
     end,
 }
 
@@ -155,9 +156,12 @@ local function creationFunc()
     frame.editbox = CreateFrame("EditBox", nil, frame)
     frame.editbox = private:CreateTextures(frame.editbox)
 
+    frame.icon = frame.editbox:CreateTexture(nil, "ARTWORK")
+    frame.icon:SetAtlas("common-search-magnifyingglass")
+
     frame.button = CreateFrame("Button", nil, frame.editbox)
     frame.button:SetNormalFontObject(GameFontHighlight)
-    frame.button:SetText(OKAY)
+    frame.button:SetNormalAtlas("common-search-clearbutton")
     frame.button:SetScript("OnClick", childScripts.button.OnClick)
 
     local widget = {

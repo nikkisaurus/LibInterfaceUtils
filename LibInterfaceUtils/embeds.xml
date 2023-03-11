@@ -14,5 +14,6 @@
     <Script file="Widgets/Label.lua"/>
     <Script file="Widgets/OptionGroup.lua"/>
     <Include file="Widgets/Scrollbar.xml"/>
+    <Script file="Widgets/SearchBox.lua"/>
     <Script file="Widgets/Texture.lua"/>
 </Ui>
