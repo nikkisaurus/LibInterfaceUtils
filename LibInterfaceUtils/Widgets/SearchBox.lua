@@ -83,8 +83,6 @@ local methods = {
         self:SetLabel()
         self:SetLabelFont(GameFontNormal)
         self:SetAutoFocus(false)
-        self:SetLabel()
-        self:SetAutoFocus(false)
         self:SetFontObject("GameFontHighlight")
         self:SetBackdrop()
         self:SetSize(300, 25)

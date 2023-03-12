@@ -44,13 +44,32 @@ local methods = {
         self:SetBackdrop(defaults.backdrop)
     end,
 
+    IsAutoWidth = function(self)
+        return self:GetUserData("autoWidth")
+    end,
+
     SetBackdrop = function(self, backdrop)
         private:SetBackdrop(self, CreateFromMixins(defaults.backdrop, backdrop or {}))
+    end,
+
+    SetAutoWidth = function(self, isAutoWidth)
+        self:SetUserData("autoWidth", isAutoWidth)
+        if isAutoWidth then
+            self:SetWidth(self:GetTextWidth() + 20)
+        end
+    end,
+
+    SetText = function(self, text)
+        self:SETTEXT(text or "")
+        if self:IsAutoWidth() then
+            self:SetWidth(self:GetTextWidth() + 20)
+        end
     end,
 }
 
 local function creationFunc()
     local button = CreateFrame("Button", private:GetObjectName(objectType), UIParent)
+    button.SETTEXT = button.SetText
     button = private:CreateTextures(button)
 
     local widget = {

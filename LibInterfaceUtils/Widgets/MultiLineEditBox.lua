@@ -1,10 +1,26 @@
 local addonName, private = ...
 local lib, minor = LibStub:GetLibrary(addonName)
 
-local objectType, version = "EditBox", 1
+local objectType, version = "MultiLineEditBox", 1
 if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
+
+local anchors = {
+    with = function(frame)
+        return {
+            CreateAnchor("TOPLEFT", frame.container, "TOPLEFT"),
+            CreateAnchor("RIGHT", frame.scrollBar, "LEFT", -3, 0),
+            CreateAnchor("BOTTOM", frame.container, "BOTTOM"),
+        }
+    end,
+    without = function(frame)
+        return {
+            CreateAnchor("TOPLEFT", frame.container, "TOPLEFT"),
+            CreateAnchor("BOTTOMRIGHT", frame.container, "BOTTOMRIGHT"),
+        }
+    end,
+}
 
 local forbidden = {
     SetMultiLine = true,
@@ -35,10 +51,6 @@ local maps = {
     scripts = {
         OnEditFocusGained = true,
         OnEditFocusLost = true,
-        OnEnterPressed = function(self)
-            self:ClearFocus()
-            self.widget.object.button:Hide()
-        end,
         OnEscapePressed = function(self)
             self:ClearFocus()
         end,
@@ -46,14 +58,12 @@ local maps = {
         OnTabPressed = true,
         OnTextChanged = function(self, userInput)
             local frame = self.widget.object
-            if userInput and frame:GetUserData("enableButton") then
-                frame.button:Show()
-            elseif not frame:GetUserData("enableButton") then
-                frame.button:Hide()
+            if userInput then
+                frame.button:Enable()
             end
         end,
         OnTextSet = function(self)
-            self.widget.object.button:Hide()
+            self.widget.object.button:Disable()
         end,
     },
 }
@@ -61,14 +71,19 @@ local maps = {
 local childScripts = {
     button = {
         OnClick = function(self)
-            self.widget.object:Fire("OnEnterPressed")
+            local widget = self.widget
+            self:Disable()
+
+            if widget.callbacks.OnEnterPressed then
+                widget.callbacks.OnEnterPressed(widget.object)
+            end
         end,
     },
 }
 
 local scripts = {
     OnSizeChanged = function(self)
-        local height = self.editbox:GetHeight() + (self:HasLabel() and (self.label:GetStringHeight() + 5) or 0)
+        local height = self.container:GetHeight() + (self:HasLabel() and (self.label:GetStringHeight() + 5) or 0) + self.button:GetHeight() + 5
         if self:GetHeight() ~= height then
             self:SetHeight(height)
         end
@@ -82,14 +97,9 @@ local methods = {
         self:SetAutoFocus(false)
         self:SetFontObject("GameFontHighlight")
         self:SetBackdrop()
-        self:SetSize(300, 25)
-        self:EnableButton(true)
-    end,
-
-    EnableButton = function(self, isEnabled)
-        self:SetUserData("enableButton", isEnabled)
-        self.button:Hide()
+        self:SetSize(300, 150)
         self:SetTextInsets()
+        self.button:Disable()
     end,
 
     HasLabel = function(self)
@@ -100,26 +110,25 @@ local methods = {
         local text = self.label:GetText()
         if private:strcheck(text) then
             self.label:Show()
-            self.editbox:SetPoint("TOP", self.label, "BOTTOM", 0, -5)
+            self.container:SetPoint("TOPLEFT", self.label, "BOTTOMLEFT", 0, -5)
         else
             self.label:Hide()
-            self.editbox:SetPoint("TOP")
+            self.container:SetPoint("TOPLEFT")
         end
 
-        self.editbox:SetPoint("RIGHT")
-        self.button:SetPoint("RIGHT")
-        self:SetEditHeight(self.editbox:GetHeight())
+        self.container:SetPoint("RIGHT")
+        self:SetEditHeight(self.container:GetHeight())
+        self.button:SetPoint("TOPLEFT", self.container, "BOTTOMLEFT", 0, -5)
     end,
 
-    SetBackdrop = function(self, backdrop)
-        private:SetBackdrop(self.editbox, backdrop)
+    SetBackdrop = function(self, backdrop, buttonBackdrop)
+        private:SetBackdrop(self.container, backdrop)
+        private:SetBackdrop(self.button, buttonBackdrop)
     end,
 
     SetEditHeight = function(self, height)
-        self.editbox:SetHeight(height)
-        self.button:SetSize(height * 2, height)
-        self:SetHeight(height + (self:HasLabel() and (self.label:GetStringHeight() + 5) or 0))
-        self:SetTextInsets()
+        self.container:SetHeight(height)
+        self:SetHeight(height + (self:HasLabel() and (self.label:GetStringHeight() + 5) or 0) + self.button:GetHeight() + 5)
     end,
 
     SetLabel = function(self, text)
@@ -138,7 +147,7 @@ local methods = {
     end,
 
     SetTextInsets = function(self, left, right, top, bottom)
-        self.editbox:SetTextInsets(left or 6, (right or 6) + (self:GetUserData("enableButton") and self.button:GetWidth() or 0), top or 6, bottom or 6)
+        self.editbox:SetTextInsets(left or 6, right or 6, top or 6, bottom or 6)
     end,
 }
 
@@ -150,12 +159,24 @@ local function creationFunc()
     frame.label:SetPoint("TOPRIGHT")
     frame.label:SetJustifyH("LEFT")
 
-    frame.editbox = CreateFrame("EditBox", nil, frame)
-    frame.editbox = private:CreateTextures(frame.editbox)
+    frame.container = CreateFrame("Frame", nil, frame, "ScrollingEditBoxTemplate")
+    frame.container = private:CreateTextures(frame.container)
+    frame.editbox = frame.container.ScrollBox.EditBox
 
-    frame.button = CreateFrame("Button", nil, frame.editbox)
+    frame.scrollBar = CreateFrame("EventFrame", nil, frame, "LibInterfaceUtilsVerticalScrollBar")
+    frame.scrollBar:SetPoint("TOPRIGHT", frame.container, "TOPRIGHT")
+    frame.scrollBar:SetPoint("BOTTOMRIGHT", frame.container, "BOTTOMRIGHT")
+    frame.scrollBar.Background.Main:Hide()
+
+    ScrollUtil.RegisterScrollBoxWithScrollBar(frame.container.ScrollBox, frame.scrollBar)
+    ScrollUtil.AddManagedScrollBarVisibilityBehavior(frame.container.ScrollBox, frame.scrollBar, anchors.with(frame), anchors.without(frame))
+
+    frame.button = CreateFrame("Button", nil, frame)
     frame.button:SetNormalFontObject(GameFontHighlight)
-    frame.button:SetText(OKAY)
+    frame.button:SetDisabledFontObject(GameFontDisable)
+    frame.button:SetText(ACCEPT)
+    frame.button:SetSize(frame.button:GetFontString():GetWidth() + 20, frame.button:GetFontString():GetHeight() + 10)
+    frame.button = private:CreateTextures(frame.button)
     frame.button:SetScript("OnClick", childScripts.button.OnClick)
 
     local widget = {
@@ -165,7 +186,7 @@ local function creationFunc()
         forbidden = forbidden,
     }
 
-    frame.editbox.widget = widget
+    frame.container.widget = widget
     frame.button.widget = widget
 
     private:Map(frame, frame.editbox, maps)
