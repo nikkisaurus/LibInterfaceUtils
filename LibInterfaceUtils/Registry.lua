@@ -27,6 +27,7 @@ local function Resetter(_, self)
     self:Hide()
 end
 
+local children = {}
 local ContainerMethods = {
     AddChild = function(self, object)
         local parent = object:GetUserData("parent")
@@ -67,7 +68,13 @@ local ContainerMethods = {
     end,
 
     ReleaseChildren = function(self)
+        wipe(children)
         for _, child in pairs(self.children) do
+            children[child] = true
+        end
+        wipe(self.children)
+
+        for child, _ in pairs(children) do
             child:Release()
         end
     end,
@@ -121,7 +128,6 @@ local ObjectMethods = {
     Release = function(self)
         if self.ReleaseChildren then
             self:ReleaseChildren()
-            wipe(self.children)
         end
 
         lib.pool[self.widget.type]:Release(self)

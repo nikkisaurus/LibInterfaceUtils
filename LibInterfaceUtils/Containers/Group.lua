@@ -39,34 +39,13 @@ local methods = {
         self:EnableBackdrop()
         self:SetLabel()
         self:SetLabelFont(GameFontNormal)
+        self:SetPadding()
     end,
 
     EnableBackdrop = function(self, isEnabled, backdrop)
         defaults.backdrop.bgEnabled = isEnabled or false
         defaults.backdrop.bordersEnabled = isEnabled or false
         self:SetBackdrop(backdrop)
-    end,
-
-    Fill = function(self, child)
-        local xOffset = child:GetUserData("xOffset")
-        local yOffset = child:GetUserData("yOffset")
-        local xFill = child:GetUserData("xFill")
-        local yFill = child:GetUserData("yFill")
-
-        child:SetPoint("TOPLEFT", self.content, "TOPLEFT", xOffset, yOffset)
-        self:FillX(child)
-        self:FillY(child)
-    end,
-
-    FillX = function(self, child)
-        local x = child:GetUserData("xFill") or 0
-        child:SetPoint("RIGHT", x, 0)
-        return self.content:GetWidth() + x
-    end,
-
-    FillY = function(self, child)
-        local y = child:GetUserData("yFill") or 0
-        child:SetPoint("BOTTOM", 0, y)
     end,
 
     GetAnchorX = function(self)
@@ -81,8 +60,12 @@ local methods = {
         return private:round(self.content:GetWidth())
     end,
 
+    HasLabel = function(self)
+        return private:strcheck(self.label:GetText())
+    end,
+
     MarkDirty = function(self, _, height)
-        self:SetHeight(height + self.label:GetHeight() + 15)
+        self:SetHeight(height + (self:HasLabel() and self.label:GetHeight() or 0) + self:GetUserData("paddingV"))
     end,
 
     ParentChild = function(self, child, parent)
@@ -108,6 +91,12 @@ local methods = {
         self.label:SetFontObject(fontObject)
         self.label:SetTextColor((color or private.assets.colors.flair):GetRGBA())
     end,
+
+    SetPadding = function(self, left, right, top, bottom)
+        self:SetUserData("paddingV", (top or 5) + (bottom or 5))
+        self.content:SetPoint("TOPLEFT", left or 5, -(top or 5))
+        self.content:SetPoint("BOTTOMRIGHT", -(right or 5), -(bottom or 5))
+    end,
 }
 
 local function creationFunc()
@@ -124,8 +113,6 @@ local function creationFunc()
     frame.container = private:CreateTextures(frame.container)
 
     frame.content = CreateFrame("Frame", nil, frame.container)
-    frame.content:SetPoint("TOPLEFT", 5, -5)
-    frame.content:SetPoint("BOTTOMRIGHT", -5, -5)
     frame.content:SetScript("OnSizeChanged", childScripts.content.OnSizeChanged)
 
     local widget = {

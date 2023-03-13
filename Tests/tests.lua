@@ -12,18 +12,18 @@ function lib:CreateTestFrame()
     frame:SetTitle("Test Frame")
     frame:SetStatus("Loading...")
     frame:SetSpacing(5, 5)
-    frame:ApplyTemplate({
-        frame = {
-            -- bgTexture = "interface/professions/professionbackgroundartalchemy",
-            -- bgColor = CreateColor(1, 1, 1, 1),
-            -- bgTexCoord = { 0, 0.75, 0, 0.25 },
-            -- bgAtlas = "Professions-Recipe-Background-Alchemy",
-            -- highlightColor = CreateColor(1, 1, 1, 1),
-            -- highlightEnabled = true,
-            -- highlightAtlas = "Professions-Recipe-Background-Enchanting",
-            -- highlightBlendMode = "DISABLE",
-        },
-    })
+    -- frame:ApplyTemplate({
+    --     frame = {
+    --         -- bgTexture = "interface/professions/professionbackgroundartalchemy",
+    --         -- bgColor = CreateColor(1, 1, 1, 1),
+    --         -- bgTexCoord = { 0, 0.75, 0, 0.25 },
+    --         -- bgAtlas = "Professions-Recipe-Background-Alchemy",
+    --         -- highlightColor = CreateColor(1, 1, 1, 1),
+    --         -- highlightEnabled = true,
+    --         -- highlightAtlas = "Professions-Recipe-Background-Enchanting",
+    --         -- highlightBlendMode = "DISABLE",
+    --     },
+    -- })
 
     local header = frame:New("Header")
     header:SetText("Widgets")
@@ -158,7 +158,8 @@ function lib:CreateTestFrame()
     divider:SetHeight(10)
 
     local texture = frame:New("Texture")
-    texture:SetAtlas("raceicon128-bloodelf-female")
+    -- texture:SetAtlas("raceicon128-bloodelf-female")
+    texture:SetTexture(236547)
 
     local giftWrapping = lib:New("Texture")
     giftWrapping:SetColorTexture(fastrandom(), fastrandom(), fastrandom(), 1)
@@ -178,8 +179,139 @@ function lib:CreateTestFrame()
     frame:DoLayout()
 end
 
+function lib:CreateTestFrame2()
+    local frame = self:New("Frame")
+    frame:SetPoint("CENTER")
+    frame:SetSize(800, 600)
+    frame:SetTitle("Test Frame")
+    frame:SetStatus("Loading...")
+    frame:SetSpacing(5, 5)
+    frame:SetLayout("Fill")
+    frame:ApplyTemplate("transparent")
+
+    local tabGroup = frame:New("TabGroup")
+    tabGroup:SetLayout("List")
+    tabGroup:SetTabs({
+        {
+            text = "Tab 1",
+            onClick = function(content)
+                for i = 1, 50 do
+                    local button = content:New("Label")
+                    button:SetFullWidth(true)
+                    button:SetText("Adipisicing ipsum laboris ad cupidatat elit cillum anim cupidatat mollit reprehenderit deserunt aute. Labore ullamco laborum ea est eu ea et labore. Pariatur veniam nulla incididunt eu irure ut amet. Cillum pariatur cupidatat duis commodo aliquip non. Aute irure laboris mollit sit esse fugiat quis.")
+                end
+
+                local button = content:New("Button")
+                button:SetWidth(700)
+                button:SetText("END")
+                content:DoLayout()
+            end,
+        },
+        {
+            text = "Tab 2",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 3",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 4",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 5",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 6",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 7",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 8",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 9",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 10",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 11",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 12",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 13",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 14",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 15",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+        {
+            text = "Tab 16",
+            onClick = function(...)
+                print(...)
+            end,
+        },
+    })
+    -- C_Timer.After(5, function()
+    --     tabGroup:SetTabs()
+    -- end)
+end
+
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:SetScript("OnEvent", function()
+    lib:CreateTestFrame2()
+end)
+
 SLASH_LIBINTERFACEUTILS1 = "/liu"
 SlashCmdList["LIBINTERFACEUTILS"] = function()
     print("New")
     lib:CreateTestFrame()
+    lib:CreateTestFrame2()
 end

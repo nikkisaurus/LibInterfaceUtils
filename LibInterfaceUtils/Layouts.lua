@@ -12,11 +12,17 @@ function private.Fill(self)
 
     self:ParentChild(child)
     child:ClearAllPoints()
-    self:Fill(child)
+    child:SetPoint("TOPLEFT")
+    child:SetPoint("BOTTOMRIGHT")
+
+    if child.DoLayout then
+        child:DoLayout()
+    end
+
+    self:MarkDirty(self:GetAvailableWidth(), self:GetAvailableHeight())
 end
 
 function private.Flow(self)
-    -- TODO FIX ME the issue with nested groups not laying out correctly is due to the scrollbar behavior
     local usedWidth = 0
     local usedHeight = 0
 
@@ -88,7 +94,7 @@ function private.Flow(self)
                 child:SetPoint("RIGHT", self:GetAnchorX(), "RIGHT")
                 childWidth = child:GetWidth()
             end
-            usedWidth = usedWidth + childWidth + xOffset
+            usedWidth = usedWidth + childWidth + spacingH + xOffset
             maxWidth = max(maxWidth, usedWidth)
             rowHeight = max(rowHeight, childHeight + yOffset)
         end
@@ -156,7 +162,8 @@ function private.List(self)
         xOffsets = xOffsets + xOffset
 
         if isFullWidth then
-            self:FillX(child)
+            child:SetPoint("RIGHT", self:GetAnchorX(), "RIGHT")
+            childWidth = child:GetWidth()
         end
 
         if child:GetFullHeight() and self.widget.type ~= "Group" and self.widget.type ~= "CollapsibleGroup" then
@@ -173,6 +180,42 @@ function private.List(self)
     end
 
     usedWidth = usedWidth + xOffsets
+
+    self:MarkDirty(usedWidth, usedHeight)
+end
+
+function private.TabFlow(self)
+    -- Used for TabGroup, so I'm not really bothered with customization as far as spacing and offsets go
+    local usedWidth = 0
+    local usedHeight = 0
+    local rowHeight = 0
+
+    local availableWidth = self:GetAvailableWidth()
+
+    for i, child in ipairs(self.children) do
+        self:ParentChild(child)
+        child:ClearAllPoints()
+
+        local childWidth = private:round(child:GetWidth())
+        local childHeight = private:round(child:GetHeight())
+
+        if i == 1 then
+            child:SetPoint("BOTTOMLEFT", usedWidth, usedHeight)
+            usedWidth = childWidth
+            rowHeight = childHeight
+        elseif usedWidth + childWidth > availableWidth then
+            usedHeight = usedHeight + rowHeight
+            usedWidth = 0
+            child:SetPoint("BOTTOMLEFT", usedWidth, usedHeight)
+            usedWidth = childWidth
+            rowHeight = childHeight
+        else
+            child:SetPoint("BOTTOMLEFT", usedWidth, usedHeight)
+            usedWidth = usedWidth + childWidth
+            rowHeight = max(rowHeight, childHeight)
+        end
+    end
+    usedHeight = usedHeight + rowHeight
 
     self:MarkDirty(usedWidth, usedHeight)
 end
