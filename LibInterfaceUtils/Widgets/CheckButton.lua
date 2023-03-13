@@ -76,7 +76,7 @@ local methods = {
                 self:SetHeight(self.checkBox:GetHeight() + self.label:GetHeight() + 10)
             end
         else
-            self.label:SetWidth(self:GetWidth() - self.checkBox:GetWidth() - 5)
+            self.label:SetWidth(self:GetWidth() - self.checkBox:GetWidth() - 10)
             if canWrap then
                 self:SetHeight(max(self.checkBox:GetHeight(), self.label:GetStringHeight()))
             else

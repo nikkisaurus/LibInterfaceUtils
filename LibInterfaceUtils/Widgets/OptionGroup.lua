@@ -51,7 +51,7 @@ local methods = {
                             optionButton:SetChecked(optionButton == checkButton)
                         end
                     end
-                    option.func(...)
+                    option.func(self, ...)
                 end)
             end
 

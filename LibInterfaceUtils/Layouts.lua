@@ -16,92 +16,100 @@ function private.Fill(self)
 end
 
 function private.Flow(self)
-    local usedWidth, usedHeight, maxWidth, rowHeight, xOffsets = 0, 0, 0, 0, 0
+    -- TODO FIX ME the issue with nested groups not laying out correctly is due to the scrollbar behavior
+    local usedWidth = 0
+    local usedHeight = 0
+
+    local maxWidth = 0
+    local rowHeight = 0
+
     local availableWidth = self:GetAvailableWidth()
-    local availableHeight = self:GetAvailableHeight() - 2
+    local availableHeight = self:GetAvailableHeight()
+
     local spacingH = self:GetUserData("spacingH") or 0
     local spacingV = self:GetUserData("spacingV") or 0
 
-    if self:GetUserData("collapsed") then
-        self:MarkDirty(nil, usedHeight)
-        return
-    end
-
-    local rowAnchor
-    for id, child in ipairs(self.children) do
-        -- Restore default height for fullHeight children so it doesn't get exponentially bigger, resulting in a scrollbar
-        local height = child:GetUserData("height")
-        if height then
-            child:SetHeight(height)
-        end
-
+    for i, child in ipairs(self.children) do
         local xOffset = child:GetUserData("xOffset") or 0
         local yOffset = child:GetUserData("yOffset") or 0
-        local childWidth = child:GetWidth()
-        local rawChildHeight = child:GetHeight()
-        local childHeight = rawChildHeight - yOffset
-        local pendingWidth = usedWidth + childWidth
+        local isFullWidth = child:GetFullWidth() or child.widget.type == "Divider" or child.widget.type == "Header"
+        local fillWidth = child:GetFillWidth()
+        local isFullHeight = child:GetFullHeight()
+
         self:ParentChild(child)
         child:ClearAllPoints()
 
-        local isFullWidth = child:GetFullWidth() or (child.widget.type == "Divider" or child.widget.type == "Header")
-
-        if id == 1 then
-            child:SetPoint("TOPLEFT", xOffset, yOffset)
-            usedWidth = childWidth
-            maxWidth = childWidth
-            rowHeight = childHeight
-            rowAnchor = child
-        elseif pendingWidth > availableWidth or isFullWidth then
-            usedHeight = usedHeight + rowHeight - yOffset + spacingV
-            child:SetPoint("LEFT", rowAnchor, "LEFT", xOffset, 0)
-            child:SetPoint("TOP", 0, -usedHeight)
-            usedWidth = isFullWidth and availableWidth or childWidth
-            maxWidth = max(usedWidth, maxWidth)
-            rowHeight = childHeight
-            rowAnchor = child
-        else
-            child:SetPoint("TOPLEFT", self.children[id - 1], "TOPRIGHT", xOffset + spacingH, yOffset)
-            usedWidth = pendingWidth + spacingH
-            maxWidth = max(usedWidth, maxWidth)
-            rowHeight = max(rowHeight, childHeight)
+        if child:GetUserData("width") then
+            child:SetWidth(child:GetUserData("width"))
         end
 
-        xOffsets = xOffsets + xOffset
-
-        if isFullWidth or child:GetFillWidth() then
-            self:FillX(child)
+        if child:GetUserData("height") then
+            child:SetHeight(child:GetUserData("height"))
         end
 
-        if child:GetFullHeight() and self.widget.type ~= "Group" then
-            usedWidth = usedWidth + xOffsets
-            usedHeight = usedHeight + rowHeight
-            maxWidth = max(usedWidth, maxWidth)
-
-            if usedHeight < availableHeight then
-                if not height then
-                    child:SetUserData("height", rawChildHeight)
-                end
-                local extra = availableHeight - usedHeight
-                child:SetHeight(rawChildHeight + extra)
-                usedHeight = usedHeight + extra
-            end
-
-            self:MarkDirty(maxWidth, usedHeight)
-
-            return
-        end
+        local childWidth = private:round(child:GetWidth())
+        local childHeight = private:round(child:GetHeight())
 
         if child.DoLayout then
-            child:DoLayout()
+            childWidth, childHeight = child:DoLayout()
+        end
+
+        if fillWidth then
+            child:InitUserData("width", childWidth)
+        end
+
+        if isFullHeight then
+            child:InitUserData("height", childHeight)
+        end
+
+        if i == 1 then
+            child:SetPoint("TOPLEFT", xOffset, yOffset)
+            if isFullWidth or fillWidth then
+                child:SetPoint("RIGHT", self:GetAnchorX(), "RIGHT")
+                childWidth = child:GetWidth()
+            end
+            usedWidth = childWidth + xOffset
+            maxWidth = usedWidth
+            rowHeight = childHeight + yOffset
+        elseif isFullWidth or (usedWidth + childWidth + xOffset) > availableWidth then
+            usedHeight = usedHeight + rowHeight + spacingV
+            maxWidth = max(maxWidth, usedWidth)
+            usedWidth = 0
+            child:SetPoint("TOPLEFT", xOffset, -usedHeight + yOffset)
+            if isFullWidth or fillWidth then
+                child:SetPoint("RIGHT", self:GetAnchorX(), "RIGHT")
+                childWidth = child:GetWidth()
+            end
+            usedWidth = childWidth + xOffset
+            rowHeight = childHeight + spacingV + yOffset
+        else
+            child:SetPoint("TOPLEFT", usedWidth + spacingH + xOffset, -usedHeight + yOffset)
+            if fillWidth then
+                child:SetPoint("RIGHT", self:GetAnchorX(), "RIGHT")
+                childWidth = child:GetWidth()
+            end
+            usedWidth = usedWidth + childWidth + xOffset
+            maxWidth = max(maxWidth, usedWidth)
+            rowHeight = max(rowHeight, childHeight + yOffset)
+        end
+
+        if isFullHeight and self.widget.type ~= "Group" and self.widget.type ~= "CollapsibleGroup" then
+            local extraHeight = availableHeight - usedHeight - spacingH - yOffset
+            if extraHeight > childHeight then
+                child:SetHeight(availableHeight - usedHeight - spacingH - yOffset)
+            end
+            rowHeight = max(rowHeight, child:GetHeight() + spacingH + yOffset)
+            break
         end
     end
 
-    usedWidth = usedWidth + xOffsets
     usedHeight = usedHeight + rowHeight
-    maxWidth = max(usedWidth, maxWidth)
 
-    self:MarkDirty(maxWidth, usedHeight)
+    if self:GetUserData("collapsed") then
+        self:MarkDirty(nil, 0)
+    else
+        self:MarkDirty(maxWidth, usedHeight)
+    end
 end
 
 function private.List(self)
@@ -119,6 +127,10 @@ function private.List(self)
         local height = child:GetUserData("height")
         if height then
             child:SetHeight(height)
+        end
+
+        if child.DoLayout then
+            child:DoLayout()
         end
 
         local xOffset = child:GetUserData("xOffset") or 0
@@ -147,7 +159,7 @@ function private.List(self)
             self:FillX(child)
         end
 
-        if child:GetFullHeight() and self.widget.type ~= "Group" then
+        if child:GetFullHeight() and self.widget.type ~= "Group" and self.widget.type ~= "CollapsibleGroup" then
             if usedHeight < availableHeight then
                 if not height then
                     child:SetUserData("height", rawChildHeight)
@@ -157,10 +169,6 @@ function private.List(self)
                 usedHeight = usedHeight + extra
             end
             break
-        end
-
-        if child.DoLayout then
-            child:DoLayout()
         end
     end
 

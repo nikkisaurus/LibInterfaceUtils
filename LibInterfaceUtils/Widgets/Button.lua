@@ -60,7 +60,7 @@ local methods = {
     end,
 
     SetText = function(self, text)
-        self:SETTEXT(text or "")
+        self:_SetText(text or "")
         if self:IsAutoWidth() then
             self:SetWidth(self:GetTextWidth() + 20)
         end
@@ -69,7 +69,7 @@ local methods = {
 
 local function creationFunc()
     local button = CreateFrame("Button", private:GetObjectName(objectType), UIParent)
-    button.SETTEXT = button.SetText
+    button._SetText = button.SetText
     button = private:CreateTextures(button)
 
     local widget = {

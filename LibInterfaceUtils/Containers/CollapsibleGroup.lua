@@ -35,6 +35,12 @@ local childScripts = {
     },
 }
 
+local scripts = {
+    -- OnSizeChanged = function(self)
+    --     self:DoLayout()
+    -- end,
+}
+
 local methods = {
     OnAcquire = function(self)
         self:SetSize(500, 300)
@@ -42,6 +48,7 @@ local methods = {
         self:SetBackdrop()
         self:SetLabel()
         self:SetLabelFont(GameFontNormal)
+        self:Collapse()
     end,
 
     Collapse = function(self, collapsed)
@@ -52,9 +59,16 @@ local methods = {
             self.container:Show()
         end
 
-        self:DoLayout()
-
         local parent = self:GetUserData("parent")
+        while parent do
+            local newParent = parent:GetUserData("parent")
+            if newParent then
+                parent = newParent
+            else
+                break
+            end
+        end
+
         if parent then
             parent:DoLayout()
         end
@@ -94,12 +108,16 @@ local methods = {
         child:SetPoint("BOTTOM", 0, y)
     end,
 
+    GetAnchorX = function(self)
+        return self.content
+    end,
+
     GetAvailableHeight = function(self)
-        return self.content:GetHeight()
+        return private:round(self.content:GetHeight())
     end,
 
     GetAvailableWidth = function(self)
-        return self.content:GetWidth()
+        return private:round(self.content:GetWidth())
     end,
 
     MarkDirty = function(self, _, height)
@@ -164,7 +182,7 @@ local function creationFunc()
 
     frame.header.widget = widget
 
-    return private:RegisterContainer(widget, methods)
+    return private:RegisterContainer(widget, methods, scripts)
 end
 
 private:RegisterWidgetPool(objectType, creationFunc)

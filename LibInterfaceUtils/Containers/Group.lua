@@ -24,6 +24,15 @@ local registry = {
     OnSizeChanged = true,
 }
 
+local childScripts = {
+    content = {
+        OnSizeChanged = function(self)
+            local frame = self.widget.object
+            frame:DoLayout()
+        end,
+    },
+}
+
 local methods = {
     OnAcquire = function(self)
         self:SetSize(500, 300)
@@ -60,12 +69,16 @@ local methods = {
         child:SetPoint("BOTTOM", 0, y)
     end,
 
+    GetAnchorX = function(self)
+        return self.content
+    end,
+
     GetAvailableHeight = function(self)
-        return self.content:GetHeight()
+        return private:round(self.content:GetHeight())
     end,
 
     GetAvailableWidth = function(self)
-        return self.content:GetWidth()
+        return private:round(self.content:GetWidth())
     end,
 
     MarkDirty = function(self, _, height)
@@ -113,6 +126,7 @@ local function creationFunc()
     frame.content = CreateFrame("Frame", nil, frame.container)
     frame.content:SetPoint("TOPLEFT", 5, -5)
     frame.content:SetPoint("BOTTOMRIGHT", -5, -5)
+    frame.content:SetScript("OnSizeChanged", childScripts.content.OnSizeChanged)
 
     local widget = {
         object = frame,
@@ -120,6 +134,8 @@ local function creationFunc()
         version = version,
         registry = registry,
     }
+
+    frame.content.widget = widget
 
     return private:RegisterContainer(widget, methods)
 end

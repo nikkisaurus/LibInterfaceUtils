@@ -183,18 +183,22 @@ local scripts = {
 
     OnDragStop = function(self)
         self:StopMovingOrSizing()
-        self:SetScrollAnchors()
     end,
 
     OnUpdate = function(self)
         -- Using OnUpdate instead of OnSizeChanged to throttle the DoLayout calls and provide a more responsive experience
         local w, h = self:GetSize()
+        w = private:round(w)
+        h = private:round(h)
         local width = self:GetUserData("width")
         local height = self:GetUserData("height")
-        if not width or not height or w ~= width or h ~= height then
+        if not width or not height or w ~= width or h ~= height or self:GetUserData("scrollUpdate") then
             self:SetUserData("width", w)
             self:SetUserData("height", h)
             self:DoLayout()
+            -- scrollUpdate needs to be here for after scrollbars change in order to update the layout, since widths and heights will change
+            -- very important that this is set to false AFTER DoLayout, or it'll continue to run every frame
+            self:SetUserData("scrollUpdate", false)
         end
     end,
 }
@@ -290,12 +294,20 @@ local methods = {
         child:SetPoint("BOTTOM", self.verticalBox, "BOTTOM", 0, y)
     end,
 
+    GetAnchorX = function(self)
+        return self.verticalBox
+    end,
+
+    GetAnchorY = function(self)
+        return self.verticalBox
+    end,
+
     GetAvailableHeight = function(self)
-        return self.verticalBox:GetHeight()
+        return private:round(self.verticalBox:GetHeight())
     end,
 
     GetAvailableWidth = function(self)
-        return self.verticalBox:GetWidth()
+        return private:round(self.verticalBox:GetWidth())
     end,
 
     MarkDirty = function(self, usedWidth, usedHeight)
@@ -335,7 +347,7 @@ local methods = {
         self.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
         verticalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
 
-        if content:GetWidth() > verticalBox:GetWidth() then
+        if private:round(content:GetWidth()) > private:round(verticalBox:GetWidth()) then
             horizontalBar:Show()
             verticalBox:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 5)
             verticalBar:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 2)
@@ -345,13 +357,15 @@ local methods = {
             verticalBar:SetPoint("BOTTOM", statusBar, "TOP", 0, 2)
         end
 
-        if content:GetHeight() > verticalBox:GetHeight() then
+        if private:round(content:GetHeight()) > private:round(verticalBox:GetHeight()) then
             verticalBar:Show()
             verticalBox:SetPoint("RIGHT", verticalBar, "LEFT", -5, 0)
         else
             verticalBar:Hide()
             verticalBox:SetPoint("RIGHT", -5, 0)
         end
+
+        self:SetUserData("scrollUpdate", true)
     end,
 
     SetStatus = function(self, text)

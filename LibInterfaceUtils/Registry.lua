@@ -17,6 +17,11 @@ local function GetNumObjects(self)
     return count
 end
 
+local function OnSizeChanged(self)
+    local object = self.widget.object
+    object:DoLayout()
+end
+
 local function Resetter(_, self)
     self:ClearAllPoints()
     self:Hide()
@@ -35,12 +40,8 @@ local ContainerMethods = {
 
     DoLayout = function(self)
         self:layoutFunc()
-        for _, child in ipairs(self.children) do
-            if child.DoLayout then
-                child:DoLayout()
-            end
-        end
         self:Fire("OnLayoutFinished")
+        return private:round(self:GetWidth()), private:round(self:GetHeight())
     end,
 
     New = function(self, objectType)
@@ -61,8 +62,6 @@ local ContainerMethods = {
             end
         end
 
-        print(remove)
-
         tremove(self.children, remove)
         self:DoLayout()
     end,
@@ -82,6 +81,11 @@ local ContainerMethods = {
 }
 
 local ObjectMethods = {
+    DoHeight = function(self, oldHeight, height)
+        self:InitUserData("height", oldHeight)
+        self:SetHeight(height)
+    end,
+
     Fire = function(self, script, ...)
         if self:HasScript(script) and self:GetScript(script) then
             self:GetScript(script)(self, ...)
@@ -106,6 +110,12 @@ local ObjectMethods = {
 
     GetUserData = function(self, key)
         return self.widget.userdata[key]
+    end,
+
+    InitUserData = function(self, key, value)
+        if not self:GetUserData(key) then
+            self:SetUserData(key, value)
+        end
     end,
 
     Release = function(self)
@@ -204,6 +214,7 @@ function private:RegisterContainer(container, ...)
     container.object.children = {}
     container.object = Mixin(container.object, ContainerMethods)
     container.object:SetLayout()
+    -- container.object.content:SetScript("OnSizeChanged", OnSizeChanged)
 
     return private:RegisterWidget(container, ...)
 end

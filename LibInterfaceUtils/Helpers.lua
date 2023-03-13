@@ -105,6 +105,15 @@ function private:ResetBorders(borders)
     end
 end
 
+function private:round(num, decimals, roundDown)
+    if roundDown then
+        local power = 10 ^ decimals
+        return math.floor(num * power) / power
+    else
+        return tonumber((("%%.%df"):format(decimals)):format(num))
+    end
+end
+
 local defaultBackdrop = {
     bgEnabled = true,
     bgTexture = private.assets.blankTexture,

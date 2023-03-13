@@ -65,6 +65,7 @@ local methods = {
                     self:SetHeight(self.icon:GetHeight() + self.label:GetHeight() + 10)
                 end
             else
+                -- TODO FIX ME label height is cutting off
                 self.label:SetWidth(self:GetWidth() - self.icon:GetWidth() - 5)
                 if canWrap then
                     self:SetHeight(max(self.icon:GetHeight(), self.label:GetStringHeight()))
