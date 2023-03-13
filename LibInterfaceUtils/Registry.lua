@@ -75,17 +75,17 @@ local ContainerMethods = {
                 break
             end
         end
-
         tremove(self.children, remove)
+
         self:DoLayout()
     end,
 
     ReleaseChildren = function(self)
         wipe(children)
+
         for _, child in pairs(self.children) do
             children[child] = true
         end
-        wipe(self.children)
 
         for child, _ in pairs(children) do
             child:Release()
@@ -156,6 +156,7 @@ local ObjectMethods = {
 
         self:Fire("OnRelease")
         wipe(self.widget.userdata)
+        wipe(self.widget.callbacks)
     end,
 
     SetCallback = function(self, script, handler)
@@ -237,7 +238,6 @@ function private:RegisterContainer(container, ...)
     container.object.children = {}
     container.object = Mixin(container.object, ContainerMethods)
     container.object:SetLayout()
-    -- container.object.content:SetScript("OnSizeChanged", OnSizeChanged)
 
     return private:RegisterWidget(container, ...)
 end

@@ -27,9 +27,9 @@ private.assets = {
         red = CreateColor(1, 0, 0, 1),
         green = CreateColor(0, 1, 0, 1),
 
-        dimmedClass = CreateColor(r, g, b, 0.25),
-        lightClass = CreateColor(r, g, b, 0.5),
-        class = CreateColor(r, g, b, 1),
+        -- dimmedClass = CreateColor(r, g, b, 0.25),
+        -- lightClass = CreateColor(r, g, b, 0.5),
+        -- class = CreateColor(r, g, b, 1),
 
         dimmedFlair = CreateColor(1, 0.82, 0, 0.25),
         lightFlair = CreateColor(1, 0.82, 0, 0.5),
@@ -37,6 +37,8 @@ private.assets = {
 
         elvBackdrop = CreateColor(26 / 255, 26 / 255, 26 / 255, 1),
         elvTransparent = CreateColor(15 / 255, 15 / 255, 15 / 255, 0.8),
+
+        highlight = CreateColor(0.1, 0.1, 0.1, 0.5),
     },
 }
 

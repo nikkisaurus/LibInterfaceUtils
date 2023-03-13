@@ -8,7 +8,25 @@ end
 
 local defaults = {
     backdrop = {
-        highlightEnabled = true,
+        normal = {
+            bgColor = private.assets.colors.darker,
+            highlightEnabled = true,
+            highlightColor = private.assets.colors.highlight,
+        },
+    },
+    font = {
+        normal = {
+            font = "GameFontNormal",
+            color = private.assets.colors.flair,
+        },
+        highlight = {
+            font = "GameFontNormal",
+            color = private.assets.colors.flair,
+        },
+        disabled = {
+            font = "GameFontDisable",
+            color = private.assets.colors.lightWhite,
+        },
     },
 }
 
@@ -29,11 +47,30 @@ local registry = {
     PreClick = true,
 }
 
+local scripts = {
+    OnEnter = function(self)
+        private:SetFont(self.text, self:GetUserData("highlight"))
+    end,
+
+    OnLeave = function(self)
+        private:SetFont(self.text, self:GetUserData("normal"))
+    end,
+
+    OnMouseDown = function(self)
+        if not self:IsDisabled() then
+            self.text:AdjustPointsOffset(1, -1)
+        end
+    end,
+
+    OnMouseUp = function(self)
+        if not self:IsDisabled() then
+            self.text:AdjustPointsOffset(-1, 1)
+        end
+    end,
+}
+
 local methods = {
     OnAcquire = function(self)
-        self:SetNormalFontObject(GameFontNormal)
-        self:SetHighlightFontObject(GameFontHighlight)
-        self:SetDisabledFontObject(GameFontDisable)
         self:SetPushedTextOffset(1, -1)
         self:SetText("")
 
@@ -41,15 +78,20 @@ local methods = {
         self:SetDraggable()
         self:EnableMouse(true) -- this gets disabled during SetDraggable
 
-        self:SetBackdrop(defaults.backdrop)
+        self:SetBackdrop()
+        self:SetDefaultFonts()
     end,
 
     IsAutoWidth = function(self)
         return self:GetUserData("autoWidth")
     end,
 
+    IsDisabled = function(self)
+        return self:GetUserData("isDisabled")
+    end,
+
     SetBackdrop = function(self, backdrop)
-        private:SetBackdrop(self, CreateFromMixins(defaults.backdrop, backdrop or {}))
+        private:SetBackdrop(self, CreateFromMixins(defaults.backdrop.normal, backdrop or {}))
     end,
 
     SetAutoWidth = function(self, isAutoWidth)
@@ -59,18 +101,44 @@ local methods = {
         end
     end,
 
+    SetDisabled = function(self, isDisabled)
+        self:SetUserData("isDisabled", isDisabled)
+        if isDisabled then
+            self:Disable()
+            private:SetFont(self.text, self:GetUserData("disabled"))
+        else
+            self:Enable()
+            private:SetFont(self.text, self:GetUserData("normal"))
+        end
+    end,
+
+    SetDefaultFonts = function(self, font)
+        self:SetUserData("normal", defaults.font.normal)
+        self:SetUserData("highlight", defaults.font.highlight)
+        self:SetUserData("disabled", defaults.font.disabled)
+        private:SetFont(self.text, self:GetUserData("normal"))
+    end,
+
+    SetFont = function(self, fontType, font)
+        self:SetUserData(fontType, font)
+        private:SetFont(self.text, self:GetUserData(self:IsDisabled() and "disabled" or "normal"))
+    end,
+
     SetText = function(self, text)
-        self:_SetText(text or "")
+        self.text:SetText(text or "")
         if self:IsAutoWidth() then
-            self:SetWidth(self:GetTextWidth() + 20)
+            self:SetWidth(self.text:GetStringWidth() + 20)
         end
     end,
 }
 
 local function creationFunc()
     local button = CreateFrame("Button", private:GetObjectName(objectType), UIParent)
-    button._SetText = button.SetText
     button = private:CreateTextures(button)
+
+    button.text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    button.text:SetPoint("TOPLEFT")
+    button.text:SetPoint("BOTTOMRIGHT")
 
     local widget = {
         object = button,
@@ -79,7 +147,7 @@ local function creationFunc()
         registry = registry,
     }
 
-    return private:RegisterWidget(widget, methods)
+    return private:RegisterWidget(widget, methods, scripts)
 end
 
 private:RegisterWidgetPool(objectType, creationFunc)

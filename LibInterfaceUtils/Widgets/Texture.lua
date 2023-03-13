@@ -44,6 +44,7 @@ local registry = {
 local methods = {
     OnAcquire = function(self)
         self:SetSize(100, 100)
+        self:SetVertexColor(1, 1, 1, 1)
         self:SetTexture()
         self:SetInteractible()
     end,

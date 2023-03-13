@@ -168,15 +168,15 @@ function lib:CreateTestFrame()
     -- texture:SetAtlas("raceicon128-bloodelf-female")
     -- texture:SetTexture(236547)
 
-    local giftWrapping = lib:New("Texture")
+    local giftWrapping = frame:New("Texture")
     giftWrapping:SetColorTexture(fastrandom(), fastrandom(), fastrandom(), 1)
-    giftWrapping:SetParent(texture)
-    giftWrapping:SetAllPoints(texture)
+    -- giftWrapping:SetParent(texture)
+    -- giftWrapping:SetAllPoints(texture)
 
     giftWrapping:SetInteractible(true)
-    giftWrapping:SetCallback("OnMouseDown", function(...)
-        giftWrapping:Release()
-    end)
+    -- giftWrapping:SetCallback("OnMouseDown", function(...)
+    --     giftWrapping:Release()
+    -- end)
 
     local artwork = frame:New("Texture")
     artwork:SetAtlas("CreditsScreen-Keyart-9")
@@ -186,7 +186,7 @@ function lib:CreateTestFrame()
     frame:DoLayout()
 end
 
-function lib:CreateTestFrame2()
+function lib:CreateTestTabFrame()
     local frame = self:New("Frame")
     frame:SetPoint("CENTER")
     frame:SetSize(800, 600)
@@ -194,114 +194,376 @@ function lib:CreateTestFrame2()
     frame:SetStatus("Loading...")
     frame:SetSpacing(5, 5)
     frame:SetLayout("Fill")
-    frame:ApplyTemplate("transparent")
+    -- frame:ApplyTemplate("transparent")
 
     local tabGroup = frame:New("TabGroup")
-    tabGroup:SetLayout("List")
+    -- tabGroup:SetLayout("List")
     tabGroup:SetTabs({
         {
             text = "Tab 1",
             onClick = function(content)
-                for i = 1, 50 do
-                    local button = content:New("Label")
-                    button:SetFullWidth(true)
-                    button:SetText("Adipisicing ipsum laboris ad cupidatat elit cillum anim cupidatat mollit reprehenderit deserunt aute. Labore ullamco laborum ea est eu ea et labore. Pariatur veniam nulla incididunt eu irure ut amet. Cillum pariatur cupidatat duis commodo aliquip non. Aute irure laboris mollit sit esse fugiat quis.")
-                end
-
-                local button = content:New("Button")
-                button:SetWidth(700)
-                button:SetText("END")
-                content:DoLayout()
+                local tabGroup = content:New("TabGroup")
+                tabGroup:SetFullWidth(true)
+                tabGroup:SetFullHeight(true)
+                tabGroup:SetTabs({
+                    {
+                        text = "Tab 1",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                            local button = content:New("Button")
+                            button:SetText("END")
+                        end,
+                    },
+                    {
+                        text = "Tab 2",
+                        disabled = function()
+                            return true
+                        end,
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 3",
+                        disabled = true,
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 4",
+                        disabled = function()
+                            return
+                        end,
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 5",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 6",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 7",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 8",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 9",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 10",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 11",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 12",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 13",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 14",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 15",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                    {
+                        text = "Tab 16",
+                        onClick = function(content)
+                            for i = 1, fastrandom(1, 50) do
+                                local button = content:New("Button")
+                                -- button:SetFullWidth(true)
+                                button:SetText(i)
+                                button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                            end
+                        end,
+                    },
+                })
             end,
         },
         {
             text = "Tab 2",
-            onClick = function(...)
-                print(...)
+            disabled = function()
+                return true
+            end,
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 3",
-            onClick = function(...)
-                print(...)
+            disabled = true,
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 4",
-            onClick = function(...)
-                print(...)
+            disabled = function()
+                return
+            end,
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 5",
-            onClick = function(...)
-                print(...)
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 6",
-            onClick = function(...)
-                print(...)
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 7",
-            onClick = function(...)
-                print(...)
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 8",
-            onClick = function(...)
-                print(...)
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 9",
-            onClick = function(...)
-                print(...)
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 10",
-            onClick = function(...)
-                print(...)
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 11",
-            onClick = function(...)
-                print(...)
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 12",
-            onClick = function(...)
-                print(...)
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 13",
-            onClick = function(...)
-                print(...)
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 14",
-            onClick = function(...)
-                print(...)
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 15",
-            onClick = function(...)
-                print(...)
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
         {
             text = "Tab 16",
-            onClick = function(...)
-                print(...)
+            onClick = function(content)
+                for i = 1, fastrandom(1, 50) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(i)
+                    button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1) })
+                end
             end,
         },
     })
@@ -314,12 +576,12 @@ local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:SetScript("OnEvent", function()
     lib:CreateTestFrame()
-    -- lib:CreateTestFrame2()
+    -- lib:CreateTestTabFrame()
 end)
 
 SLASH_LIBINTERFACEUTILS1 = "/liu"
 SlashCmdList["LIBINTERFACEUTILS"] = function()
     print("New")
     lib:CreateTestFrame()
-    lib:CreateTestFrame2()
+    -- lib:CreateTestTabFrame()
 end
