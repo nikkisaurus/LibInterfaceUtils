@@ -103,6 +103,10 @@ local templates = {
     },
 }
 
+local templateMetaTable = {
+    __index = templates.default,
+}
+
 local childScripts = {
     close = {
         OnClick = function(self)
@@ -221,9 +225,14 @@ local methods = {
         self:SetScrollAnchors()
     end,
 
-    ApplyTemplate = function(self, templateName)
-        local template = templates[templateName]
-        assert(template, "Invalid argument for Frame:ApplyTemplate(template): template")
+    ApplyTemplate = function(self, templateName, mixin)
+        local template
+        if type(templateName) == "table" then
+            template = templateName
+            local info = setmetatable(template, templateMetaTable)
+        else
+            template = templates[templateName]
+        end
 
         private:SetBackdrop(self, template.frame)
         private:SetBackdrop(self.statusBar, template.statusBar)

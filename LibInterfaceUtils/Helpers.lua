@@ -116,6 +116,8 @@ end
 
 local defaultBackdrop = {
     bgEnabled = true,
+    bgAtlas = false,
+    bgTexCoord = { 0, 1, 0, 1 },
     bgTexture = private.assets.blankTexture,
     bgColor = private.assets.colors.dark,
 
@@ -125,6 +127,8 @@ local defaultBackdrop = {
     bordersSize = 1,
 
     highlightEnabled = false,
+    highlightAtlas = false,
+    highlightTexCoord = { 0, 1, 0, 1 },
     highlightTexture = private.assets.blankTexture,
     highlightColor = private.assets.colors.normal,
     highlightBlendMode = "ADD",
@@ -139,12 +143,18 @@ function private:SetBackdrop(object, backdrop)
 
     if object.bg then
         if info.bgEnabled then
-            object.bg:SetTexture(info.bgTexture)
+            if info.bgAtlas then
+                object.bg:SetAtlas(info.bgAtlas)
+            else
+                object.bg:SetTexture(info.bgTexture)
+            end
             object.bg:SetVertexColor(info.bgColor:GetRGBA())
         else
             object.bg:SetTexture()
             object.bg:SetVertexColor(1, 1, 1, 1)
         end
+
+        object.bg:SetTexCoord(unpack(info.bgTexCoord))
     end
 
     if object.borders then
@@ -157,13 +167,19 @@ function private:SetBackdrop(object, backdrop)
 
     if object.highlight then
         if info.highlightEnabled then
-            object.highlight:SetTexture(info.highlightTexture)
+            if info.highlightAtlas then
+                object.highlight:SetAtlas(info.highlightAtlas)
+            else
+                object.highlight:SetTexture(info.highlightTexture)
+            end
             object.highlight:SetVertexColor(info.highlightColor:GetRGBA())
             object.highlight:SetBlendMode(info.highlightBlendMode)
         else
             object.highlight:SetTexture()
             object.highlight:SetVertexColor(1, 1, 1, 1)
         end
+
+        object.highlight:SetTexCoord(unpack(info.highlightTexCoord))
     end
 end
 

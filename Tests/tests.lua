@@ -12,6 +12,18 @@ function lib:CreateTestFrame()
     frame:SetTitle("Test Frame")
     frame:SetStatus("Loading...")
     frame:SetSpacing(5, 5)
+    frame:ApplyTemplate({
+        frame = {
+            -- bgTexture = "interface/professions/professionbackgroundartalchemy",
+            -- bgColor = CreateColor(1, 1, 1, 1),
+            -- bgTexCoord = { 0, 0.75, 0, 0.25 },
+            -- bgAtlas = "Professions-Recipe-Background-Alchemy",
+            -- highlightColor = CreateColor(1, 1, 1, 1),
+            -- highlightEnabled = true,
+            -- highlightAtlas = "Professions-Recipe-Background-Enchanting",
+            -- highlightBlendMode = "DISABLE",
+        },
+    })
 
     local header = frame:New("Header")
     header:SetText("Widgets")
