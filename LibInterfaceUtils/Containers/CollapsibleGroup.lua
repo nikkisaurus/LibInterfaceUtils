@@ -100,7 +100,13 @@ local methods = {
     end,
 
     MarkDirty = function(self, _, height)
-        self:SetHeight(height + self.header:GetHeight() + (self:GetUserData("collapsed") and 0 or 9))
+        if self:GetUserData("collapsed") then
+            height = 0
+        else
+            height = height + self:GetUserData("top") + self:GetUserData("bottom")
+        end
+        self.container:SetHeight(height)
+        self:SetHeight(height + self.header:GetHeight())
     end,
 
     ParentChild = function(self, child, parent)
@@ -126,8 +132,12 @@ local methods = {
     end,
 
     SetPadding = function(self, left, right, top, bottom)
+        self:SetUserData("left", left or 5)
+        self:SetUserData("right", right or 5)
+        self:SetUserData("top", top or 5)
+        self:SetUserData("bottom", bottom or 5)
         self.content:SetPoint("TOPLEFT", left or 5, -(top or 5))
-        self.content:SetPoint("BOTTOMRIGHT", -(right or 5), -(bottom or 5))
+        self.content:SetPoint("BOTTOMRIGHT", -(right or 5), (bottom or 5))
     end,
 }
 

@@ -11,8 +11,9 @@ local selected = {}
 local methods = {
     OnAcquire = function(self)
         self:SetSize(300, 20)
-        self:SetInfo()
+        self:SetPadding()
         self:SetMultiselect(true)
+        self:SetInfo()
     end,
 
     GetSelected = function(self)

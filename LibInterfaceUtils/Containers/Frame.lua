@@ -115,22 +115,6 @@ local childScripts = {
         end,
     },
 
-    content = {
-        OnMouseDown = function(self)
-            local frame = self.widget.object
-            if frame:IsMovable() then
-                frame:StartMoving()
-            end
-        end,
-
-        OnMouseUp = function(self)
-            local frame = self.widget.object
-            if frame:IsMovable() then
-                frame:StopMovingOrSizing()
-            end
-        end,
-    },
-
     resizer = {
         OnMouseDown = function(self)
             local frame = self.widget.object
@@ -229,24 +213,23 @@ local methods = {
     end,
 
     GetAnchorX = function(self)
-        return self.content
+        return self.content:GetAnchorX()
     end,
 
     GetAvailableHeight = function(self)
-        return private:round(self.content:GetHeight())
+        return self.content:GetAvailableHeight()
     end,
 
     GetAvailableWidth = function(self)
-        return private:round(self.content:GetWidth())
+        return self.content:GetAvailableWidth()
     end,
 
-    MarkDirty = function(self, usedWidth, usedHeight)
-        -- self.content:SetSize(usedWidth, usedHeight)
-        -- self.horizontalBox:SetSize(usedWidth, usedHeight)
+    MarkDirty = function(self, ...)
+        self.content:MarkDirty(...)
     end,
 
     ParentChild = function(self, child)
-        child:SetParent(self.content)
+        self.content:ParentChild(child)
     end,
 
     SetAnchors = function(self)
@@ -279,10 +262,12 @@ local methods = {
 
 local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
+    frame = private:CreateTextures(frame)
+
     frame.titleBar = CreateFrame("Frame", nil, frame)
     frame.titleBar:SetPoint("TOPLEFT")
     frame.titleBar:SetPoint("TOPRIGHT")
-    frame.titleBar.frame = frame
+    frame.titleBar = private:CreateTextures(frame.titleBar)
 
     frame.titleBar.title = frame.titleBar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.titleBar.title:SetAllPoints(frame.titleBar)
@@ -296,6 +281,7 @@ local function creationFunc()
     frame.statusBar:SetPoint("BOTTOMLEFT")
     frame.statusBar:SetPoint("BOTTOMRIGHT")
     frame.statusBar:SetHeight(20)
+    frame.statusBar = private:CreateTextures(frame.statusBar)
 
     frame.statusBar.resizer = CreateFrame("Button", nil, frame.statusBar)
     frame.statusBar.resizer:SetNormalTexture([[INTERFACE\CHATFRAME\UI-CHATIM-SIZEGRABBER-DOWN]])
@@ -309,14 +295,10 @@ local function creationFunc()
     frame.statusBar.text = frame.statusBar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.statusBar.text:SetJustifyH("LEFT")
 
-    frame.content = CreateFrame("Frame", nil, frame, "ResizeLayoutFrame")
-    frame.content.scrollable = true
-    frame.content:SetScript("OnMouseDown", childScripts.content.OnMouseDown)
-    frame.content:SetScript("OnMouseUp", childScripts.content.OnMouseUp)
-
-    frame = private:CreateTextures(frame)
-    frame.titleBar = private:CreateTextures(frame.titleBar)
-    frame.statusBar = private:CreateTextures(frame.statusBar)
+    frame.content = lib:New("ScrollFrame")
+    frame.content:SetParent(frame)
+    frame.content:SetPoint("TOPLEFT", frame.titleBar, "BOTTOMLEFT", 5, -5)
+    frame.content:SetPoint("BOTTOMRIGHT", frame.statusBar, "TOPRIGHT", -5, 5)
 
     local widget = {
         object = frame,

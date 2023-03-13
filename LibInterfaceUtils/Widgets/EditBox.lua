@@ -118,7 +118,7 @@ local methods = {
     SetEditHeight = function(self, height)
         self.editbox:SetHeight(height)
         self.button:SetSize(height * 2, height)
-        self:SetHeight(height + (self:HasLabel() and (self.label:GetStringHeight() + 5) or 0))
+        self:SetHeight(height + (self:HasLabel() and (self.label:GetHeight() + 5) or 0))
         self:SetTextInsets()
     end,
 

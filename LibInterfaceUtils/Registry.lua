@@ -30,6 +30,10 @@ end
 local children = {}
 local ContainerMethods = {
     AddChild = function(self, object)
+        if self.content.AddChild then
+            return self.content:AddChild(object)
+        end
+
         local parent = object:GetUserData("parent")
         if parent then
             parent:ReleaseChild(object)
@@ -46,6 +50,10 @@ local ContainerMethods = {
     end,
 
     New = function(self, objectType)
+        if self.content.New then
+            return self.content:New(objectType)
+        end
+
         local object = lib:New(objectType)
         tinsert(self.children, object)
         object:SetUserData("parent", self)
@@ -55,6 +63,11 @@ local ContainerMethods = {
     end,
 
     ReleaseChild = function(self, object)
+        if self.content.ReleaseChild then
+            self.content:ReleaseChild(object)
+            return
+        end
+
         local remove
         for id, child in ipairs(self.children) do
             if child == object then
@@ -80,6 +93,10 @@ local ContainerMethods = {
     end,
 
     SetLayout = function(self, layout, customFunc)
+        if self.content.SetLayout then
+            self.content:SetLayout(layout, customFunc)
+        end
+
         self.layoutFunc = customFunc or private[layout or "Flow"]
         self.layoutRef = customFunc and "custom" or layout or "Flow"
     end,
