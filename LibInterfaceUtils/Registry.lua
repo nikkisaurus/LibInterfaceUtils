@@ -50,9 +50,9 @@ local ContainerMethods = {
     end,
 
     New = function(self, objectType)
-        if self.content.New then
-            return self.content:New(objectType)
-        end
+        -- if self.content.New then
+        --     return self.content:New(objectType)
+        -- end
 
         local object = lib:New(objectType)
         tinsert(self.children, object)
@@ -90,6 +90,8 @@ local ContainerMethods = {
         for child, _ in pairs(children) do
             child:Release()
         end
+
+        wipe(self.children)
     end,
 
     SetLayout = function(self, layout, customFunc)

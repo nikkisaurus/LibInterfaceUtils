@@ -168,8 +168,21 @@ function lib:CreateTestFrame()
     -- texture:SetAtlas("raceicon128-bloodelf-female")
     -- texture:SetTexture(236547)
 
-    local giftWrapping = frame:New("Texture")
-    giftWrapping:SetColorTexture(fastrandom(), fastrandom(), fastrandom(), 1)
+    local giftWrapping = lib:New("Texture")
+    frame:AddChild(giftWrapping)
+    print(giftWrapping:GetName())
+    local r, g, b, a = fastrandom(), fastrandom(), fastrandom(), 1
+    giftWrapping:SetColorTexture(r, g, b, a)
+
+    C_Timer.After(10, function()
+        if not loaded then
+            giftWrapping:SetTexture(134400)
+            loaded = true
+        else
+            print(giftWrapping:GetName(), frame:GetName())
+            giftWrapping:Release()
+        end
+    end)
     -- giftWrapping:SetParent(texture)
     -- giftWrapping:SetAllPoints(texture)
 

@@ -156,6 +156,10 @@ local methods = {
         self:SetStatus()
     end,
 
+    AddChild = function(self, ...)
+        return self.content:AddChild(...)
+    end,
+
     ApplyTemplate = function(self, templateName, mixin)
         local template
         if type(templateName) == "table" then
@@ -197,6 +201,10 @@ local methods = {
         self:SetAnchors()
     end,
 
+    DoLayout = function(self, ...)
+        return self.content:DoLayout(...)
+    end,
+
     EnableResize = function(self, enabled, minWidth, minHeight, maxWidth, maxHeight)
         self:SetResizable(enabled or false)
         if enabled then
@@ -226,6 +234,10 @@ local methods = {
 
     MarkDirty = function(self, ...)
         self.content:MarkDirty(...)
+    end,
+
+    New = function(self, ...)
+        return self.content:New(...)
     end,
 
     ParentChild = function(self, child)
@@ -312,7 +324,7 @@ local function creationFunc()
     frame.content.widget = widget
     frame.statusBar.resizer.widget = widget
 
-    return private:RegisterContainer(widget, methods, scripts)
+    return private:RegisterWidget(widget, methods, scripts)
 end
 
 private:RegisterWidgetPool(objectType, creationFunc)

@@ -9,8 +9,8 @@ lib.versions = {}
 
 function lib:New(objectType)
     local object = self.pool[objectType]:Acquire()
-    object:Show()
     object:Fire("OnAcquire")
+    object:Show()
 
     return object
 end
