@@ -48,9 +48,51 @@ local defaults = {
 
 local methods = {
     OnAcquire = function(self)
+        self:SetLayout()
         self:SetSize(300, 300)
         self:SetBackdrop()
         self:SetTabs()
+    end,
+
+    OnRelease = function(self)
+        self.tabs:ReleaseChildren()
+        self.content:ReleaseChildren()
+    end,
+
+    DoLayout = function(self, ...)
+        return self.content:DoLayout(...)
+    end,
+
+    GetAnchorX = function(self)
+        return self.content:GetAnchorX()
+    end,
+
+    GetAvailableHeight = function(self)
+        return self.content:GetAvailableHeight()
+    end,
+
+    GetAvailableWidth = function(self)
+        return self.content:GetAvailableWidth()
+    end,
+
+    MarkDirty = function(self, ...)
+        self.content:MarkDirty(...)
+    end,
+
+    New = function(self, ...)
+        return self.content:New(...)
+    end,
+
+    ParentChild = function(self, ...)
+        self.content:ParentChild(...)
+    end,
+
+    ReleaseChildren = function(self)
+        self.content:ReleaseChildren()
+    end,
+
+    RemoveChild = function(self, ...)
+        self.content:RemoveChild(...)
     end,
 
     SetBackdrop = function(self, backdrop)
@@ -79,6 +121,7 @@ local methods = {
 
     SetTabs = function(self, tabs)
         self.tabs:ReleaseChildren()
+
         if not tabs then
             return
         end
@@ -86,12 +129,6 @@ local methods = {
         for _, tabInfo in ipairs(tabs) do
             local tab = self.tabs:New("Button")
             tab:SetText(tabInfo.text)
-            tab:SetScript("OnClick", function()
-                self:SetSelected(tab)
-                self.content:ReleaseChildren()
-                tabInfo.onClick(self.content, tabInfo)
-                self.content:DoLayout()
-            end)
 
             local disabled = tabInfo.disabled
             if type(disabled) == "boolean" then
@@ -99,6 +136,13 @@ local methods = {
             elseif type(disabled) == "function" then
                 tab:SetDisabled(disabled())
             end
+
+            tab:SetCallback("OnClick", function()
+                self:SetSelected(tab)
+                self.content:ReleaseChildren()
+                tabInfo.onClick(self.content, tabInfo)
+                self.content:DoLayout()
+            end)
         end
 
         self:SetSelected()
@@ -129,7 +173,7 @@ local function creationFunc()
         version = version,
     }
 
-    return private:RegisterWidget(widget, methods)
+    return private:RegisterContainer(widget, methods)
 end
 
 private:RegisterWidgetPool(objectType, creationFunc)

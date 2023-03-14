@@ -35,6 +35,7 @@ local childScripts = {
 
 local methods = {
     OnAcquire = function(self)
+        self:SetLayout()
         self:SetSize(500, 300)
         self:EnableBackdrop()
         self:SetLabel()
@@ -48,28 +49,12 @@ local methods = {
         self:SetBackdrop(backdrop)
     end,
 
-    GetAnchorX = function(self)
-        return self.content
-    end,
-
-    GetAvailableHeight = function(self)
-        return private:round(self.content:GetHeight())
-    end,
-
-    GetAvailableWidth = function(self)
-        return private:round(self.content:GetWidth())
-    end,
-
     HasLabel = function(self)
         return private:strcheck(self.label:GetText())
     end,
 
     MarkDirty = function(self, _, height)
         self:SetHeight(height + (self:HasLabel() and (self.label:GetHeight() + 5) or 0) + (self:GetUserData("top")) + (self:GetUserData("bottom")))
-    end,
-
-    ParentChild = function(self, child, parent)
-        child:SetParent(self.content)
     end,
 
     SetBackdrop = function(self, backdrop)

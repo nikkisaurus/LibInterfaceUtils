@@ -45,12 +45,32 @@ local ContainerMethods = {
         return private:round(self:GetWidth()), private:round(self:GetHeight())
     end,
 
+    GetAnchorX = function(self)
+        return self.content
+    end,
+
+    GetAvailableHeight = function(self)
+        return private:round(self.content:GetHeight())
+    end,
+
+    GetAvailableWidth = function(self)
+        return private:round(self.content:GetWidth())
+    end,
+
+    MarkDirty = function(self, width, height)
+        self:SetSize(width, height)
+    end,
+
     New = function(self, objectType)
         local object = lib:New(objectType)
         tinsert(self.children, object)
         object:SetUserData("parent", self)
         self:DoLayout()
         return object
+    end,
+
+    ParentChild = function(self, child, parent)
+        child:SetParent(self.content)
     end,
 
     ReleaseChildren = function(self)
@@ -71,7 +91,7 @@ local ContainerMethods = {
     end,
 
     SetLayout = function(self, layout, customFunc)
-        if self.content.SetLayout then
+        if self.content and self.content.SetLayout then
             self.content:SetLayout(layout, customFunc)
         end
 
@@ -137,12 +157,6 @@ local ObjectMethods = {
 
     SetCallback = function(self, script, handler)
         self.widget.callbacks[script] = handler
-    end,
-
-    SetDraggable = function(self, isDraggable, ...)
-        self:EnableMouse(isDraggable or false)
-        self:SetMovable(isDraggable or false)
-        self:RegisterForDrag(...)
     end,
 
     SetFillWidth = function(self, fillWidth)

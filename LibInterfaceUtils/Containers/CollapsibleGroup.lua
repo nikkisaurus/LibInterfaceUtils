@@ -35,25 +35,21 @@ local childScripts = {
     },
 }
 
-local scripts = {
-    -- OnSizeChanged = function(self)
-    --     self:DoLayout()
-    -- end,
-}
-
 local methods = {
     OnAcquire = function(self)
+        self:SetLayout()
         self:SetSize(500, 300)
-        self:EnableHeaderBackdrop(true)
-        self:SetBackdrop()
-        self:SetLabel()
-        self:SetLabelFont(GameFontNormal)
-        self:Collapse()
         self:SetPadding()
+        self:SetBackdrop()
+        self:EnableHeaderBackdrop(true)
+        self:SetLabelFont(GameFontNormal)
+        self:SetLabel()
+        self:Collapse()
     end,
 
     Collapse = function(self, collapsed)
         self:SetUserData("collapsed", collapsed)
+
         if collapsed then
             self.container:Hide()
         else
@@ -62,16 +58,8 @@ local methods = {
 
         local parent = self:GetUserData("parent")
         while parent do
-            local newParent = parent:GetUserData("parent")
-            if newParent then
-                parent = newParent
-            else
-                break
-            end
-        end
-
-        if parent then
             parent:DoLayout()
+            parent = parent:GetUserData("parent")
         end
     end,
 
@@ -87,20 +75,7 @@ local methods = {
         self:SetHeaderBackdrop(backdrop)
     end,
 
-    GetAnchorX = function(self)
-        return self.content
-    end,
-
-    GetAvailableHeight = function(self)
-        return private:round(self.content:GetHeight())
-    end,
-
-    GetAvailableWidth = function(self)
-        return private:round(self.content:GetWidth())
-    end,
-
     MarkDirty = function(self, _, height)
-        print(self.header:GetText())
         if self:GetUserData("collapsed") then
             height = 0
         else
@@ -108,10 +83,6 @@ local methods = {
         end
         self.container:SetHeight(height)
         self:SetHeight(height + self.header:GetHeight())
-    end,
-
-    ParentChild = function(self, child, parent)
-        child:SetParent(self.content)
     end,
 
     SetBackdrop = function(self, backdrop)
@@ -175,7 +146,7 @@ local function creationFunc()
 
     frame.header.widget = widget
 
-    return private:RegisterContainer(widget, methods, scripts)
+    return private:RegisterContainer(widget, methods)
 end
 
 private:RegisterWidgetPool(objectType, creationFunc)

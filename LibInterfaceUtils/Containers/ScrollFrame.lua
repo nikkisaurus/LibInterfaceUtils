@@ -86,6 +86,7 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self)
+        self:SetLayout()
         self:SetSize(500, 300)
         self:EnableBackdrop()
     end,
@@ -115,10 +116,6 @@ local methods = {
     MarkDirty = function(self, usedWidth, usedHeight)
         self.content:SetSize(usedWidth, usedHeight)
         self.horizontalBox:SetSize(usedWidth, usedHeight)
-    end,
-
-    ParentChild = function(self, child, parent)
-        child:SetParent(self.content)
     end,
 
     SetBackdrop = function(self, backdrop)

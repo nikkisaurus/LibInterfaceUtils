@@ -11,7 +11,7 @@ function lib:CreateTestFrame()
     frame:SetSize(800, 600)
     frame:SetTitle("Test Frame")
     frame:SetStatus("Loading...")
-    -- frame:SetSpacing(5, 5)
+    frame:SetSpacing(5, 5)
     -- frame:ApplyTemplate({
     --     frame = {
     --         -- bgTexture = "interface/professions/professionbackgroundartalchemy",
@@ -578,13 +578,13 @@ end
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:SetScript("OnEvent", function()
-    lib:CreateTestFrame()
-    -- lib:CreateTestTabFrame()
+    -- lib:CreateTestFrame()
+    lib:CreateTestTabFrame()
 end)
 
 SLASH_LIBINTERFACEUTILS1 = "/liu"
 SlashCmdList["LIBINTERFACEUTILS"] = function()
     print("New")
-    lib:CreateTestFrame()
-    -- lib:CreateTestTabFrame()
+    -- lib:CreateTestFrame()
+    lib:CreateTestTabFrame()
 end

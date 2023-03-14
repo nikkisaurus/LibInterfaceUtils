@@ -19,10 +19,6 @@ local methods = {
     OnAcquire = function(self)
         self:SetSize(100, 100)
         self:SetInteractible()
-        print("Acquire texture")
-    end,
-
-    OnRelease = function(self)
         self:SetTexture()
     end,
 
@@ -50,4 +46,3 @@ local function creationFunc()
 end
 
 private:RegisterWidgetPool(objectType, creationFunc)
--- !FIX ME textures are not resetting

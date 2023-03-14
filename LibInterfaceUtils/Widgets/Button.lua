@@ -75,8 +75,6 @@ local methods = {
         self:SetText("")
 
         self:SetSize(100, 20)
-        self:SetDraggable()
-        self:EnableMouse(true) -- this gets disabled during SetDraggable
 
         self:SetBackdrop()
         self:SetDefaultFonts()

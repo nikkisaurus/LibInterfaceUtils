@@ -144,13 +144,13 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self, ...)
-        self:SetClampedToScreen(true)
-        self:SetDraggable(true, "LeftButton")
         local w, h = GetPhysicalScreenSize()
-        self:EnableResize(true, 300, 300, w * 0.8, h * 0.8)
-        self:SetFrameStrata("DIALOG")
-
+        self:SetLayout()
         self:SetSize(300, 300)
+        self:EnableResize(true, 300, 300, w * 0.8, h * 0.8)
+        self:SetDraggable(true, "LeftButton")
+        self:SetClampedToScreen(true)
+        self:SetFrameStrata("DIALOG")
         self:ApplyTemplate("default")
         self:SetTitle()
         self:SetStatus()
@@ -177,6 +177,7 @@ local methods = {
         private:SetBackdrop(self.statusBar, template.statusBar)
         private:SetBackdrop(self.titleBar, template.titleBar)
 
+        -- TODO redo templates and implement scrollbar customization on scrollFrame container
         -- self.verticalBar.Track.Thumb.Main:SetTexture(template.scrollBars.vertical.track.texture)
         -- self.verticalBar.Track.Thumb.Main:SetVertexColor(template.scrollBars.vertical.track.color:GetRGBA())
         -- self.verticalBar.Back.Texture:SetVertexColor(template.scrollBars.vertical.track.color:GetRGBA())
@@ -211,6 +212,7 @@ local methods = {
 
     EnableResize = function(self, enabled, minWidth, minHeight, maxWidth, maxHeight)
         self:SetResizable(enabled or false)
+
         if enabled then
             assert(type(minWidth) == "number", "Invalid argument for Frame:EnableResize(enabled, minWidth, minHeight, maxWidth, maxHeight): minWidth")
             assert(type(minHeight) == "number", "Invalid argument for Frame:EnableResize(enabled, minWidth, minHeight, maxWidth, maxHeight): minHeight")
@@ -244,8 +246,16 @@ local methods = {
         return self.content:New(...)
     end,
 
-    ParentChild = function(self, child)
-        self.content:ParentChild(child)
+    ParentChild = function(self, ...)
+        self.content:ParentChild(...)
+    end,
+
+    ReleaseChildren = function(self)
+        self.content:ReleaseChildren()
+    end,
+
+    RemoveChild = function(self, ...)
+        self.content:RemoveChild(...)
     end,
 
     SetAnchors = function(self)
@@ -265,6 +275,22 @@ local methods = {
         self.statusBar.text:SetPoint("RIGHT", self.statusBar.resizer, "LEFT", -template.statusBar.padding, 0)
         self.statusBar.text:SetPoint("BOTTOM", -template.statusBar.padding, template.statusBar.padding)
     end,
+
+    SetDraggable = function(self, isDraggable, ...)
+        self:EnableMouse(isDraggable or false)
+        self:SetMovable(isDraggable or false)
+        self:RegisterForDrag(...)
+    end,
+
+    -- !
+    -- SetLayout = function(self, ...)
+    --     self.content:SetLayout(...)
+    -- end,
+
+    -- SetPadding = function(self, ...)
+    --     self.content:SetPadding(...)
+    -- end,
+    -- !
 
     SetStatus = function(self, text)
         self.statusBar.text:SetText(text or "")
@@ -325,10 +351,9 @@ local function creationFunc()
     }
 
     frame.titleBar.close.widget = widget
-    frame.content.widget = widget
     frame.statusBar.resizer.widget = widget
 
-    return private:RegisterWidget(widget, methods, scripts)
+    return private:RegisterContainer(widget, methods, scripts)
 end
 
 private:RegisterWidgetPool(objectType, creationFunc)
