@@ -30,13 +30,9 @@ end
 local children = {}
 local ContainerMethods = {
     AddChild = function(self, object)
-        if self.content.AddChild then
-            return self.content:AddChild(object)
-        end
-
         local parent = object:GetUserData("parent")
         if parent then
-            parent:ReleaseChild(object)
+            parent:RemoveChild(object)
         end
         tinsert(self.children, object)
         object:SetUserData("parent", self)
@@ -50,48 +46,28 @@ local ContainerMethods = {
     end,
 
     New = function(self, objectType)
-        -- if self.content.New then
-        --     return self.content:New(objectType)
-        -- end
-
         local object = lib:New(objectType)
         tinsert(self.children, object)
         object:SetUserData("parent", self)
         self:DoLayout()
-
         return object
     end,
 
-    ReleaseChild = function(self, object)
-        if self.content.ReleaseChild then
-            self.content:ReleaseChild(object)
-            return
+    ReleaseChildren = function(self)
+        for i = #self.children, 1, -1 do
+            self.children[i]:Release()
+            tremove(self.children, i)
         end
-
-        local remove
-        for id, child in ipairs(self.children) do
-            if child == object then
-                remove = id
-                break
-            end
-        end
-        tremove(self.children, remove)
-
-        self:DoLayout()
     end,
 
-    ReleaseChildren = function(self)
-        wipe(children)
-
-        for _, child in pairs(self.children) do
-            children[child] = true
+    RemoveChild = function(self, object)
+        for id, child in ipairs(self.children) do
+            if child == object then
+                tremove(self.children, id)
+                self:DoLayout()
+                return
+            end
         end
-
-        for child, _ in pairs(children) do
-            child:Release()
-        end
-
-        wipe(self.children)
     end,
 
     SetLayout = function(self, layout, customFunc)
@@ -103,15 +79,13 @@ local ContainerMethods = {
         self.layoutRef = customFunc and "custom" or layout or "Flow"
     end,
 
-    -- Required container methods (relies on protected frames): Fill, FillX, FillY, GetAvailableHeight, GetAvailableWidth, MarkDirty, ParentChild
+    SetSpacing = function(self, spacingH, spacingV)
+        self:SetUserData("spacingH", spacingH)
+        self:SetUserData("spacingV", spacingV)
+    end,
 }
 
 local ObjectMethods = {
-    DoHeight = function(self, oldHeight, height)
-        self:InitUserData("height", oldHeight)
-        self:SetHeight(height)
-    end,
-
     Fire = function(self, script, ...)
         if self:HasScript(script) and self:GetScript(script) then
             self:GetScript(script)(self, ...)
@@ -149,16 +123,16 @@ local ObjectMethods = {
             self:ReleaseChildren()
         end
 
-        lib.pool[self.widget.type]:Release(self)
-
         local parent = self:GetUserData("parent")
         if parent then
-            parent:ReleaseChild(self)
+            parent:RemoveChild(self)
         end
 
-        self:Fire("OnRelease")
+        lib.pool[self.widget.type]:Release(self)
         wipe(self.widget.userdata)
         wipe(self.widget.callbacks)
+
+        self:Fire("OnRelease")
     end,
 
     SetCallback = function(self, script, handler)
@@ -188,11 +162,6 @@ local ObjectMethods = {
         self:SetUserData("yOffset", yOffset)
         self:SetUserData("xFill", xFill)
         self:SetUserData("yFill", yFill)
-    end,
-
-    SetSpacing = function(self, spacingH, spacingV)
-        self:SetUserData("spacingH", spacingH)
-        self:SetUserData("spacingV", spacingV)
     end,
 
     SetUserData = function(self, key, value)

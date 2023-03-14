@@ -100,6 +100,7 @@ local methods = {
     end,
 
     MarkDirty = function(self, _, height)
+        print(self.header:GetText())
         if self:GetUserData("collapsed") then
             height = 0
         else

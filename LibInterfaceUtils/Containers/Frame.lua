@@ -156,6 +156,10 @@ local methods = {
         self:SetStatus()
     end,
 
+    OnRelease = function(self)
+        self.content:ReleaseChildren()
+    end,
+
     AddChild = function(self, ...)
         return self.content:AddChild(...)
     end,

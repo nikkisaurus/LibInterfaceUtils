@@ -11,7 +11,7 @@ function lib:CreateTestFrame()
     frame:SetSize(800, 600)
     frame:SetTitle("Test Frame")
     frame:SetStatus("Loading...")
-    frame:SetSpacing(5, 5)
+    -- frame:SetSpacing(5, 5)
     -- frame:ApplyTemplate({
     --     frame = {
     --         -- bgTexture = "interface/professions/professionbackgroundartalchemy",
@@ -166,30 +166,20 @@ function lib:CreateTestFrame()
     local texture = frame:New("Texture")
     texture:SetAtlas(format("Rune-0%d-light", fastrandom(1, 9)))
     -- texture:SetAtlas("raceicon128-bloodelf-female")
-    -- texture:SetTexture(236547)
 
-    local giftWrapping = lib:New("Texture")
-    frame:AddChild(giftWrapping)
-    print(giftWrapping:GetName())
-    local r, g, b, a = fastrandom(), fastrandom(), fastrandom(), 1
-    giftWrapping:SetColorTexture(r, g, b, a)
-
-    C_Timer.After(10, function()
-        if not loaded then
-            giftWrapping:SetTexture(134400)
-            loaded = true
-        else
-            print(giftWrapping:GetName(), frame:GetName())
-            giftWrapping:Release()
-        end
-    end)
-    -- giftWrapping:SetParent(texture)
-    -- giftWrapping:SetAllPoints(texture)
-
+    local giftWrapping = frame:New("Texture")
+    giftWrapping:SetColorTexture(fastrandom(), fastrandom(), fastrandom(), 1)
     giftWrapping:SetInteractible(true)
-    -- giftWrapping:SetCallback("OnMouseDown", function(...)
-    --     giftWrapping:Release()
-    -- end)
+    giftWrapping:SetCallback("OnMouseDown", function(...)
+        -- giftWrapping:Release()
+        giftWrapping:SetTexture(236547)
+    end)
+
+    local btn = frame:New("Button")
+    btn:SetText("Click")
+    btn:SetCallback("OnClick", function()
+        editBoxes:Release()
+    end)
 
     local artwork = frame:New("Texture")
     artwork:SetAtlas("CreditsScreen-Keyart-9")
