@@ -150,6 +150,7 @@ local methods = {
         end
 
         self.editbox:SetPoint("RIGHT")
+        self.button:SetParent(self.editbox)
         self.button:SetPoint("TOPRIGHT")
         self:SetEditHeight(self.editbox:GetHeight())
     end,
@@ -188,7 +189,6 @@ local function creationFunc()
     frame.editbox = private:CreateTextures(frame.editbox)
 
     frame.button = lib:New("Button")
-    frame.button:SetParent(frame.editbox)
     frame.button:SetText(OKAY)
     frame.button:SetScript("OnClick", childScripts.button.OnClick)
 

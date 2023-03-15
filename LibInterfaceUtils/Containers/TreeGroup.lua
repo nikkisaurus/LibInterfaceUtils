@@ -88,6 +88,7 @@ local childScripts = {
             local frame = self.widget.object
             frame.treeContainer:StopMovingOrSizing()
             frame:SetAnchors()
+            frame.treeContainer:SetUserPlaced(false)
         end,
     },
 }
@@ -250,7 +251,7 @@ local methods = {
             end
 
             if treeInfo.children then
-                for _, childInfo in pairs(treeInfo.children) do
+                for _, childInfo in ipairs(treeInfo.children) do
                     local container = node:New("Group")
                     container:SetFullWidth(true)
                     container:SetPadding(2, 2, 2, 2)

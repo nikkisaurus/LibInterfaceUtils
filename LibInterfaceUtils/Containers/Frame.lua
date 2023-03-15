@@ -249,6 +249,10 @@ local methods = {
     end,
 
     SetAnchors = function(self)
+        self.content:SetParent(self)
+        self.content:SetPoint("TOPLEFT", self.titleBar, "BOTTOMLEFT", 5, -5)
+        self.content:SetPoint("BOTTOMRIGHT", self.statusBar, "TOPRIGHT", -5, 5)
+
         local template = self:GetUserData("template")
 
         self.titleBar:SetHeight(max(self.titleBar.title:GetStringHeight() + (template.titleBar.padding * 2), 20))
@@ -330,9 +334,6 @@ local function creationFunc()
     frame.statusBar.text:SetJustifyH("LEFT")
 
     frame.content = lib:New("ScrollFrame")
-    frame.content:SetParent(frame)
-    frame.content:SetPoint("TOPLEFT", frame.titleBar, "BOTTOMLEFT", 5, -5)
-    frame.content:SetPoint("BOTTOMRIGHT", frame.statusBar, "TOPRIGHT", -5, 5)
 
     local widget = {
         object = frame,

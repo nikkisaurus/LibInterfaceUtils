@@ -248,9 +248,9 @@ function lib:CreateTreeWindow()
             -- text = "Node " .. i .. (fastrandom(1, 2) == 1 and " long node name so I can check out the wrapping situation" or ""),
             text = "Node " .. i,
             -- icon = fastrandom(1, 2) == 1 and 134400,
-            icon = 134400,
+            -- icon = 134400,
             disabled = fastrandom(1, 2) == 1,
-            children = {
+            children = fastrandom(1, 2) == 1 and {
                 {
                     text = "Child " .. 1,
                     -- icon = fastrandom(1, 2) == 1 and 134400,
@@ -326,8 +326,6 @@ function lib:CreateTreeWindow()
             end,
         })
     end
-
-    tree[1].children = nil
 
     local treeGroup = window:New("TreeGroup")
     treeGroup:SetTree(tree)

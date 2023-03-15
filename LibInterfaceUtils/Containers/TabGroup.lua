@@ -45,6 +45,7 @@ local methods = {
         self:SetSize(300, 300)
         self:ApplyTemplate("default")
         self:SetTabs()
+        self:SetAnchors()
     end,
 
     OnRelease = function(self)
@@ -100,6 +101,17 @@ local methods = {
 
     RemoveChild = function(self, ...)
         self.content:RemoveChild(...)
+    end,
+
+    SetAnchors = function(self)
+        self.tabs:SetParent(self)
+        self.tabs:SetPoint("TOPLEFT")
+        self.tabs:SetPoint("TOPRIGHT")
+
+        self.content:SetParent(self)
+        self.content:SetPoint("TOP", self.tabs, "BOTTOM")
+        self.content:SetPoint("LEFT")
+        self.content:SetPoint("BOTTOMRIGHT")
     end,
 
     SetLayout = function(self, ...)
@@ -158,18 +170,11 @@ local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
 
     frame.tabs = lib:New("Group")
-    frame.tabs:SetParent(frame)
-    frame.tabs:SetPoint("TOPLEFT")
-    frame.tabs:SetPoint("TOPRIGHT")
     frame.tabs:SetHeight(1)
     frame.tabs:SetPadding(0, 0, 0, 0)
     frame.tabs:SetLayout("TabFlow")
 
     frame.content = lib:New("ScrollFrame")
-    frame.content:SetParent(frame)
-    frame.content:SetPoint("TOP", frame.tabs, "BOTTOM")
-    frame.content:SetPoint("LEFT")
-    frame.content:SetPoint("BOTTOMRIGHT")
 
     local widget = {
         object = frame,

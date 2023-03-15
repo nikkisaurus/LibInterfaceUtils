@@ -144,6 +144,7 @@ local methods = {
 
         self.container:SetPoint("RIGHT")
         self:SetEditHeight(self.container:GetHeight())
+        self.button:SetParent(self)
         self.button:SetPoint("TOPLEFT", self.container, "BOTTOMLEFT", 0, -5)
     end,
 
@@ -187,7 +188,6 @@ local function creationFunc()
     ScrollUtil.AddManagedScrollBarVisibilityBehavior(frame.container.ScrollBox, frame.scrollBar, anchors.with(frame), anchors.without(frame))
 
     frame.button = lib:New("Button")
-    frame.button:SetParent(frame)
     frame.button:SetText(ACCEPT)
     frame.button:SetAutoWidth(true)
     frame.button:SetScript("OnClick", childScripts.button.OnClick)

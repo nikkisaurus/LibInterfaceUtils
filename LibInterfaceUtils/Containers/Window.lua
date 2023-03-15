@@ -247,6 +247,10 @@ local methods = {
     end,
 
     SetAnchors = function(self)
+        self.content:SetParent(self)
+        self.content:SetPoint("TOPLEFT", self.titleBar, "BOTTOMLEFT", 5, 0)
+        self.content:SetPoint("BOTTOMRIGHT", -5, 5)
+
         local template = self:GetUserData("template")
 
         self.titleBar:SetHeight(max(self.titleBar.title:GetStringHeight() + (template.titleBar.padding * 2), 20))
@@ -311,9 +315,6 @@ local function creationFunc()
     frame.resizer:SetScript("OnMouseUp", childScripts.resizer.OnMouseUp)
 
     frame.content = lib:New("ScrollFrame")
-    frame.content:SetParent(frame)
-    frame.content:SetPoint("TOPLEFT", frame.titleBar, "BOTTOMLEFT", 5, 0)
-    frame.content:SetPoint("BOTTOMRIGHT", -5, 5)
 
     local widget = {
         object = frame,
