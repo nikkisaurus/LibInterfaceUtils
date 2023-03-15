@@ -177,16 +177,17 @@ local methods = {
 
     SetAnchors = function(self)
         self.treeContainer:SetParent(self)
-        self.tree:SetParent(self.treeContainer)
-        self.resizer:SetParent(self.treeContainer)
-        self.content:SetParent(self)
-
         self.treeContainer:SetPoint("TOPLEFT")
         self.treeContainer:SetPoint("BOTTOM")
 
+        self.tree:SetParent(self.treeContainer)
+        self.tree:SetAllPoints(self.treeContainer)
+
+        self.resizer:SetParent(self.treeContainer)
         self.resizer:SetPoint("TOPLEFT", self.tree, "TOPRIGHT")
         self.resizer:SetPoint("BOTTOMLEFT", self.tree, "BOTTOMRIGHT")
 
+        self.content:SetParent(self)
         self.content:SetPoint("TOPLEFT", self.resizer, "TOPRIGHT", 0, 0)
         self.content:SetPoint("BOTTOMRIGHT")
     end,
@@ -322,7 +323,6 @@ local function creationFunc()
     frame.treeContainer = CreateFrame("Frame", nil, frame)
 
     frame.tree = lib:New("ScrollFrame")
-    frame.tree:SetAllPoints(frame.treeContainer)
     frame.tree:SetLayout("List")
 
     frame.resizer = lib:New("Button")
