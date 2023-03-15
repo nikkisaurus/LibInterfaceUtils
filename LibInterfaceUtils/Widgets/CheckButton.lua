@@ -6,6 +6,12 @@ if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
 
+local defaults = {
+    label = {
+        justifyH = "LEFT",
+    },
+}
+
 local maps = {
     methods = {
         SetJustifyH = true,
@@ -40,15 +46,17 @@ local scripts = {
 local methods = {
     OnAcquire = function(self)
         self:SetSize(300, 20)
-        self:SetLabelFont(GameFontHighlight)
-        self:SetJustifyH("LEFT")
-        self:SetJustifyV("MIDDLE")
-        self:SetWordWrap(true)
+        self:ApplyTemplate()
         self:SetCheckAlignment("TOPLEFT")
-        self:SetAutoWidth(true)
         self:SetStyle()
+        self:SetAutoWidth(true)
         self:SetText()
         self:SetChecked()
+    end,
+
+    ApplyTemplate = function(self, template)
+        local label = CreateFromMixins(defaults.label, template or {})
+        private:SetFont(self.label, label)
     end,
 
     GetChecked = function(self)
@@ -121,11 +129,6 @@ local methods = {
     SetLabel = function(self, text)
         self.label:SetText(text or "")
         self:SetAnchors()
-    end,
-
-    SetLabelFont = function(self, fontObject, color)
-        self.label:SetFontObject(fontObject)
-        self.label:SetTextColor((color or private.assets.colors.white):GetRGBA())
     end,
 
     SetStyle = function(self, style)

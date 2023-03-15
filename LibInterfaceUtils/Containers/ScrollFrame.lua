@@ -7,64 +7,16 @@ if not lib or (lib.versions[objectType] or 0) >= version then
 end
 
 local templates = {
-    default = {
-        frame = { -- backdropTable
-            bgEnabled = false,
-            bordersEnabled = false,
-        },
-        scrollBars = {
-            vertical = {
-                track = { -- scrollBarTable
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.dimmedWhite,
-                },
-                background = { -- scrollBarTable
-                    enabled = true,
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.darker,
-                },
-            },
-            horizontal = {
-                track = { -- scrollBarTable
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.dimmedWhite,
-                },
-                background = { -- scrollBarTable
-                    enabled = true,
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.darker,
-                },
-            },
-        },
-    },
     bordered = {
-        frame = { -- backdropTable
+        frame = {
             bgEnabled = true,
             bordersEnabled = true,
         },
-        scrollBars = {
-            vertical = {
-                track = { -- scrollBarTable
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.dimmedWhite,
-                },
-                background = { -- scrollBarTable
-                    enabled = true,
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.darker,
-                },
-            },
-            horizontal = {
-                track = { -- scrollBarTable
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.dimmedWhite,
-                },
-                background = { -- scrollBarTable
-                    enabled = true,
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.darker,
-                },
-            },
+    },
+    default = {
+        frame = {
+            bgEnabled = false,
+            bordersEnabled = false,
         },
     },
 }
@@ -172,7 +124,8 @@ local methods = {
         end
 
         private:SetBackdrop(self, template.frame)
-        self:SetScrollBars(template.scrollBars)
+        private:SetScrollBarBackdrop(self.verticalBar, template.scrollBars and template.scrollBars.vertical)
+        private:SetScrollBarBackdrop(self.horizontalBar, template.scrollBars and template.scrollBars.horizontal)
 
         self:SetUserData("template", template)
     end,

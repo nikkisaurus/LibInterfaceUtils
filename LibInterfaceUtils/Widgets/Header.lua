@@ -6,6 +6,14 @@ if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
 
+local defaults = {
+    label = {
+        font = "GameFontNormal",
+        color = private.assets.colors.flair,
+        justifyH = "LEFT",
+    },
+}
+
 local scripts = {
     OnSizeChanged = function(self)
         self:SetAnchors()
@@ -24,8 +32,17 @@ local registry = {
 local methods = {
     OnAcquire = function(self)
         self:SetSize(300, 20)
-        self:SetLabelFont(GameFontNormal)
+        self:ApplyTemplate()
         self:SetText()
+    end,
+
+    ApplyTemplate = function(self, template)
+        local label = CreateFromMixins(defaults.label, template or {})
+        private:SetFont(self.label, label)
+
+        self.left:SetColorTexture((label.color):GetRGBA())
+        self.right:SetColorTexture((label.color):GetRGBA())
+        self.bottom:SetColorTexture((label.color):GetRGBA())
     end,
 
     SetAnchors = function(self)
@@ -58,14 +75,6 @@ local methods = {
             self.bottom:SetHeight(pixelSize)
         end
         self:SetHeight(self.label:GetStringHeight() + 15)
-    end,
-
-    SetLabelFont = function(self, fontObject, color)
-        self.label:SetFontObject(fontObject)
-        self.label:SetTextColor((color or private.assets.colors.flair):GetRGBA())
-        self.left:SetColorTexture((color or private.assets.colors.flair):GetRGBA())
-        self.right:SetColorTexture((color or private.assets.colors.flair):GetRGBA())
-        self.bottom:SetColorTexture((color or private.assets.colors.flair):GetRGBA())
     end,
 
     SetStyle = function(self, style)

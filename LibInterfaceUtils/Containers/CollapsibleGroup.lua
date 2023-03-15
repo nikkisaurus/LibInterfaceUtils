@@ -6,15 +6,6 @@ if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
 
-local defaults = {
-    backdrop = {
-        bgEnabled = false,
-    },
-    headerBackdrop = {
-        highlightEnabled = true,
-    },
-}
-
 local registry = {
     OnEnter = true,
     OnHide = true,
@@ -27,36 +18,38 @@ local registry = {
 }
 
 local templates = {
-    default = {
-        header = { -- backdropTable
+    bordered = {
+        content = {
+            bgEnabled = true,
+            bordersEnabled = true,
+        },
+        header = {
             bgColor = private.assets.colors.darker,
             highlightEnabled = true,
             highlightColor = private.assets.colors.dimmedFlair,
         },
-        label = { -- fontTable
+        label = {
             font = "GameFontNormal",
             color = private.assets.colors.flair,
             highlightColor = private.assets.colors.white,
+            justifyH = "LEFT",
         },
-        content = { -- backdropTable
+    },
+    default = {
+        content = {
             bgEnabled = false,
             bordersEnabled = false,
         },
-    },
-    bordered = {
-        header = { -- backdropTable
+        header = {
             bgColor = private.assets.colors.darker,
             highlightEnabled = true,
             highlightColor = private.assets.colors.dimmedFlair,
         },
-        label = { -- fontTable
+        label = {
             font = "GameFontNormal",
             color = private.assets.colors.flair,
             highlightColor = private.assets.colors.white,
-        },
-        content = { -- backdropTable
-            bgEnabled = true,
-            bordersEnabled = true,
+            justifyH = "LEFT",
         },
     },
 }

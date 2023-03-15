@@ -22,6 +22,21 @@ local anchors = {
     end,
 }
 
+local defaults = {
+    button = {},
+    editbox = {
+        bgColor = private.assets.colors.normal,
+        font = "GameFontHighlight",
+        color = private.assets.colors.white,
+        justifyH = "LEFT",
+    },
+    label = {
+        font = "GameFontNormal",
+        color = private.assets.colors.flair,
+        justifyH = "LEFT",
+    },
+}
+
 local forbidden = {
     SetMultiLine = true,
 }
@@ -59,11 +74,11 @@ local maps = {
         OnTextChanged = function(self, userInput)
             local frame = self.widget.object
             if userInput then
-                frame.button:Enable()
+                frame.button:SetDisabled()
             end
         end,
         OnTextSet = function(self)
-            self.widget.object.button:Disable()
+            self.widget.object.button:SetDisabled(true)
         end,
     },
 }
@@ -72,7 +87,7 @@ local childScripts = {
     button = {
         OnClick = function(self)
             local widget = self.widget
-            self:Disable()
+            self:SetDisabled(true)
 
             if widget.callbacks.OnEnterPressed then
                 widget.callbacks.OnEnterPressed(widget.object)
@@ -92,14 +107,25 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self)
-        self:SetLabel()
-        self:SetLabelFont(GameFontNormal)
-        self:SetAutoFocus(false)
-        self:SetFontObject("GameFontHighlight")
-        self:SetBackdrop()
         self:SetSize(300, 150)
+        self:ApplyTemplate()
+        self.button:SetDisabled(true)
+        self:SetAutoFocus(false)
         self:SetTextInsets()
-        self.button:Disable()
+        self:SetText("")
+        self:SetLabel()
+    end,
+
+    ApplyTemplate = function(self, template)
+        local label = CreateFromMixins(defaults.label, template and template.label or {})
+        local editbox = CreateFromMixins(defaults.editbox, template and template.editbox or {})
+        local button = CreateFromMixins(defaults.button, template and template.button or {})
+
+        private:SetFont(self.label, label)
+        private:SetFont(self.editbox, editbox)
+        private:SetBackdrop(self.container, editbox)
+        private:SetScrollBarBackdrop(self.scrollBar, template and template.scrollBar)
+        self.button:ApplyTemplate(button)
     end,
 
     HasLabel = function(self)
@@ -121,11 +147,6 @@ local methods = {
         self.button:SetPoint("TOPLEFT", self.container, "BOTTOMLEFT", 0, -5)
     end,
 
-    SetBackdrop = function(self, backdrop, buttonBackdrop)
-        private:SetBackdrop(self.container, backdrop)
-        private:SetBackdrop(self.button, buttonBackdrop)
-    end,
-
     SetEditHeight = function(self, height)
         self.container:SetHeight(height)
         self:SetHeight(height + (self:HasLabel() and (self.label:GetStringHeight() + 5) or 0) + self.button:GetHeight() + 5)
@@ -134,11 +155,6 @@ local methods = {
     SetLabel = function(self, text)
         self.label:SetText(text or "")
         self:SetAnchors()
-    end,
-
-    SetLabelFont = function(self, fontObject, color)
-        self.label:SetFontObject(fontObject)
-        self.label:SetTextColor((color or private.assets.colors.flair):GetRGBA())
     end,
 
     SetSize = function(self, width, height)
@@ -154,7 +170,7 @@ local methods = {
 local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
 
-    frame.label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal", "SearchBoxTemplate")
+    frame.label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.label:SetPoint("TOPLEFT")
     frame.label:SetPoint("TOPRIGHT")
     frame.label:SetJustifyH("LEFT")
@@ -166,17 +182,14 @@ local function creationFunc()
     frame.scrollBar = CreateFrame("EventFrame", nil, frame, "LibInterfaceUtilsVerticalScrollBar")
     frame.scrollBar:SetPoint("TOPRIGHT", frame.container, "TOPRIGHT")
     frame.scrollBar:SetPoint("BOTTOMRIGHT", frame.container, "BOTTOMRIGHT")
-    frame.scrollBar.Background.Main:Hide()
 
     ScrollUtil.RegisterScrollBoxWithScrollBar(frame.container.ScrollBox, frame.scrollBar)
     ScrollUtil.AddManagedScrollBarVisibilityBehavior(frame.container.ScrollBox, frame.scrollBar, anchors.with(frame), anchors.without(frame))
 
-    frame.button = CreateFrame("Button", nil, frame)
-    frame.button:SetNormalFontObject(GameFontHighlight)
-    frame.button:SetDisabledFontObject(GameFontDisable)
+    frame.button = lib:New("Button")
+    frame.button:SetParent(frame)
     frame.button:SetText(ACCEPT)
-    frame.button:SetSize(frame.button:GetFontString():GetWidth() + 20, frame.button:GetFontString():GetHeight() + 10)
-    frame.button = private:CreateTextures(frame.button)
+    frame.button:SetAutoWidth(true)
     frame.button:SetScript("OnClick", childScripts.button.OnClick)
 
     local widget = {

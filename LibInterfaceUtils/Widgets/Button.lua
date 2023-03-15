@@ -7,26 +7,22 @@ if not lib or (lib.versions[objectType] or 0) >= version then
 end
 
 local defaults = {
-    backdrop = {
-        normal = {
-            bgColor = private.assets.colors.darker,
-            highlightEnabled = true,
-            highlightColor = private.assets.colors.highlight,
-        },
+    disabled = {
+        font = "GameFontDisable",
+        color = private.assets.colors.lightWhite,
+        wrap = false,
     },
-    font = {
-        normal = {
-            font = "GameFontNormal",
-            color = private.assets.colors.flair,
-        },
-        highlight = {
-            font = "GameFontNormal",
-            color = private.assets.colors.flair,
-        },
-        disabled = {
-            font = "GameFontDisable",
-            color = private.assets.colors.lightWhite,
-        },
+    highlight = {
+        bordersColor = private.assets.colors.lightFlair,
+        font = "GameFontNormal",
+        color = private.assets.colors.flair,
+        wrap = false,
+    },
+    normal = {
+        bgColor = private.assets.colors.darker,
+        font = "GameFontNormal",
+        color = private.assets.colors.flair,
+        wrap = false,
     },
 }
 
@@ -49,35 +45,47 @@ local registry = {
 
 local scripts = {
     OnEnter = function(self)
-        private:SetFont(self.text, self:GetUserData("highlight"))
+        self:SetState("highlight")
     end,
 
     OnLeave = function(self)
-        private:SetFont(self.text, self:GetUserData("normal"))
+        self:SetState("normal")
     end,
 
     OnMouseDown = function(self)
         if not self:IsDisabled() then
-            self.text:AdjustPointsOffset(1, -1)
+            local x, y = unpack(self:GetUserData("offset") or { 1, -1 })
+            self.text:AdjustPointsOffset(x, y)
         end
     end,
 
     OnMouseUp = function(self)
         if not self:IsDisabled() then
-            self.text:AdjustPointsOffset(-1, 1)
+            local x, y = unpack(self:GetUserData("offset") or { 1, -1 })
+            self.text:AdjustPointsOffset(-x, -y)
         end
     end,
 }
 
 local methods = {
     OnAcquire = function(self)
-        self:SetPushedTextOffset(1, -1)
         self:SetText("")
 
         self:SetSize(100, 20)
 
-        self:SetBackdrop()
-        self:SetDefaultFonts()
+        self:SetPushedTextOffsets()
+        self:ApplyTemplate()
+    end,
+
+    ApplyTemplate = function(self, template)
+        local normal = CreateFromMixins(defaults.normal, template and template.normal or {})
+        local highlight = CreateFromMixins(defaults.highlight, template and template.highlight or {})
+        local disabled = CreateFromMixins(defaults.disabled, template and template.disabled or {})
+
+        self:SetUserData("normal", normal)
+        self:SetUserData("highlight", highlight)
+        self:SetUserData("disabled", disabled)
+        self:SetState(self:IsDisabled() and "disabled" or "normal")
     end,
 
     IsAutoWidth = function(self)
@@ -95,7 +103,7 @@ local methods = {
     SetAutoWidth = function(self, isAutoWidth)
         self:SetUserData("autoWidth", isAutoWidth)
         if isAutoWidth then
-            self:SetWidth(self:GetTextWidth() + 20)
+            self:SetWidth(self.text:GetStringWidth() + 20)
         end
     end,
 
@@ -103,23 +111,21 @@ local methods = {
         self:SetUserData("isDisabled", isDisabled)
         if isDisabled then
             self:Disable()
-            private:SetFont(self.text, self:GetUserData("disabled"))
+            self:SetState("disabled")
         else
             self:Enable()
-            private:SetFont(self.text, self:GetUserData("normal"))
+            self:SetState("normal")
         end
     end,
 
-    SetDefaultFonts = function(self, font)
-        self:SetUserData("normal", defaults.font.normal)
-        self:SetUserData("highlight", defaults.font.highlight)
-        self:SetUserData("disabled", defaults.font.disabled)
-        private:SetFont(self.text, self:GetUserData("normal"))
+    SetPushedTextOffsets = function(self, x, y)
+        self:SetUserData("offset", { x or 1, y or -1 })
     end,
 
-    SetFont = function(self, fontType, font)
-        self:SetUserData(fontType, font)
-        private:SetFont(self.text, self:GetUserData(self:IsDisabled() and "disabled" or "normal"))
+    SetState = function(self, state)
+        local template = self:GetUserData(state)
+        private:SetBackdrop(self, template)
+        private:SetFont(self.text, template)
     end,
 
     SetText = function(self, text)

@@ -185,17 +185,63 @@ function private:SetBackdrop(object, backdrop)
     end
 end
 
-function private:SetFont(fontString, font)
-    assert(type(font) == "table")
+local defaultFont = {
+    font = "GameFontHighlight", -- "fontObject"|{"FONT", height, flags...}
+    color = private.assets.colors.white,
+    wrap = true,
+    justifyH = "CENTER",
+    justifyV = "MIDDLE",
+}
 
-    if type(font.font) == "string" then
-        fontString:SetFontObject(_G[font.font])
-    elseif type(font.font) == "table" then
-        fontString:SetFont(unpack(font.font))
+function private:SetFont(fontString, font)
+    local info = setmetatable(font or {}, { __index = defaultFont })
+
+    if type(info.font) == "string" then
+        fontString:SetFontObject(_G[info.font])
+    elseif type(info.font) == "table" then
+        fontString:SetFont(unpack(info.font))
     end
 
-    if font.color then
-        fontString:SetTextColor(font.color:GetRGBA())
+    fontString:SetTextColor(info.color:GetRGBA())
+    if fontString.SetWordWrap then -- EditBox doesn't have word wrap
+        fontString:SetWordWrap(info.wrap or false)
+    end
+    fontString:SetJustifyH(info.justifyH)
+    fontString:SetJustifyV(info.justifyV)
+end
+
+local defaultScrollBar = {
+    thumbs = {
+        color = private.assets.colors.dimmedWhite,
+    },
+    track = {
+        texture = private.assets.blankTexture,
+        color = private.assets.colors.dimmedWhite,
+    },
+    background = {
+        enabled = true,
+        texture = private.assets.blankTexture,
+        color = private.assets.colors.darker,
+    },
+}
+
+function private:SetScrollBarBackdrop(scrollBar, backdrop)
+    local thumbs = setmetatable(backdrop and backdrop.thumbs or {}, { __index = defaultScrollBar.thumbs })
+    local track = setmetatable(backdrop and backdrop.track or {}, { __index = defaultScrollBar.track })
+    local background = setmetatable(backdrop and backdrop.background or {}, { __index = defaultScrollBar.background })
+
+    scrollBar.Track.Thumb.Main:SetTexture(track.texture)
+    scrollBar.Track.Thumb.Main:SetVertexColor(track.color:GetRGBA())
+
+    scrollBar.Back.Texture:SetVertexColor(thumbs.color:GetRGBA())
+    scrollBar.Forward.Texture:SetVertexColor(thumbs.color:GetRGBA())
+
+    if background.enabled then
+        scrollBar.Background.Main:SetTexture(background.texture)
+        scrollBar.Background.Main:SetVertexColor(background.color:GetRGBA())
+        scrollBar.Background.Main:Show()
+    else
+        scrollBar.Background.Main:Hide()
     end
 end
 

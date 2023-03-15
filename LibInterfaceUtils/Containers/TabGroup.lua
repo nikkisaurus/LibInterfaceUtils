@@ -8,30 +8,30 @@ end
 
 local templates = {
     default = {
-        frame = { -- backdropTable
+        frame = {
             bgEnabled = true,
             bordersEnabled = true,
         },
-        tab = { -- backdropTable
-            bgColor = private.assets.colors.darker,
+        selectedTab = {
+            bgColor = private.assets.colors.lightFlair,
             highlightEnabled = false,
-            normal = { -- fontTable
-                font = "GameFontNormal",
-                color = private.assets.colors.flair,
+            normal = {
+                font = "GameFontHighlight",
+                color = private.assets.colors.white,
             },
-            highlight = { -- fontTable
+            highlight = {
                 font = "GameFontHighlight",
                 color = private.assets.colors.white,
             },
         },
-        selectedTab = { -- backdropTable
-            bgColor = private.assets.colors.lightFlair,
+        tab = {
+            bgColor = private.assets.colors.darker,
             highlightEnabled = false,
-            normal = { -- fontTable
-                font = "GameFontHighlight",
-                color = private.assets.colors.white,
+            normal = {
+                font = "GameFontNormal",
+                color = private.assets.colors.flair,
             },
-            highlight = { -- fontTable
+            highlight = {
                 font = "GameFontHighlight",
                 color = private.assets.colors.white,
             },
@@ -111,13 +111,13 @@ local methods = {
 
         for _, tab in pairs(self.tabs.children) do
             if tab ~= selectedTab then
-                tab:SetFont("normal", template.tab.normal)
-                tab:SetFont("highlight", template.tab.highlight)
-                tab:SetBackdrop(template.tab)
+                -- tab:SetFont("normal", template.tab.normal)
+                -- tab:SetFont("highlight", template.tab.highlight)
+                -- tab:SetBackdrop(template.tab)
             else
-                tab:SetFont("normal", template.selectedTab.normal)
-                tab:SetFont("highlight", template.selectedTab.highlight)
-                tab:SetBackdrop(template.selectedTab)
+                -- tab:SetFont("normal", template.selectedTab.normal)
+                -- tab:SetFont("highlight", template.selectedTab.highlight)
+                -- tab:SetBackdrop(template.selectedTab)
             end
         end
     end,

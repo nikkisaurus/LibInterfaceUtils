@@ -31,89 +31,89 @@ local registry = {
 
 local templates = {
     default = {
-        frame = { -- backdropTable
-            bgColor = private.assets.colors.elvBackdrop,
-        },
-        titleBar = { -- backdropTable
-            bgColor = private.assets.colors.elvTransparent,
-            padding = 4,
-        },
-        title = { -- fontTable
-            font = "GameFontNormal",
-            color = private.assets.colors.flair,
-        },
-        content = { -- backdropTable
+        content = {
             bgEnabled = false,
             bordersEnabled = false,
         },
-        statusBar = { -- backdropTable
-            bgColor = private.assets.colors.elvTransparent,
-            padding = 4, -- Frame specific setting
+        frame = {
+            bgColor = private.assets.colors.elvBackdrop,
         },
         scrollBars = {
             vertical = {
-                track = { -- scrollBarTable
+                track = {
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.dimmedWhite,
                 },
                 background = {
-                    enabled = true, -- scrollBarTable
+                    enabled = true,
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.darker,
                 },
             },
             horizontal = {
-                track = { -- scrollBarTable
+                track = {
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.dimmedWhite,
                 },
-                background = { -- scrollBarTable
+                background = {
                     enabled = true,
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.darker,
                 },
             },
         },
-    },
-    transparent = {
-        frame = { -- backdropTable
-            bgColor = private.assets.colors.elvTransparent,
-        },
-        titleBar = { -- backdropTable
-            bgColor = private.assets.colors.elvTransparent,
-            padding = 4,
-        },
-        title = { -- fontTable
-            font = "GameFontNormal",
-            color = private.assets.colors.flair,
-        },
-        content = { -- backdropTable
-            bgEnabled = false,
-            bordersEnabled = false,
-        },
-        statusBar = { -- backdropTable
+        statusBar = {
             bgColor = private.assets.colors.elvTransparent,
             padding = 4, -- Frame specific setting
         },
+        title = {
+            font = "GameFontNormal",
+            color = private.assets.colors.flair,
+        },
+        titleBar = {
+            bgColor = private.assets.colors.elvTransparent,
+            padding = 4,
+        },
+    },
+    transparent = {
+        content = {
+            bgEnabled = false,
+            bordersEnabled = false,
+        },
+        frame = {
+            bgColor = private.assets.colors.elvTransparent,
+        },
         scrollBars = {
             vertical = {
-                track = { -- scrollBarTable
+                track = {
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.dimmedWhite,
                 },
-                background = { -- scrollBarTable
+                background = {
                     enabled = false,
                 },
             },
             horizontal = {
-                track = { -- scrollBarTable
+                track = {
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.dimmedWhite,
                 },
-                background = { -- scrollBarTable
+                background = {
                     enabled = false,
                 },
             },
+        },
+        statusBar = {
+            bgColor = private.assets.colors.elvTransparent,
+            padding = 4, -- Frame specific setting
+        },
+        title = {
+            font = "GameFontNormal",
+            color = private.assets.colors.flair,
+        },
+        titleBar = {
+            bgColor = private.assets.colors.elvTransparent,
+            padding = 4,
         },
     },
 }

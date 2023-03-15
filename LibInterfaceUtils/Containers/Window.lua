@@ -34,81 +34,81 @@ local registry = {
 
 local templates = {
     default = {
-        frame = { -- backdropTable
-            bgColor = private.assets.colors.elvBackdrop,
-        },
-        titleBar = { -- backdropTable
-            bgColor = private.assets.colors.elvTransparent,
-            padding = 4,
-        },
-        title = { -- fontTable
-            font = "GameFontNormal",
-            color = private.assets.colors.flair,
-        },
-        content = { -- backdropTable
+        content = {
             bgEnabled = false,
             bordersEnabled = false,
         },
+        frame = {
+            bgColor = private.assets.colors.elvBackdrop,
+        },
         scrollBars = {
             vertical = {
-                track = { -- scrollBarTable
+                track = {
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.dimmedWhite,
                 },
-                background = { -- scrollBarTable
+                background = {
                     enabled = true,
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.darker,
                 },
             },
             horizontal = {
-                track = { -- scrollBarTable
+                track = {
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.dimmedWhite,
                 },
-                background = { -- scrollBarTable
+                background = {
                     enabled = true,
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.darker,
                 },
             },
+        },
+        title = {
+            font = "GameFontNormal",
+            color = private.assets.colors.flair,
+        },
+        titleBar = {
+            bgColor = private.assets.colors.elvTransparent,
+            padding = 4,
         },
     },
     transparent = {
-        frame = { -- backdropTable
-            bgColor = private.assets.colors.elvTransparent,
-        },
-        titleBar = { -- backdropTable
-            bgColor = private.assets.colors.elvTransparent,
-            padding = 4,
-        },
-        title = { -- fontTable
-            font = "GameFontNormal",
-            color = private.assets.colors.flair,
-        },
-        content = { -- backdropTable
+        content = {
             bgEnabled = false,
             bordersEnabled = false,
         },
+        frame = {
+            bgColor = private.assets.colors.elvTransparent,
+        },
         scrollBars = {
             vertical = {
-                track = { -- scrollBarTable
+                track = {
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.dimmedWhite,
                 },
-                background = { -- scrollBarTable
+                background = {
                     enabled = false,
                 },
             },
             horizontal = {
-                track = { -- scrollBarTable
+                track = {
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.dimmedWhite,
                 },
-                background = { -- scrollBarTable
+                background = {
                     enabled = false,
                 },
             },
+        },
+        title = {
+            font = "GameFontNormal",
+            color = private.assets.colors.flair,
+        },
+        titleBar = {
+            bgColor = private.assets.colors.elvTransparent,
+            padding = 4,
         },
     },
 }
@@ -161,7 +161,7 @@ local methods = {
         self:SetDraggable(true, "LeftButton")
         self:SetClampedToScreen(true)
         self:SetFrameStrata("HIGH")
-        self:ApplyTemplate("transparent")
+        self:ApplyTemplate("default")
         self:SetTitle()
     end,
 

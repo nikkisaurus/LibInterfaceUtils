@@ -6,6 +6,27 @@ if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
 
+local defaults = {
+    button = {
+        color = private.assets.colors.white,
+        highlightColor = private.assets.colors.flair,
+    },
+    editbox = {
+        bgColor = private.assets.colors.normal,
+        font = "GameFontHighlight",
+        color = private.assets.colors.white,
+        justifyH = "LEFT",
+    },
+    icon = {
+        color = private.assets.colors.lightWhite,
+    },
+    label = {
+        font = "GameFontNormal",
+        color = private.assets.colors.flair,
+        justifyH = "LEFT",
+    },
+}
+
 local forbidden = {
     SetMultiLine = true,
 }
@@ -66,6 +87,22 @@ local childScripts = {
                 widget.callbacks.OnEditCleared(widget.object)
             end
         end,
+
+        OnEnter = function(self)
+            local frame = self.widget.object
+            local button = frame:GetUserData("button")
+            if button then
+                self:GetNormalTexture():SetVertexColor(button.highlightColor:GetRGBA())
+            end
+        end,
+
+        OnLeave = function(self)
+            local frame = self.widget.object
+            local button = frame:GetUserData("button")
+            if button then
+                self:GetNormalTexture():SetVertexColor(button.color:GetRGBA())
+            end
+        end,
     },
 }
 
@@ -80,15 +117,27 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self)
-        self:SetLabel()
-        self:SetLabelFont(GameFontNormal)
-        self:SetAutoFocus(false)
-        self:SetFontObject("GameFontHighlight")
-        self:SetBackdrop()
         self:SetSize(300, 25)
+        self:ApplyTemplate()
+        self.button:Hide()
+        self:SetAutoFocus(false)
         self:SetTextInsets()
         self:SetText("")
-        self.button:Hide()
+        self:SetLabel()
+    end,
+
+    ApplyTemplate = function(self, template)
+        local label = CreateFromMixins(defaults.label, template and template.label or {})
+        local icon = CreateFromMixins(defaults.icon, template and template.icon or {})
+        local editbox = CreateFromMixins(defaults.editbox, template and template.editbox or {})
+        local button = CreateFromMixins(defaults.button, template and template.button or {})
+
+        private:SetFont(self.label, label)
+        self.icon:SetVertexColor(icon.color:GetRGBA())
+        private:SetFont(self.editbox, editbox)
+        private:SetBackdrop(self.editbox, editbox)
+        self.button:GetNormalTexture():SetVertexColor(button.color:GetRGBA())
+        self:SetUserData("button", button)
     end,
 
     HasLabel = function(self)
@@ -111,10 +160,6 @@ local methods = {
         self:SetEditHeight(self.editbox:GetHeight())
     end,
 
-    SetBackdrop = function(self, backdrop)
-        private:SetBackdrop(self.editbox, backdrop)
-    end,
-
     SetEditHeight = function(self, height)
         self.editbox:SetHeight(height)
         self.icon:SetSize(height / 2, height / 2)
@@ -126,11 +171,6 @@ local methods = {
     SetLabel = function(self, text)
         self.label:SetText(text or "")
         self:SetAnchors()
-    end,
-
-    SetLabelFont = function(self, fontObject, color)
-        self.label:SetFontObject(fontObject)
-        self.label:SetTextColor((color or private.assets.colors.flair):GetRGBA())
     end,
 
     SetSize = function(self, width, height)
@@ -146,7 +186,7 @@ local methods = {
 local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
 
-    frame.label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal", "SearchBoxTemplate")
+    frame.label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.label:SetPoint("TOPLEFT")
     frame.label:SetPoint("TOPRIGHT")
     frame.label:SetJustifyH("LEFT")
@@ -158,9 +198,10 @@ local function creationFunc()
     frame.icon:SetAtlas("common-search-magnifyingglass")
 
     frame.button = CreateFrame("Button", nil, frame.editbox)
-    frame.button:SetNormalFontObject(GameFontHighlight)
     frame.button:SetNormalAtlas("common-search-clearbutton")
     frame.button:SetScript("OnClick", childScripts.button.OnClick)
+    frame.button:SetScript("OnEnter", childScripts.button.OnEnter)
+    frame.button:SetScript("OnLeave", childScripts.button.OnLeave)
 
     local widget = {
         object = frame,

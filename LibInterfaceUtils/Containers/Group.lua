@@ -26,21 +26,23 @@ local registry = {
 
 local templates = {
     default = {
-        label = { -- fontTable
+        label = {
             font = "GameFontNormal",
             color = private.assets.colors.flair,
+            justifyH = "LEFT",
         },
-        content = { -- backdropTable
+        content = {
             bgEnabled = false,
             bordersEnabled = false,
         },
     },
     bordered = {
-        label = { -- fontTable
+        label = {
             font = "GameFontNormal",
             color = private.assets.colors.flair,
+            justifyH = "LEFT",
         },
-        content = { -- backdropTable
+        content = {
             bgEnabled = true,
             bordersEnabled = true,
         },
@@ -98,11 +100,6 @@ local methods = {
             self.label:Hide()
             self.container:SetPoint("TOP")
         end
-    end,
-
-    SetLabelFont = function(self, fontObject, color)
-        self.label:SetFontObject(fontObject)
-        self.label:SetTextColor((color or private.assets.colors.flair):GetRGBA())
     end,
 
     SetPadding = function(self, left, right, top, bottom)

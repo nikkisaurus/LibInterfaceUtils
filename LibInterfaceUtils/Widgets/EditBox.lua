@@ -6,6 +6,36 @@ if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
 
+local defaults = {
+    button = {
+        disabled = {
+            bgEnabled = false,
+            bordersEnabled = false,
+        },
+        highlight = {
+            bgEnabled = false,
+            bordersEnabled = false,
+        },
+        normal = {
+            bgEnabled = false,
+            bordersEnabled = false,
+            font = "GameFontHighlight",
+            color = private.assets.colors.white,
+        },
+    },
+    editbox = {
+        bgColor = private.assets.colors.normal,
+        font = "GameFontHighlight",
+        color = private.assets.colors.white,
+        justifyH = "LEFT",
+    },
+    label = {
+        font = "GameFontNormal",
+        color = private.assets.colors.flair,
+        justifyH = "LEFT",
+    },
+}
+
 local forbidden = {
     SetMultiLine = true,
 }
@@ -32,6 +62,7 @@ local maps = {
         SetSpacing = true,
         SetText = true,
     },
+
     scripts = {
         OnEditFocusGained = true,
         OnEditFocusLost = true,
@@ -77,18 +108,30 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self)
-        self:SetLabel()
-        self:SetLabelFont(GameFontNormal)
-        self:SetAutoFocus(false)
-        self:SetFontObject("GameFontHighlight")
-        self:SetBackdrop()
         self:SetSize(300, 25)
+        self:ApplyTemplate()
         self:EnableButton(true)
+        self:SetAutoFocus(false)
+        self:SetTextInsets()
+        self:SetText("")
+        self:SetLabel()
+    end,
+
+    ApplyTemplate = function(self, template)
+        local label = CreateFromMixins(defaults.label, template and template.label or {})
+        local editbox = CreateFromMixins(defaults.editbox, template and template.editbox or {})
+        local button = CreateFromMixins(defaults.button, template and template.button or {})
+
+        private:SetFont(self.label, label)
+        private:SetFont(self.editbox, editbox)
+        private:SetBackdrop(self.editbox, editbox)
+        self.button:ApplyTemplate(button)
     end,
 
     EnableButton = function(self, isEnabled)
         self:SetUserData("enableButton", isEnabled)
         self.button:Hide()
+        self.button:SetPushedTextOffsets(0, 0)
         self:SetTextInsets()
     end,
 
@@ -107,12 +150,8 @@ local methods = {
         end
 
         self.editbox:SetPoint("RIGHT")
-        self.button:SetPoint("RIGHT")
+        self.button:SetPoint("TOPRIGHT")
         self:SetEditHeight(self.editbox:GetHeight())
-    end,
-
-    SetBackdrop = function(self, backdrop)
-        private:SetBackdrop(self.editbox, backdrop)
     end,
 
     SetEditHeight = function(self, height)
@@ -125,11 +164,6 @@ local methods = {
     SetLabel = function(self, text)
         self.label:SetText(text or "")
         self:SetAnchors()
-    end,
-
-    SetLabelFont = function(self, fontObject, color)
-        self.label:SetFontObject(fontObject)
-        self.label:SetTextColor((color or private.assets.colors.flair):GetRGBA())
     end,
 
     SetSize = function(self, width, height)
@@ -145,7 +179,7 @@ local methods = {
 local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
 
-    frame.label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal", "SearchBoxTemplate")
+    frame.label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.label:SetPoint("TOPLEFT")
     frame.label:SetPoint("TOPRIGHT")
     frame.label:SetJustifyH("LEFT")
@@ -153,8 +187,8 @@ local function creationFunc()
     frame.editbox = CreateFrame("EditBox", nil, frame)
     frame.editbox = private:CreateTextures(frame.editbox)
 
-    frame.button = CreateFrame("Button", nil, frame.editbox)
-    frame.button:SetNormalFontObject(GameFontHighlight)
+    frame.button = lib:New("Button")
+    frame.button:SetParent(frame.editbox)
     frame.button:SetText(OKAY)
     frame.button:SetScript("OnClick", childScripts.button.OnClick)
 
