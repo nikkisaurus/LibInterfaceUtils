@@ -109,9 +109,10 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self)
-        self:ApplyTemplate("default")
+        self:SetAnchors()
         self:SetLayout()
         self:SetSize(600, 500)
+        self:ApplyTemplate("default")
         self:SetTree()
         self.treeContainer:SetResizable(true)
         self.treeContainer:SetWidth(200)
