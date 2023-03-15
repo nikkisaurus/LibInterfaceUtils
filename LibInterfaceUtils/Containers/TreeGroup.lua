@@ -341,8 +341,6 @@ local function creationFunc()
         version = version,
     }
 
-    frame.widget = widget
-
     return private:RegisterContainer(widget, methods, scripts)
 end
 
