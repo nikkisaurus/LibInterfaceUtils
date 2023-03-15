@@ -156,6 +156,8 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self, ...)
+        self.content = lib:New("ScrollFrame")
+
         local w, h = GetPhysicalScreenSize()
         self:SetLayout()
         self:SetSize(300, 300)
@@ -169,7 +171,7 @@ local methods = {
     end,
 
     OnRelease = function(self)
-        self.content:ReleaseChildren()
+        self.content:Release()
     end,
 
     AddChild = function(self, ...)
@@ -332,8 +334,6 @@ local function creationFunc()
 
     frame.statusBar.text = frame.statusBar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.statusBar.text:SetJustifyH("LEFT")
-
-    frame.content = lib:New("ScrollFrame")
 
     local widget = {
         object = frame,

@@ -41,6 +41,7 @@ local templates = {
 
 local methods = {
     OnAcquire = function(self)
+        self:AcquireChildren()
         self:SetLayout()
         self:SetSize(300, 300)
         self:ApplyTemplate("default")
@@ -49,8 +50,17 @@ local methods = {
     end,
 
     OnRelease = function(self)
-        self.tabs:ReleaseChildren()
-        self.content:ReleaseChildren()
+        self.tabs:Release()
+        self.content:Release()
+    end,
+
+    AcquireChildren = function(self)
+        self.tabs = lib:New("Group")
+        self.tabs:SetHeight(1)
+        self.tabs:SetPadding(0, 0, 0, 0)
+        self.tabs:SetLayout("TabFlow")
+
+        self.content = lib:New("ScrollFrame")
     end,
 
     ApplyTemplate = function(self, templateName, mixin)
@@ -168,13 +178,6 @@ local methods = {
 
 local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
-
-    frame.tabs = lib:New("Group")
-    frame.tabs:SetHeight(1)
-    frame.tabs:SetPadding(0, 0, 0, 0)
-    frame.tabs:SetLayout("TabFlow")
-
-    frame.content = lib:New("ScrollFrame")
 
     local widget = {
         object = frame,

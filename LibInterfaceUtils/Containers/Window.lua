@@ -155,6 +155,8 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self, ...)
+        self.content = lib:New("ScrollFrame")
+
         local w, h = GetPhysicalScreenSize()
         self:SetLayout()
         self:SetSize(300, 300)
@@ -167,7 +169,7 @@ local methods = {
     end,
 
     OnRelease = function(self)
-        self.content:ReleaseChildren()
+        self.content:Release()
     end,
 
     AddChild = function(self, ...)
@@ -313,8 +315,6 @@ local function creationFunc()
     frame.resizer:EnableMouse(true)
     frame.resizer:SetScript("OnMouseDown", childScripts.resizer.OnMouseDown)
     frame.resizer:SetScript("OnMouseUp", childScripts.resizer.OnMouseUp)
-
-    frame.content = lib:New("ScrollFrame")
 
     local widget = {
         object = frame,
