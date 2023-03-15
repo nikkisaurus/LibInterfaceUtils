@@ -176,6 +176,10 @@ local methods = {
 
     SetAnchors = function(self)
         self.treeContainer:SetParent(self)
+        self.tree:SetParent(self.treeContainer)
+        self.resizer:SetParent(self.treeContainer)
+        self.content:SetParent(self)
+
         self.treeContainer:SetPoint("TOPLEFT")
         self.treeContainer:SetPoint("BOTTOM")
 
@@ -271,9 +275,11 @@ local methods = {
                         childInfo.onClick(self.content, childInfo)
                         self.content:DoLayout()
                     end)
+
                     container:SetCallback("OnEnter", function()
                         container:ApplyTemplate(template.selectedChild)
                     end)
+
                     container:SetCallback("OnLeave", function()
                         container:ApplyTemplate(template[container:GetUserData("selected") and "selectedChild" or "child"])
                     end)
@@ -315,19 +321,16 @@ local function creationFunc()
     frame.treeContainer = CreateFrame("Frame", nil, frame)
 
     frame.tree = lib:New("ScrollFrame")
-    frame.tree:SetParent(frame.treeContainer)
     frame.tree:SetAllPoints(frame.treeContainer)
     frame.tree:SetLayout("List")
 
     frame.resizer = lib:New("Button")
-    frame.resizer:SetParent(frame.treeContainer)
     frame.resizer:SetWidth(5)
     frame.resizer:RegisterForDrag("LeftButton")
     frame.resizer:SetCallback("OnMouseDown", childScripts.resizer.OnMouseDown)
     frame.resizer:SetCallback("OnMouseUp", childScripts.resizer.OnMouseUp)
 
     frame.content = lib:New("ScrollFrame")
-    frame.content:SetParent(frame)
 
     local widget = {
         object = frame,
