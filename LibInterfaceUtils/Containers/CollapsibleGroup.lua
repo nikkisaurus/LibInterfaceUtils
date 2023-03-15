@@ -95,6 +95,7 @@ local methods = {
         self:SetIcon()
         self:EnableIndicator(true)
         self:SetLabel()
+        self:SetDisabled()
         self:Collapse()
     end,
 
