@@ -81,12 +81,12 @@ local childScripts = {
     resizer = {
         OnMouseDown = function(self)
             local frame = self.widget.object
-            frame.treeContainer:StartSizing("RIGHT")
+            frame.tree:StartSizing("RIGHT")
         end,
 
         OnMouseUp = function(self)
             local frame = self.widget.object
-            frame.treeContainer:StopMovingOrSizing()
+            frame.tree:StopMovingOrSizing()
             frame:SetAnchors()
         end,
     },
@@ -97,13 +97,13 @@ local scripts = {
         local w, h = self:GetSize()
         local minWidth = min(200, w * (1 / 3))
         local maxWidth = w * (1 / 2)
-        local width = self.treeContainer:GetWidth()
+        local width = self.tree:GetWidth()
         if width < minWidth then
-            self.treeContainer:SetWidth(minWidth)
+            self.tree:SetWidth(minWidth)
         elseif width > maxWidth then
-            self.treeContainer:SetWidth(maxWidth)
+            self.tree:SetWidth(maxWidth)
         end
-        self.treeContainer:SetResizeBounds(minWidth, h, maxWidth, h)
+        self.tree:SetResizeBounds(minWidth, h, maxWidth, h)
     end,
 }
 
@@ -114,8 +114,8 @@ local methods = {
         self:SetSize(600, 500)
         self:ApplyTemplate("default")
         self:SetTree()
-        self.treeContainer:SetResizable(true)
-        self.treeContainer:SetWidth(200)
+        self.tree:SetResizable(true)
+        self.tree:SetWidth(200)
     end,
 
     OnRelease = function(self)
@@ -176,18 +176,16 @@ local methods = {
     end,
 
     SetAnchors = function(self)
-        self.treeContainer:SetParent(self)
-        self.treeContainer:SetPoint("TOPLEFT")
-        self.treeContainer:SetPoint("BOTTOM")
+        self.tree:SetParent(self)
+        self.resizer:SetParent(self.tree)
+        self.content:SetParent(self)
 
-        self.tree:SetParent(self.treeContainer)
-        self.tree:SetAllPoints(self.treeContainer)
+        self.tree:SetPoint("TOPLEFT")
+        self.tree:SetPoint("BOTTOM")
 
-        self.resizer:SetParent(self.treeContainer)
         self.resizer:SetPoint("TOPLEFT", self.tree, "TOPRIGHT")
         self.resizer:SetPoint("BOTTOMLEFT", self.tree, "BOTTOMRIGHT")
 
-        self.content:SetParent(self)
         self.content:SetPoint("TOPLEFT", self.resizer, "TOPRIGHT", 0, 0)
         self.content:SetPoint("BOTTOMRIGHT")
     end,
@@ -319,8 +317,6 @@ local methods = {
 local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
     frame = private:CreateTextures(frame)
-
-    frame.treeContainer = CreateFrame("Frame", nil, frame)
 
     frame.tree = lib:New("ScrollFrame")
     frame.tree:SetLayout("List")

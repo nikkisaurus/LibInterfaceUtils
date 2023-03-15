@@ -112,6 +112,7 @@ local methods = {
         self:SetLayout()
         self:SetSize(500, 300)
         self:ApplyTemplate("default")
+        self:SetResizable(false)
     end,
 
     ApplyTemplate = function(self, templateName, mixin)
