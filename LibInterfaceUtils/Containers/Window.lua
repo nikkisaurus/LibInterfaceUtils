@@ -30,6 +30,7 @@ local registry = {
     OnReceiveDrag = true,
     OnShow = true,
     OnSizeChanged = true,
+    OnUpdate = true,
 }
 
 local templates = {

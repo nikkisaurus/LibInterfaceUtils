@@ -73,6 +73,7 @@ local methods = {
 
         self:SetSize(100, 20)
 
+        self:RegisterForDrag()
         self:SetPushedTextOffsets()
         self:ApplyTemplate()
     end,

@@ -6,13 +6,15 @@ end
 
 function lib:CreateFrame()
     local frame = self:New("Frame")
-    -- frame:SetLayout("List")
     frame:SetPoint("CENTER")
     frame:SetSize(800, 600)
-    frame:SetTitle("Test Frame")
-    frame:SetStatus("Loading...")
-    -- frame:ApplyTemplate("transparent")
+    frame:SetTitle("Frame")
     frame:SetSpacing(5, 5)
+    frame:SetCallback("OnUpdate", function()
+        frame:SetStatus(date("%x %X", time()))
+    end)
+    -- frame:SetLayout("List")
+    -- frame:ApplyTemplate("transparent")
     -- frame:ApplyTemplate({
     --     frame = {
     --         -- bgTexture = "interface/professions/professionbackgroundartalchemy",
@@ -194,7 +196,7 @@ function lib:CreateTabWindow()
     local window = self:New("Window")
     window:SetPoint("CENTER")
     window:SetSize(800, 600)
-    window:SetTitle("Test Tab Group")
+    window:SetTitle("Tab Group")
     window:SetSpacing(5, 5)
     window:SetLayout("Fill")
     -- window:ApplyTemplate("transparent")
@@ -232,17 +234,120 @@ function lib:CreateTabWindow()
     -- tabGroup:SetLayout("List")
 end
 
+function lib:CreateTreeWindow()
+    local window = self:New("Window")
+    window:SetPoint("CENTER")
+    window:SetSize(800, 600)
+    window:SetTitle("Tree Group")
+    window:SetSpacing(5, 5)
+    window:SetLayout("Fill")
+
+    local tree = {}
+    for i = 1, fastrandom(1, 40) do
+        tinsert(tree, {
+            -- text = "Node " .. i .. (fastrandom(1, 2) == 1 and " long node name so I can check out the wrapping situation" or ""),
+            text = "Node " .. i,
+            -- icon = fastrandom(1, 2) == 1 and 134400,
+            icon = 134400,
+            disabled = fastrandom(1, 2) == 1,
+            children = {
+                {
+                    text = "Child " .. 1,
+                    -- icon = fastrandom(1, 2) == 1 and 134400,
+                    icon = 134400,
+                    disabled = fastrandom(1, 2) == 1,
+                    onClick = function(content)
+                        for x = 1, fastrandom(1, 200) do
+                            local button = content:New("Button")
+                            -- button:SetFullWidth(true)
+                            button:SetText(x)
+                            button:SetDisabled(fastrandom(1, 2) == 1)
+                            button:ApplyTemplate({
+                                disabled = {
+                                    bgColor = private.assets.colors.darkest,
+                                },
+                                highlight = {
+                                    bordersColor = private.assets.colors.black,
+                                    bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                                },
+                                normal = {
+                                    bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                                },
+                            })
+                        end
+                    end,
+                },
+                {
+                    text = "Child " .. 2,
+                    -- icon = fastrandom(1, 2) == 1 and 134400,
+                    icon = 134400,
+                    disabled = fastrandom(1, 2) == 1,
+                    onClick = function(content)
+                        for x = 1, fastrandom(1, 200) do
+                            local button = content:New("Button")
+                            -- button:SetFullWidth(true)
+                            button:SetText(x)
+                            button:SetDisabled(fastrandom(1, 2) == 1)
+                            button:ApplyTemplate({
+                                disabled = {
+                                    bgColor = private.assets.colors.darkest,
+                                },
+                                highlight = {
+                                    bordersColor = private.assets.colors.black,
+                                    bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                                },
+                                normal = {
+                                    bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                                },
+                            })
+                        end
+                    end,
+                },
+            },
+            onClick = function(content)
+                for x = 1, fastrandom(1, 200) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(x)
+                    button:SetDisabled(fastrandom(1, 2) == 1)
+                    button:ApplyTemplate({
+                        disabled = {
+                            bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 0.1),
+                        },
+                        highlight = {
+                            bordersColor = private.assets.colors.black,
+                            bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                        },
+                        normal = {
+                            bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                        },
+                    })
+                end
+            end,
+        })
+    end
+
+    tree[1].children = nil
+
+    local treeGroup = window:New("TreeGroup")
+    treeGroup:SetTree(tree)
+end
+
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:SetScript("OnEvent", function()
     -- lib:CreateFrame()
-    lib:CreateTabWindow()
+    -- lib:CreateTabWindow()
+    lib:CreateTreeWindow()
 end)
 
 SLASH_LIBINTERFACEUTILS1 = "/liu"
 SlashCmdList["LIBINTERFACEUTILS"] = function(input)
-    if input and input:lower() == "tabwindow" then
+    input = input and input:lower()
+    if input == "tabwindow" then
         lib:CreateTabWindow()
+    elseif input == "treewindow" then
+        lib:CreateTreeWindow()
     else
         lib:CreateFrame()
     end

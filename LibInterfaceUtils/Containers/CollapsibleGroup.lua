@@ -31,6 +31,7 @@ local templates = {
         label = {
             font = "GameFontNormal",
             color = private.assets.colors.flair,
+            disabledColor = private.assets.colors.dimmedWhite,
             highlightColor = private.assets.colors.white,
             justifyH = "LEFT",
         },
@@ -48,6 +49,7 @@ local templates = {
         label = {
             font = "GameFontNormal",
             color = private.assets.colors.flair,
+            disabledColor = private.assets.colors.dimmedWhite,
             highlightColor = private.assets.colors.white,
             justifyH = "LEFT",
         },
@@ -57,23 +59,28 @@ local templates = {
 local childScripts = {
     header = {
         OnClick = function(self)
-            local frame = self.widget.object
+            local widget = self.widget
+            local frame = widget.object
             frame:Collapse(not frame:GetUserData("collapsed"))
+
+            if widget.callbacks.OnCollapse then
+                widget.callbacks.OnCollapse(widget.object)
+            end
         end,
 
         OnEnter = function(self)
             local frame = self.widget.object
-            local template = frame:GetUserData("template")
-            if template.label.highlightColor then
-                frame.label:SetTextColor(template.label.highlightColor:GetRGBA())
+            local label = frame:GetUserData("label")
+            if label.highlightColor then
+                frame.label:SetTextColor(label.highlightColor:GetRGBA())
             end
         end,
 
         OnLeave = function(self)
             local frame = self.widget.object
-            local template = frame:GetUserData("template")
-            if template.label.highlightColor then
-                frame.label:SetTextColor(template.label.color:GetRGBA())
+            local label = frame:GetUserData("label")
+            if label.highlightColor then
+                frame.label:SetTextColor(label.color:GetRGBA())
             end
         end,
     },
@@ -85,24 +92,23 @@ local methods = {
         self:SetSize(500, 300)
         self:SetPadding()
         self:ApplyTemplate("default")
+        self:SetIcon()
+        self:EnableIndicator(true)
         self:SetLabel()
         self:Collapse()
     end,
 
-    ApplyTemplate = function(self, templateName, mixin)
-        templateName = type(templateName) == "string" and templateName:lower() or templateName
-        local template
-        if type(templateName) == "table" then
-            template = CreateFromMixins(templates.default, templateName)
-        else
-            template = templates[templateName or "default"] or templates.default
-        end
+    ApplyTemplate = function(self, template, mixin)
+        local templateName = type(template) == "string" and template:lower() or mixin or "default"
+        local header = CreateFromMixins(templates[templateName].header, template and template.header or {})
+        local label = CreateFromMixins(templates[templateName].label, template and template.label or {})
+        local content = CreateFromMixins(templates[templateName].content, template and template.disabled or {})
 
-        private:SetBackdrop(self.header, template.header)
-        private:SetFont(self.label, template.label)
-        private:SetBackdrop(self.container, template.content)
+        private:SetBackdrop(self.header, header)
+        private:SetFont(self.label, label)
+        private:SetBackdrop(self.container, content)
 
-        self:SetUserData("template", template)
+        self:SetUserData("label", CopyTable(label))
     end,
 
     Collapse = function(self, collapsed)
@@ -110,7 +116,9 @@ local methods = {
 
         if collapsed then
             self.container:Hide()
+            self.indicator:SetAtlas("Gamepad_Rev_Plus_32")
         else
+            self.indicator:SetAtlas("Gamepad_Rev_Minus_32")
             self.container:Show()
         end
 
@@ -119,6 +127,22 @@ local methods = {
             parent:DoLayout()
             parent = parent:GetUserData("parent")
         end
+    end,
+
+    EnableIndicator = function(self, isEnabled)
+        self:SetUserData("enableIndicator", isEnabled)
+
+        if isEnabled then
+            self.indicator:Show()
+            self.label:SetPoint("TOPRIGHT", self.indicator, "TOPLEFT", -5, 0)
+        else
+            self.indicator:Hide()
+            self.label:SetPoint("RIGHT", -5, 0)
+        end
+    end,
+
+    IsDisabled = function(self)
+        return self:GetUserData("isDisabled")
     end,
 
     MarkDirty = function(self, _, height)
@@ -130,12 +154,40 @@ local methods = {
 
         local canWrap = self.label:CanWordWrap()
         if canWrap then
-            self.header:SetHeight(self.label:GetStringHeight() + 15)
+            self.header:SetHeight(self.label:GetStringHeight() + 10)
         else
             self.header:SetHeight(20)
         end
 
         self:SetHeight(height + self.header:GetHeight())
+    end,
+
+    SetDisabled = function(self, isDisabled)
+        self:SetUserData("isDisabled", isDisabled)
+
+        local label = self:GetUserData("label")
+        if isDisabled then
+            self.label:SetTextColor(label.disabledColor:GetRGBA())
+            self.indicator:SetVertexColor(label.disabledColor:GetRGBA())
+        else
+            self.label:SetTextColor(label.color:GetRGBA())
+            self.indicator:SetVertexColor(1, 1, 1, 1)
+        end
+        self.icon:SetDesaturated(isDisabled)
+        self.header:SetEnabled(not isDisabled)
+    end,
+
+    SetIcon = function(self, icon, width, height)
+        self.icon:SetTexture(icon)
+        self.icon:SetWidth(width or 20)
+        self.icon:SetHeight(height or 20)
+        if icon then
+            self.icon:Show()
+            self.label:SetPoint("TOPLEFT", self.icon, "TOPRIGHT", 5, 0)
+        else
+            self.icon:Hide()
+            self.label:SetPoint("LEFT", 5, 0)
+        end
     end,
 
     SetLabel = function(self, text)
@@ -164,9 +216,15 @@ local function creationFunc()
     frame.header:SetScript("OnEnter", childScripts.header.OnEnter)
     frame.header:SetScript("OnLeave", childScripts.header.OnLeave)
 
+    frame.icon = frame.header:CreateTexture(nil, "ARTWORK")
+    frame.icon:SetSize(14, 14)
+    frame.icon:SetPoint("TOPLEFT", 5, -5)
+
+    frame.indicator = frame.header:CreateTexture(nil, "ARTWORK")
+    frame.indicator:SetSize(10, 10)
+    frame.indicator:SetPoint("TOPRIGHT", -5, -5)
+
     frame.label = frame.header:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    frame.label:SetPoint("LEFT", 5, 0)
-    frame.label:SetPoint("RIGHT", -5, 0)
     frame.label:SetJustifyH("LEFT")
     frame.header:SetFontString(frame.label)
 

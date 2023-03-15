@@ -50,6 +50,18 @@ local templates = {
 }
 
 local childScripts = {
+    container = {
+        OnEnter = function(self)
+            local frame = self.widget.object
+            frame:Fire("OnEnter")
+        end,
+
+        OnLeave = function(self)
+            local frame = self.widget.object
+            frame:Fire("OnLeave")
+        end,
+    },
+
     content = {
         OnSizeChanged = function(self)
             local frame = self.widget.object
@@ -124,6 +136,8 @@ local function creationFunc()
     frame.container:SetPoint("LEFT")
     frame.container:SetPoint("BOTTOMRIGHT")
     frame.container = private:CreateTextures(frame.container)
+    frame.container:SetScript("OnEnter", childScripts.container.OnEnter)
+    frame.container:SetScript("OnLeave", childScripts.container.OnLeave)
 
     frame.content = CreateFrame("Frame", nil, frame.container)
     frame.content:SetScript("OnSizeChanged", childScripts.content.OnSizeChanged)
@@ -135,6 +149,7 @@ local function creationFunc()
         registry = registry,
     }
 
+    frame.container.widget = widget
     frame.content.widget = widget
 
     return private:RegisterContainer(widget, methods)

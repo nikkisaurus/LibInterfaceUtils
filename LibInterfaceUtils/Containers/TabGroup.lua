@@ -111,6 +111,7 @@ local methods = {
 
         for _, tab in pairs(self.tabs.children) do
             if tab ~= selectedTab then
+                -- TODO
                 -- tab:SetFont("normal", template.tab.normal)
                 -- tab:SetFont("highlight", template.tab.highlight)
                 -- tab:SetBackdrop(template.tab)
