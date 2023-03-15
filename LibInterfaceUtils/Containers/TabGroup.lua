@@ -6,39 +6,32 @@ if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
 
-local defaults = {
-    backdrop = {
-        tab = {
-            bgColor = private.assets.colors.darker,
-            highlightEnabled = false,
-        },
-        selectedTab = {
-            bgColor = private.assets.colors.lightFlair,
-            highlightEnabled = false,
-        },
-        content = {
+local templates = {
+    default = {
+        frame = { -- backdropTable
             bgEnabled = true,
             bordersEnabled = true,
-            bgColor = private.assets.colors.normal,
         },
-    },
-    font = {
-        tab = {
-            normal = {
+        tab = { -- backdropTable
+            bgColor = private.assets.colors.darker,
+            highlightEnabled = false,
+            normal = { -- fontTable
                 font = "GameFontNormal",
                 color = private.assets.colors.flair,
             },
-            highlight = {
+            highlight = { -- fontTable
                 font = "GameFontHighlight",
                 color = private.assets.colors.white,
             },
         },
-        selectedTab = {
-            normal = {
+        selectedTab = { -- backdropTable
+            bgColor = private.assets.colors.lightFlair,
+            highlightEnabled = false,
+            normal = { -- fontTable
                 font = "GameFontHighlight",
                 color = private.assets.colors.white,
             },
-            highlight = {
+            highlight = { -- fontTable
                 font = "GameFontHighlight",
                 color = private.assets.colors.white,
             },
@@ -50,13 +43,27 @@ local methods = {
     OnAcquire = function(self)
         self:SetLayout()
         self:SetSize(300, 300)
-        self:SetBackdrop()
+        self:ApplyTemplate("default")
         self:SetTabs()
     end,
 
     OnRelease = function(self)
         self.tabs:ReleaseChildren()
         self.content:ReleaseChildren()
+    end,
+
+    ApplyTemplate = function(self, templateName, mixin)
+        templateName = type(templateName) == "string" and templateName:lower() or templateName
+        local template
+        if type(templateName) == "table" then
+            template = CreateFromMixins(templates.default, templateName)
+        else
+            template = templates[templateName or "default"] or templates.default
+        end
+
+        self.content:ApplyTemplate(template)
+
+        self:SetUserData("template", template)
     end,
 
     DoLayout = function(self, ...)
@@ -95,26 +102,22 @@ local methods = {
         self.content:RemoveChild(...)
     end,
 
-    SetBackdrop = function(self, backdrop)
-        self.content:SetBackdrop(CreateFromMixins(defaults.backdrop.content, backdrop or {}))
-    end,
-
     SetLayout = function(self, ...)
         self.content:SetLayout(...)
     end,
 
     SetSelected = function(self, selectedTab)
-        self:GetUserData("selectedTab", selectedTab)
+        local template = self:GetUserData("template")
 
         for _, tab in pairs(self.tabs.children) do
             if tab ~= selectedTab then
-                tab:SetFont("normal", defaults.font.tab.normal)
-                tab:SetFont("highlight", defaults.font.tab.highlight)
-                tab:SetBackdrop(defaults.backdrop.tab)
+                tab:SetFont("normal", template.tab.normal)
+                tab:SetFont("highlight", template.tab.highlight)
+                tab:SetBackdrop(template.tab)
             else
-                tab:SetFont("normal", defaults.font.selectedTab.normal)
-                tab:SetFont("highlight", defaults.font.selectedTab.highlight)
-                tab:SetBackdrop(defaults.backdrop.selectedTab)
+                tab:SetFont("normal", template.selectedTab.normal)
+                tab:SetFont("highlight", template.selectedTab.highlight)
+                tab:SetBackdrop(template.selectedTab)
             end
         end
     end,

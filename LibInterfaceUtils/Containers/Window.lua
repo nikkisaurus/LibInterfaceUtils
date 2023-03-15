@@ -1,7 +1,7 @@
 local addonName, private = ...
 local lib, minor = LibStub:GetLibrary(addonName)
 
-local objectType, version = "Frame", 1
+local objectType, version = "Window", 1
 if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
@@ -10,6 +10,9 @@ local forbidden = {
     CreateFontString = true,
     RegisterAllEvents = true,
     RegisterEvent = true,
+    SetBackdrop = true,
+    SetBackdropBorderColor = true,
+    SetBackdropColor = true,
     SetScale = true,
     SetScript = true,
     UnregisterAllEvents = true,
@@ -46,18 +49,14 @@ local templates = {
             bgEnabled = false,
             bordersEnabled = false,
         },
-        statusBar = { -- backdropTable
-            bgColor = private.assets.colors.elvTransparent,
-            padding = 4, -- Frame specific setting
-        },
         scrollBars = {
             vertical = {
                 track = { -- scrollBarTable
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.dimmedWhite,
                 },
-                background = {
-                    enabled = true, -- scrollBarTable
+                background = { -- scrollBarTable
+                    enabled = true,
                     texture = private.assets.blankTexture,
                     color = private.assets.colors.darker,
                 },
@@ -91,10 +90,6 @@ local templates = {
             bgEnabled = false,
             bordersEnabled = false,
         },
-        statusBar = { -- backdropTable
-            bgColor = private.assets.colors.elvTransparent,
-            padding = 4, -- Frame specific setting
-        },
         scrollBars = {
             vertical = {
                 track = { -- scrollBarTable
@@ -116,6 +111,10 @@ local templates = {
             },
         },
     },
+}
+
+local templatesMetatable = {
+    __index = templates.default,
 }
 
 local childScripts = {
@@ -162,9 +161,8 @@ local methods = {
         self:SetDraggable(true, "LeftButton")
         self:SetClampedToScreen(true)
         self:SetFrameStrata("HIGH")
-        self:ApplyTemplate("default")
+        self:ApplyTemplate("transparent")
         self:SetTitle()
-        self:SetStatus()
     end,
 
     OnRelease = function(self)
@@ -179,7 +177,8 @@ local methods = {
         templateName = type(templateName) == "string" and templateName:lower() or templateName
         local template
         if type(templateName) == "table" then
-            template = CreateFromMixins(templates.default, templateName)
+            template = templateName
+            local info = setmetatable(template, templatesMetatable)
         else
             template = templates[templateName or "default"] or templates.default
         end
@@ -189,7 +188,6 @@ local methods = {
         private:SetFont(self.titleBar.title, template.title)
         private:SetBackdrop(self.content, template.content)
         self.content:SetScrollBars(template.scrollBars)
-        private:SetBackdrop(self.statusBar, template.statusBar)
 
         self:SetUserData("template", template)
         self:SetAnchors()
@@ -209,9 +207,9 @@ local methods = {
             assert(type(maxHeight) == "number", "Invalid argument for Frame:EnableResize(enabled, minWidth, minHeight, maxWidth, maxHeight): maxHeight")
 
             self:SetResizeBounds(minWidth, minHeight, maxWidth, maxHeight)
-            self.statusBar.resizer:Show()
+            self.resizer:Show()
         else
-            self.statusBar.resizer:Hide()
+            self.resizer:Hide()
         end
     end,
 
@@ -259,10 +257,6 @@ local methods = {
         self.titleBar.title:SetPoint("TOPLEFT", template.titleBar.padding, -template.titleBar.padding)
         self.titleBar.title:SetPoint("RIGHT", self.titleBar.close, "LEFT", -template.titleBar.padding, 0)
         self.titleBar.title:SetPoint("BOTTOM", 0, template.titleBar.padding)
-
-        self.statusBar.text:SetPoint("TOPLEFT", template.statusBar.padding, -template.statusBar.padding)
-        self.statusBar.text:SetPoint("RIGHT", self.statusBar.resizer, "LEFT", -template.statusBar.padding, 0)
-        self.statusBar.text:SetPoint("BOTTOM", -template.statusBar.padding, template.statusBar.padding)
     end,
 
     SetDraggable = function(self, isDraggable, ...)
@@ -281,10 +275,6 @@ local methods = {
 
     SetSpacing = function(self, ...)
         self.content:SetSpacing(...)
-    end,
-
-    SetStatus = function(self, text)
-        self.statusBar.text:SetText(text or "")
     end,
 
     SetTitle = function(self, text)
@@ -310,28 +300,19 @@ local function creationFunc()
     frame.titleBar.close:SetHighlightAtlas("PlayerDeadBlip", "ADD")
     frame.titleBar.close:SetScript("OnClick", childScripts.close.OnClick)
 
-    frame.statusBar = CreateFrame("Frame", nil, frame)
-    frame.statusBar:SetPoint("BOTTOMLEFT")
-    frame.statusBar:SetPoint("BOTTOMRIGHT")
-    frame.statusBar:SetHeight(20)
-    frame.statusBar = private:CreateTextures(frame.statusBar)
-
-    frame.statusBar.resizer = CreateFrame("Button", nil, frame.statusBar)
-    frame.statusBar.resizer:SetNormalTexture([[INTERFACE\CHATFRAME\UI-CHATIM-SIZEGRABBER-DOWN]])
-    frame.statusBar.resizer:SetHighlightTexture([[INTERFACE\CHATFRAME\UI-CHATIM-SIZEGRABBER-HIGHLIGHT]])
-    frame.statusBar.resizer:SetPoint("BOTTOMRIGHT", 0, 0)
-    frame.statusBar.resizer:SetSize(16, 16)
-    frame.statusBar.resizer:EnableMouse(true)
-    frame.statusBar.resizer:SetScript("OnMouseDown", childScripts.resizer.OnMouseDown)
-    frame.statusBar.resizer:SetScript("OnMouseUp", childScripts.resizer.OnMouseUp)
-
-    frame.statusBar.text = frame.statusBar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    frame.statusBar.text:SetJustifyH("LEFT")
+    frame.resizer = CreateFrame("Button", nil, frame)
+    frame.resizer:SetNormalTexture([[INTERFACE\CHATFRAME\UI-CHATIM-SIZEGRABBER-DOWN]])
+    frame.resizer:SetHighlightTexture([[INTERFACE\CHATFRAME\UI-CHATIM-SIZEGRABBER-HIGHLIGHT]])
+    frame.resizer:SetPoint("BOTTOMRIGHT", 0, 0)
+    frame.resizer:SetSize(16, 16)
+    frame.resizer:EnableMouse(true)
+    frame.resizer:SetScript("OnMouseDown", childScripts.resizer.OnMouseDown)
+    frame.resizer:SetScript("OnMouseUp", childScripts.resizer.OnMouseUp)
 
     frame.content = lib:New("ScrollFrame")
     frame.content:SetParent(frame)
-    frame.content:SetPoint("TOPLEFT", frame.titleBar, "BOTTOMLEFT", 5, -5)
-    frame.content:SetPoint("BOTTOMRIGHT", frame.statusBar, "TOPRIGHT", -5, 5)
+    frame.content:SetPoint("TOPLEFT", frame.titleBar, "BOTTOMLEFT", 5, 0)
+    frame.content:SetPoint("BOTTOMRIGHT", -5, 5)
 
     local widget = {
         object = frame,
@@ -342,7 +323,7 @@ local function creationFunc()
     }
 
     frame.titleBar.close.widget = widget
-    frame.statusBar.resizer.widget = widget
+    frame.resizer.widget = widget
 
     return private:RegisterContainer(widget, methods, scripts)
 end

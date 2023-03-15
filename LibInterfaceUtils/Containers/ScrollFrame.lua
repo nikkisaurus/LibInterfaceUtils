@@ -6,14 +6,72 @@ if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
 
-local defaults = {
-    backdrop = {
-        bgEnabled = false,
-        bordersEnabled = false,
+local templates = {
+    default = {
+        frame = { -- backdropTable
+            bgEnabled = false,
+            bordersEnabled = false,
+        },
+        scrollBars = {
+            vertical = {
+                track = { -- scrollBarTable
+                    texture = private.assets.blankTexture,
+                    color = private.assets.colors.dimmedWhite,
+                },
+                background = { -- scrollBarTable
+                    enabled = true,
+                    texture = private.assets.blankTexture,
+                    color = private.assets.colors.darker,
+                },
+            },
+            horizontal = {
+                track = { -- scrollBarTable
+                    texture = private.assets.blankTexture,
+                    color = private.assets.colors.dimmedWhite,
+                },
+                background = { -- scrollBarTable
+                    enabled = true,
+                    texture = private.assets.blankTexture,
+                    color = private.assets.colors.darker,
+                },
+            },
+        },
+    },
+    bordered = {
+        frame = { -- backdropTable
+            bgEnabled = true,
+            bordersEnabled = true,
+        },
+        scrollBars = {
+            vertical = {
+                track = { -- scrollBarTable
+                    texture = private.assets.blankTexture,
+                    color = private.assets.colors.dimmedWhite,
+                },
+                background = { -- scrollBarTable
+                    enabled = true,
+                    texture = private.assets.blankTexture,
+                    color = private.assets.colors.darker,
+                },
+            },
+            horizontal = {
+                track = { -- scrollBarTable
+                    texture = private.assets.blankTexture,
+                    color = private.assets.colors.dimmedWhite,
+                },
+                background = { -- scrollBarTable
+                    enabled = true,
+                    texture = private.assets.blankTexture,
+                    color = private.assets.colors.darker,
+                },
+            },
+        },
     },
 }
 
 local registry = {
+    OnDragStart = true,
+    OnDragStop = true,
     OnEnter = true,
     OnHide = true,
     OnLeave = true,
@@ -25,18 +83,16 @@ local registry = {
 }
 
 local childScripts = {
-    content = {
-        OnSizeChanged = function(self)
-            local frame = self.widget.object
-            frame:DoLayout()
-        end,
-    },
-
     horizontalBox = {
         OnMouseDown = function(self)
             local frame = self.widget.object
             if frame:IsMovable() then
                 frame:StartMoving()
+            end
+
+            local parent = frame:GetUserData("parent")
+            if parent then
+                parent:Fire("OnDragStart")
             end
         end,
 
@@ -44,6 +100,11 @@ local childScripts = {
             local frame = self.widget.object
             if frame:IsMovable() then
                 frame:StopMovingOrSizing()
+            end
+
+            local parent = frame:GetUserData("parent")
+            if parent then
+                parent:Fire("OnDragStop")
             end
         end,
     },
@@ -54,12 +115,22 @@ local childScripts = {
             if frame:IsMovable() then
                 frame:StartMoving()
             end
+
+            local parent = frame:GetUserData("parent")
+            if parent then
+                parent:Fire("OnDragStart")
+            end
         end,
 
         OnMouseUp = function(self)
             local frame = self.widget.object
             if frame:IsMovable() then
                 frame:StopMovingOrSizing()
+            end
+
+            local parent = frame:GetUserData("parent")
+            if parent then
+                parent:Fire("OnDragStop")
             end
         end,
     },
@@ -88,17 +159,26 @@ local methods = {
     OnAcquire = function(self)
         self:SetLayout()
         self:SetSize(500, 300)
-        self:EnableBackdrop()
+        self:ApplyTemplate("default")
+    end,
+
+    ApplyTemplate = function(self, templateName, mixin)
+        templateName = type(templateName) == "string" and templateName:lower() or templateName or templateName
+        local template
+        if type(templateName) == "table" then
+            template = CreateFromMixins(templates.default, templateName)
+        else
+            template = templates[templateName or "default"] or templates.default
+        end
+
+        private:SetBackdrop(self, template.frame)
+        self:SetScrollBars(template.scrollBars)
+
+        self:SetUserData("template", template)
     end,
 
     OnLayoutFinished = function(self)
         self:SetScrollAnchors()
-    end,
-
-    EnableBackdrop = function(self, isEnabled, backdrop)
-        defaults.backdrop.bgEnabled = isEnabled or false
-        defaults.backdrop.bordersEnabled = isEnabled or false
-        self:SetBackdrop(backdrop)
     end,
 
     GetAnchorX = function(self)
@@ -116,10 +196,6 @@ local methods = {
     MarkDirty = function(self, usedWidth, usedHeight)
         self.content:SetSize(usedWidth, usedHeight)
         self.horizontalBox:SetSize(usedWidth, usedHeight)
-    end,
-
-    SetBackdrop = function(self, backdrop)
-        private:SetBackdrop(self, CreateFromMixins(defaults.backdrop, backdrop or {}))
     end,
 
     SetScrollAnchors = function(self)
@@ -151,6 +227,32 @@ local methods = {
 
         self:SetUserData("scrollUpdate", true)
     end,
+
+    SetScrollBars = function(self, template)
+        self.verticalBar.Track.Thumb.Main:SetTexture(template.vertical.track.texture)
+        self.verticalBar.Track.Thumb.Main:SetVertexColor(template.vertical.track.color:GetRGBA())
+        self.verticalBar.Back.Texture:SetVertexColor(template.vertical.track.color:GetRGBA())
+        self.verticalBar.Forward.Texture:SetVertexColor(template.vertical.track.color:GetRGBA())
+        if template.vertical.background.enabled then
+            self.verticalBar.Background.Main:SetTexture(template.vertical.background.texture)
+            self.verticalBar.Background.Main:SetVertexColor(template.vertical.background.color:GetRGBA())
+            self.verticalBar.Background.Main:Show()
+        else
+            self.verticalBar.Background.Main:Hide()
+        end
+
+        self.horizontalBar.Track.Thumb.Main:SetTexture(template.horizontal.track.texture)
+        self.horizontalBar.Track.Thumb.Main:SetVertexColor(template.horizontal.track.color:GetRGBA())
+        self.horizontalBar.Back.Texture:SetVertexColor(template.horizontal.track.color:GetRGBA())
+        self.horizontalBar.Forward.Texture:SetVertexColor(template.horizontal.track.color:GetRGBA())
+        if template.horizontal.background.enabled then
+            self.horizontalBar.Background.Main:SetTexture(template.horizontal.background.texture)
+            self.horizontalBar.Background.Main:SetVertexColor(template.horizontal.background.color:GetRGBA())
+            self.horizontalBar.Background.Main:Show()
+        else
+            self.horizontalBar.Background.Main:Hide()
+        end
+    end,
 }
 
 local function creationFunc()
@@ -171,8 +273,6 @@ local function creationFunc()
 
     frame.content = CreateFrame("Frame", nil, frame.horizontalBox, "ResizeLayoutFrame")
     frame.content.scrollable = true
-    frame.content:SetScript("OnMouseDown", childScripts.content.OnMouseDown)
-    frame.content:SetScript("OnMouseUp", childScripts.content.OnMouseUp)
 
     frame.horizontalView = CreateScrollBoxLinearView()
     frame.horizontalView:SetPanExtent(50)
@@ -208,7 +308,6 @@ local function creationFunc()
         registry = registry,
     }
 
-    frame.content.widget = widget
     frame.horizontalBox.widget = widget
     frame.verticalBox.widget = widget
 

@@ -8,6 +8,7 @@
     <Script file="Containers/Group.lua"/>
     <Script file="Containers/ScrollFrame.lua"/>
     <Script file="Containers/TabGroup.lua"/>
+    <Script file="Containers/Window.lua"/>
     <Script file="Widgets/Button.lua"/>
     <Script file="Widgets/CheckButton.lua"/>
     <Script file="Widgets/Divider.lua"/>

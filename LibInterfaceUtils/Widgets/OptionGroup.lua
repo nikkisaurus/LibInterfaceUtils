@@ -12,6 +12,7 @@ local methods = {
     OnAcquire = function(self)
         self:SetSize(300, 20)
         self:SetPadding()
+        self:ApplyTemplate("bordered")
         self:SetMultiselect(true)
         self:SetInfo()
     end,
@@ -67,7 +68,6 @@ local methods = {
 
 local function creationFunc()
     local frame = lib:New("Group")
-    frame:EnableBackdrop(true)
 
     local widget = {
         object = frame,

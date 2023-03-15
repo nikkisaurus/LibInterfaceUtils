@@ -105,16 +105,16 @@ function private.Flow(self)
         end
 
         if isFullHeight and self.widget.type ~= "Group" and self.widget.type ~= "CollapsibleGroup" then
-            local extraHeight = availableHeight - usedHeight - spacingH - yOffset
+            local extraHeight = availableHeight - usedHeight - spacingV - yOffset
             if extraHeight > childHeight then
-                child:SetHeight(availableHeight - usedHeight - spacingH - yOffset)
+                child:SetHeight(extraHeight)
             end
-            rowHeight = max(rowHeight, child:GetHeight() + spacingH + yOffset)
+            rowHeight = max(rowHeight, child:GetHeight() + yOffset)
             break
         end
     end
 
-    usedHeight = usedHeight + rowHeight - spacingV
+    usedHeight = usedHeight + rowHeight + spacingV
 
     if self:GetUserData("collapsed") then
         self:MarkDirty(nil, 0)
@@ -205,7 +205,7 @@ function private.List(self)
         end
     end
 
-    usedHeight = usedHeight + rowHeight - spacingV
+    usedHeight = usedHeight + rowHeight + spacingV
 
     if self:GetUserData("collapsed") then
         self:MarkDirty(nil, 0)

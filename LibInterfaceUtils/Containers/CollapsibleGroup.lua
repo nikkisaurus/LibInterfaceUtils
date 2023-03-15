@@ -26,11 +26,62 @@ local registry = {
     OnSizeChanged = true,
 }
 
+local templates = {
+    default = {
+        header = { -- backdropTable
+            bgColor = private.assets.colors.darker,
+            highlightEnabled = true,
+            highlightColor = private.assets.colors.dimmedFlair,
+        },
+        label = { -- fontTable
+            font = "GameFontNormal",
+            color = private.assets.colors.flair,
+            highlightColor = private.assets.colors.white,
+        },
+        content = { -- backdropTable
+            bgEnabled = false,
+            bordersEnabled = false,
+        },
+    },
+    bordered = {
+        header = { -- backdropTable
+            bgColor = private.assets.colors.darker,
+            highlightEnabled = true,
+            highlightColor = private.assets.colors.dimmedFlair,
+        },
+        label = { -- fontTable
+            font = "GameFontNormal",
+            color = private.assets.colors.flair,
+            highlightColor = private.assets.colors.white,
+        },
+        content = { -- backdropTable
+            bgEnabled = true,
+            bordersEnabled = true,
+        },
+    },
+}
+
 local childScripts = {
     header = {
         OnClick = function(self)
             local frame = self.widget.object
             frame:Collapse(not frame:GetUserData("collapsed"))
+        end,
+
+        OnEnter = function(self)
+            local frame = self.widget.object
+            local template = frame:GetUserData("template")
+            if template.label.highlightColor then
+                frame.label:SetTextColor(template.label.highlightColor:GetRGBA())
+            end
+        end,
+
+        OnLeave = function(self)
+            local frame = self.widget.object
+            local template = frame:GetUserData("template")
+            if template.label.highlightColor then
+                frame.label:SetTextColor(template.label.color:GetRGBA())
+            end
         end,
     },
 }
@@ -40,11 +91,25 @@ local methods = {
         self:SetLayout()
         self:SetSize(500, 300)
         self:SetPadding()
-        self:SetBackdrop()
-        self:EnableHeaderBackdrop(true)
-        self:SetLabelFont(GameFontNormal)
+        self:ApplyTemplate("default")
         self:SetLabel()
         self:Collapse()
+    end,
+
+    ApplyTemplate = function(self, templateName, mixin)
+        templateName = type(templateName) == "string" and templateName:lower() or templateName
+        local template
+        if type(templateName) == "table" then
+            template = CreateFromMixins(templates.default, templateName)
+        else
+            template = templates[templateName or "default"] or templates.default
+        end
+
+        private:SetBackdrop(self.header, template.header)
+        private:SetFont(self.label, template.label)
+        private:SetBackdrop(self.container, template.content)
+
+        self:SetUserData("template", template)
     end,
 
     Collapse = function(self, collapsed)
@@ -63,44 +128,25 @@ local methods = {
         end
     end,
 
-    EnableBackdrop = function(self, isEnabled, backdrop)
-        defaults.backdrop.bgEnabled = isEnabled or false
-        defaults.backdrop.bordersEnabled = isEnabled or false
-        self:SetBackdrop(backdrop)
-    end,
-
-    EnableHeaderBackdrop = function(self, isEnabled, backdrop)
-        defaults.headerBackdrop.bgEnabled = isEnabled or false
-        defaults.headerBackdrop.bordersEnabled = isEnabled or false
-        self:SetHeaderBackdrop(backdrop)
-    end,
-
     MarkDirty = function(self, _, height)
-        if self:GetUserData("collapsed") then
-            height = 0
-        else
+        if not self:GetUserData("collapsed") then
             height = height + self:GetUserData("top") + self:GetUserData("bottom")
         end
+
         self.container:SetHeight(height)
+
+        local canWrap = self.label:CanWordWrap()
+        if canWrap then
+            self.header:SetHeight(self.label:GetStringHeight() + 15)
+        else
+            self.header:SetHeight(20)
+        end
+
         self:SetHeight(height + self.header:GetHeight())
     end,
 
-    SetBackdrop = function(self, backdrop)
-        private:SetBackdrop(self.container, CreateFromMixins(defaults.backdrop, backdrop or {}))
-    end,
-
-    SetHeaderBackdrop = function(self, backdrop)
-        private:SetBackdrop(self.header, CreateFromMixins(defaults.headerBackdrop, backdrop or {}))
-    end,
-
     SetLabel = function(self, text)
-        self.header:SetText(text or "")
-    end,
-
-    SetLabelFont = function(self, fontObject, color)
-        self.header:SetNormalFontObject(fontObject)
-        self.header:GetFontString():SetTextColor((color or private.assets.colors.flair):GetRGBA())
-        self.header:SetHeight(self.header:GetTextHeight() + 20)
+        self.label:SetText(text or "")
     end,
 
     SetPadding = function(self, left, right, top, bottom)
@@ -122,6 +168,8 @@ local function creationFunc()
     frame.header:SetHeight(20)
     frame.header = private:CreateTextures(frame.header)
     frame.header:SetScript("OnClick", childScripts.header.OnClick)
+    frame.header:SetScript("OnEnter", childScripts.header.OnEnter)
+    frame.header:SetScript("OnLeave", childScripts.header.OnLeave)
 
     frame.label = frame.header:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.label:SetPoint("LEFT", 5, 0)

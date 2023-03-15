@@ -121,7 +121,7 @@ local defaultBackdrop = {
     bgAtlas = false,
     bgTexCoord = { 0, 1, 0, 1 },
     bgTexture = private.assets.blankTexture,
-    bgColor = private.assets.colors.dark,
+    bgColor = private.assets.colors.elvTransparent,
 
     bordersEnabled = true,
     bordersTexture = private.assets.blankTexture,
@@ -132,7 +132,7 @@ local defaultBackdrop = {
     highlightAtlas = false,
     highlightTexCoord = { 0, 1, 0, 1 },
     highlightTexture = private.assets.blankTexture,
-    highlightColor = private.assets.colors.normal,
+    highlightColor = private.assets.colors.dimmedWhite,
     highlightBlendMode = "ADD",
 }
 

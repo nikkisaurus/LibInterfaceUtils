@@ -11,6 +11,7 @@ function lib:CreateTestFrame()
     frame:SetSize(800, 600)
     frame:SetTitle("Test Frame")
     frame:SetStatus("Loading...")
+    -- frame:ApplyTemplate("transparent")
     frame:SetSpacing(5, 5)
     -- frame:ApplyTemplate({
     --     frame = {
@@ -32,7 +33,7 @@ function lib:CreateTestFrame()
     editBoxes:SetFullWidth(true)
     editBoxes:SetSpacing(5, 5)
     editBoxes:SetLabel("EditBoxes")
-    editBoxes:EnableBackdrop(true, { bgEnabled = true, bgColor = private.assets.colors.normal })
+    editBoxes:ApplyTemplate("bordered")
     editBoxes:Collapse(true)
     -- editBoxes:SetLayout("List")
 
@@ -63,7 +64,7 @@ function lib:CreateTestFrame()
     checkButtons:SetFullWidth(true)
     checkButtons:SetLabel("CheckButtons")
     checkButtons:SetSpacing(5, 5)
-    checkButtons:EnableBackdrop(true, { bgEnabled = true, bgColor = private.assets.colors.normal })
+    checkButtons:ApplyTemplate("bordered")
     -- checkButtons:SetLayout("List")
 
     local checkButton1 = checkButtons:New("CheckButton")
@@ -108,20 +109,20 @@ function lib:CreateTestFrame()
     collapsibleCheckGroup:SetUserData("name", "collapsibleCheckGroup")
     collapsibleCheckGroup:SetFullWidth(true)
     collapsibleCheckGroup:SetLabel("Select multiple options")
-    collapsibleCheckGroup:EnableBackdrop(true, { bgEnabled = true })
+    collapsibleCheckGroup:ApplyTemplate("bordered")
 
     local collapsibleCheckOptions = collapsibleCheckGroup:New("OptionGroup")
     collapsibleCheckOptions:SetUserData("name", "collapsibleCheckOptions")
     collapsibleCheckOptions:SetFullWidth(true)
-    collapsibleCheckOptions:EnableBackdrop()
     collapsibleCheckOptions:SetInfo(info)
     collapsibleCheckOptions:SetPadding(0, 0, 0, 0)
+    collapsibleCheckOptions:ApplyTemplate()
 
     local labels = frame:New("CollapsibleGroup")
     labels:SetFullWidth(true)
     labels:SetSpacing(5, 5)
     labels:SetLabel("Labels")
-    labels:EnableBackdrop(true, { bgEnabled = true })
+    labels:ApplyTemplate("bordered")
     labels:Collapse(true)
 
     for k, v in pairs({ "TOP", "TOPLEFT", "TOPRIGHT", "LEFT", "RIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "BOTTOM" }) do
@@ -189,7 +190,7 @@ function lib:CreateTestFrame()
     frame:DoLayout()
 end
 
-function lib:CreateTestTabFrame()
+function lib:CreateTestTabGroup()
     local frame = self:New("Frame")
     frame:SetPoint("CENTER")
     frame:SetSize(800, 600)
@@ -575,16 +576,35 @@ function lib:CreateTestTabFrame()
     -- end)
 end
 
+function lib:CreateTestWindow()
+    local window = lib:New("Window")
+    window:SetPoint("CENTER")
+    window:SetSize(500, 300)
+    window:SetSpacing(10, 10)
+    -- window:SetLayout("Fill")
+
+    local group = window:New("CollapsibleGroup")
+    group:SetLabel("Group blah blasdfjlksdfl joj foajsf op8asjf ;sajdfl;asjdfljsa fojasfoj")
+    group:SetFullWidth(true)
+
+    for i = 1, 150 do
+        local button = group:New("Button")
+        button:SetText(i)
+        button:SetWidth(400)
+    end
+end
+
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:SetScript("OnEvent", function()
     -- lib:CreateTestFrame()
-    lib:CreateTestTabFrame()
+    lib:CreateTestTabGroup()
+    -- lib:CreateTestWindow()
 end)
 
 SLASH_LIBINTERFACEUTILS1 = "/liu"
 SlashCmdList["LIBINTERFACEUTILS"] = function()
-    print("New")
+    -- print("New")
     -- lib:CreateTestFrame()
-    lib:CreateTestTabFrame()
+    -- lib:CreateTestTabGroup()
 end

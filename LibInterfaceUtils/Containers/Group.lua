@@ -24,6 +24,29 @@ local registry = {
     OnSizeChanged = true,
 }
 
+local templates = {
+    default = {
+        label = { -- fontTable
+            font = "GameFontNormal",
+            color = private.assets.colors.flair,
+        },
+        content = { -- backdropTable
+            bgEnabled = false,
+            bordersEnabled = false,
+        },
+    },
+    bordered = {
+        label = { -- fontTable
+            font = "GameFontNormal",
+            color = private.assets.colors.flair,
+        },
+        content = { -- backdropTable
+            bgEnabled = true,
+            bordersEnabled = true,
+        },
+    },
+}
+
 local childScripts = {
     content = {
         OnSizeChanged = function(self)
@@ -37,16 +60,24 @@ local methods = {
     OnAcquire = function(self)
         self:SetLayout()
         self:SetSize(500, 300)
-        self:EnableBackdrop()
-        self:SetLabel()
-        self:SetLabelFont(GameFontNormal)
         self:SetPadding()
+        self:ApplyTemplate("default")
+        self:SetLabel()
     end,
 
-    EnableBackdrop = function(self, isEnabled, backdrop)
-        defaults.backdrop.bgEnabled = isEnabled or false
-        defaults.backdrop.bordersEnabled = isEnabled or false
-        self:SetBackdrop(backdrop)
+    ApplyTemplate = function(self, templateName, mixin)
+        templateName = type(templateName) == "string" and templateName:lower() or templateName
+        local template
+        if type(templateName) == "table" then
+            template = CreateFromMixins(templates.default, templateName)
+        else
+            template = templates[templateName or "default"] or templates.default
+        end
+
+        private:SetFont(self.label, template.label)
+        private:SetBackdrop(self.container, template.content)
+
+        self:SetUserData("template", template)
     end,
 
     HasLabel = function(self)
@@ -57,12 +88,9 @@ local methods = {
         self:SetHeight(height + (self:HasLabel() and (self.label:GetHeight() + 5) or 0) + (self:GetUserData("top")) + (self:GetUserData("bottom")))
     end,
 
-    SetBackdrop = function(self, backdrop)
-        private:SetBackdrop(self.container, CreateFromMixins(defaults.backdrop, backdrop or {}))
-    end,
-
     SetLabel = function(self, text)
         self.label:SetText(text or "")
+
         if private:strcheck(text) then
             self.label:Show()
             self.container:SetPoint("TOP", self.label, "BOTTOM", 0, -5)
