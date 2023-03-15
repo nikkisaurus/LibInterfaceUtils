@@ -80,12 +80,12 @@ local templates = {
 local childScripts = {
     resizer = {
         OnMouseDown = function(self)
-            local frame = self.widget.object
+            local frame = self.frame
             frame.tree:StartSizing("RIGHT")
         end,
 
         OnMouseUp = function(self)
-            local frame = self.widget.object
+            local frame = self.frame
             frame.tree:StopMovingOrSizing()
             frame:SetAnchors()
         end,
@@ -109,7 +109,7 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self)
-        self:SetAnchors()
+        self:AcquireChildren()
         self:SetLayout()
         self:SetSize(600, 500)
         self:ApplyTemplate("default")
@@ -119,8 +119,25 @@ local methods = {
     end,
 
     OnRelease = function(self)
-        self.tree:ReleaseChildren()
-        self.content:ReleaseChildren()
+        self.tree:Release()
+        self.resizer:Release()
+        self.content:Release()
+    end,
+
+    AcquireChildren = function(self)
+        self.tree = lib:New("ScrollFrame")
+        self.tree:SetLayout("List")
+
+        self.resizer = lib:New("Button")
+        self.resizer:SetWidth(5)
+        self.resizer:RegisterForDrag("LeftButton")
+        self.resizer.frame = self
+        self.resizer:SetCallback("OnMouseDown", childScripts.resizer.OnMouseDown)
+        self.resizer:SetCallback("OnMouseUp", childScripts.resizer.OnMouseUp)
+
+        self.content = lib:New("ScrollFrame")
+
+        self:SetAnchors()
     end,
 
     ApplyTemplate = function(self, templateName, mixin)
@@ -318,24 +335,13 @@ local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
     frame = private:CreateTextures(frame)
 
-    frame.tree = lib:New("ScrollFrame")
-    frame.tree:SetLayout("List")
-
-    frame.resizer = lib:New("Button")
-    frame.resizer:SetWidth(5)
-    frame.resizer:RegisterForDrag("LeftButton")
-    frame.resizer:SetCallback("OnMouseDown", childScripts.resizer.OnMouseDown)
-    frame.resizer:SetCallback("OnMouseUp", childScripts.resizer.OnMouseUp)
-
-    frame.content = lib:New("ScrollFrame")
-
     local widget = {
         object = frame,
         type = objectType,
         version = version,
     }
 
-    frame.resizer.widget = widget
+    frame.widget = widget
 
     return private:RegisterContainer(widget, methods, scripts)
 end
