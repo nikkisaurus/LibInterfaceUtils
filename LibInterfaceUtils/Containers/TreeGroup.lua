@@ -118,7 +118,6 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self)
-        self:AcquireChildren()
         self:SetLayout()
         self:SetSize(600, 500)
         self:ApplyTemplate("default")
@@ -127,12 +126,7 @@ local methods = {
 
     OnRelease = function(self)
         self.tree:ReleaseChildren()
-        -- self.resizer:Release()
         self.content:ReleaseChildren()
-    end,
-
-    AcquireChildren = function(self)
-        self:SetAnchors()
     end,
 
     ApplyTemplate = function(self, templateName, mixin)
@@ -202,7 +196,6 @@ local methods = {
         self.resizer:SetPoint("TOPLEFT", self.tree, "TOPRIGHT")
         self.resizer:SetPoint("BOTTOMLEFT", self.tree, "BOTTOMRIGHT")
 
-        -- self.content:SetPoint("TOPLEFT", self.resizer, "TOPRIGHT", 0, 0)
         self.content:SetPoint("BOTTOMRIGHT")
         self.content:SetPoint("TOPRIGHT")
         self.content:SetWidth(self:GetWidth() - self.tree:GetWidth())
@@ -330,9 +323,6 @@ local methods = {
         self:SetSelected()
         self.tree:DoLayout()
     end,
-
-    -- UpdateContentWidth = function(self)
-    -- end,
 }
 
 local function creationFunc()
