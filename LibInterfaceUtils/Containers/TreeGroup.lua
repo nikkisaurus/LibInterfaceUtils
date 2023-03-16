@@ -16,7 +16,7 @@ local templates = {
             header = {
                 bgEnabled = false,
                 bordersEnabled = false,
-                highlightColor = private.assets.colors.dimmedFlair,
+                highlightColor = private.assets.colors.lightFlair,
             },
         },
         child = {
@@ -64,13 +64,13 @@ local templates = {
             header = {
                 bgEnabled = true,
                 bordersEnabled = false,
-                bgColor = private.assets.colors.dimmedFlair,
+                bgColor = private.assets.colors.lightFlair,
             },
         },
         selectedChild = {
             content = {
                 bgEnabled = true,
-                bgColor = private.assets.colors.dimmedFlair,
+                bgColor = private.assets.colors.lightFlair,
                 bordersEnabled = false,
             },
         },
