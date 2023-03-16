@@ -82,11 +82,13 @@ local childScripts = {
         OnMouseDown = function(self)
             local frame = self.frame
             frame.tree:StartSizing("RIGHT")
+            frame:SetUserData("isSizing", true)
         end,
 
         OnMouseUp = function(self)
             local frame = self.frame
             frame.tree:StopMovingOrSizing()
+            frame:SetUserData("isSizing")
             frame:SetAnchors()
         end,
     },
@@ -104,6 +106,13 @@ local scripts = {
             self.tree:SetWidth(maxWidth)
         end
         self.tree:SetResizeBounds(minWidth, h, maxWidth, h)
+        self:SetAnchors()
+    end,
+
+    OnUpdate = function(self)
+        if self:GetUserData("isSizing") then
+            self:SetAnchors()
+        end
     end,
 }
 
@@ -114,29 +123,15 @@ local methods = {
         self:SetSize(600, 500)
         self:ApplyTemplate("default")
         self:SetTree()
-        self.tree:SetResizable(true)
-        self.tree:SetWidth(200)
     end,
 
     OnRelease = function(self)
-        self.tree:Release()
-        self.resizer:Release()
-        self.content:Release()
+        self.tree:ReleaseChildren()
+        -- self.resizer:Release()
+        self.content:ReleaseChildren()
     end,
 
     AcquireChildren = function(self)
-        self.tree = lib:New("ScrollFrame")
-        self.tree:SetLayout("List")
-
-        self.resizer = lib:New("Button")
-        self.resizer:SetWidth(5)
-        self.resizer:RegisterForDrag("LeftButton")
-        self.resizer.frame = self
-        self.resizer:SetCallback("OnMouseDown", childScripts.resizer.OnMouseDown)
-        self.resizer:SetCallback("OnMouseUp", childScripts.resizer.OnMouseUp)
-
-        self.content = lib:New("ScrollFrame")
-
         self:SetAnchors()
     end,
 
@@ -193,8 +188,12 @@ local methods = {
     end,
 
     SetAnchors = function(self)
+        self.tree:ClearAllPoints()
+        self.resizer:ClearAllPoints()
+        self.content:ClearAllPoints()
+
         self.tree:SetParent(self)
-        self.resizer:SetParent(self.tree)
+        self.resizer:SetParent(self)
         self.content:SetParent(self)
 
         self.tree:SetPoint("TOPLEFT")
@@ -203,8 +202,10 @@ local methods = {
         self.resizer:SetPoint("TOPLEFT", self.tree, "TOPRIGHT")
         self.resizer:SetPoint("BOTTOMLEFT", self.tree, "BOTTOMRIGHT")
 
-        self.content:SetPoint("TOPLEFT", self.resizer, "TOPRIGHT", 0, 0)
+        -- self.content:SetPoint("TOPLEFT", self.resizer, "TOPRIGHT", 0, 0)
         self.content:SetPoint("BOTTOMRIGHT")
+        self.content:SetPoint("TOPRIGHT")
+        self.content:SetWidth(self:GetWidth() - self.tree:GetWidth())
     end,
 
     SetLayout = function(self, ...)
@@ -329,11 +330,29 @@ local methods = {
         self:SetSelected()
         self.tree:DoLayout()
     end,
+
+    -- UpdateContentWidth = function(self)
+    -- end,
 }
 
 local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
     frame = private:CreateTextures(frame)
+
+    frame.tree = lib:New("ScrollFrame")
+    frame.tree:SetLayout("List")
+    frame.tree:SetResizable(true)
+    frame.tree:SetWidth(200)
+
+    frame.resizer = lib:New("Button")
+    frame.resizer:SetWidth(5)
+    frame.resizer:RegisterForDrag("LeftButton")
+    frame.resizer.frame = frame
+    frame.resizer:SetCallback("OnMouseDown", childScripts.resizer.OnMouseDown)
+    frame.resizer:SetCallback("OnMouseUp", childScripts.resizer.OnMouseUp)
+
+    frame.content = lib:New("ScrollFrame")
+    frame.content:SetWidth(400)
 
     local widget = {
         object = frame,
