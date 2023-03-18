@@ -299,8 +299,9 @@ local scripts = {
 
         if self:IsDisabled() or not info then
             return
-        elseif self.menu then
-            private:CloseMenus()
+        elseif self:GetUserData("closeMenu") then
+            self:SetUserData("closeMenu")
+            private:CloseMenu(self.menu)
             return
         end
 
@@ -314,6 +315,32 @@ local scripts = {
         self.menu:SetUserData("dropdown", self)
         tinsert(menus, self.menu)
         private:CloseMenus(self.menu)
+
+        self.menu:RegisterEvent("GLOBAL_MOUSE_DOWN")
+        self.menu:SetScript("OnEvent", function(menu, ...)
+            local scale = menu:GetEffectiveScale()
+            local left, bottom, width, height = menu:GetRect()
+            local cx, cy = GetCursorPosition()
+            cx = (cx / scale - left) / width
+            cy = (bottom + height - cy / scale) / height
+
+            -- If cursor is outside of menu:
+            if cx < 0 or cx > 1 or cy < 0 or cy > 1 then
+                local scale = self:GetEffectiveScale()
+                local left, bottom, width, height = self:GetRect()
+                local cx, cy = GetCursorPosition()
+                cx = (cx / scale - left) / width
+                cy = (bottom + height - cy / scale) / height
+
+                -- If cursor is inside of button:
+                if cx > 0 and cx < 1 and cy > 0 and cy < 1 then
+                    self:SetUserData("closeMenu", true)
+                end
+
+                menu:UnregisterAllEvents()
+                private:CloseMenu(menu)
+            end
+        end)
 
         self:SetDataProvider()
     end,
@@ -556,6 +583,21 @@ local function creationFunc()
 end
 
 private:RegisterWidgetPool(objectType, creationFunc)
+
+function private:CloseMenu(closeMenu)
+    for id, menu in ipairs(menus) do
+        if menu == closeMenu then
+            local dropdown = menu:GetUserData("dropdown")
+            if dropdown then
+                dropdown.menu = nil
+            end
+            menu:SetFrameStrata("HIGH")
+            menu:Release()
+            tremove(menus, id)
+            return
+        end
+    end
+end
 
 function private:CloseMenus(ignoredMenu)
     for id, menu in ipairs_reverse(menus) do
