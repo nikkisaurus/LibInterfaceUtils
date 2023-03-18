@@ -284,7 +284,7 @@ local methods = {
                         self:SetSelected(node, child)
                         self.content:ReleaseChildren()
                         childInfo.onClick(self.content, childInfo)
-                        self.content:DoLayout()
+                        self.content:DoLayoutDeferred()
                     end)
 
                     container:SetCallback("OnEnter", function()
@@ -316,12 +316,12 @@ local methods = {
                 self:SetSelected(node)
                 self.content:ReleaseChildren()
                 treeInfo.onClick(self.content, treeInfo)
-                self.content:DoLayout()
+                self.content:DoLayoutDeferred()
             end)
         end
 
         self:SetSelected()
-        self.tree:DoLayout()
+        self.tree:DoLayoutDeferred()
     end,
 }
 

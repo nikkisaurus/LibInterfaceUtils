@@ -177,12 +177,12 @@ local methods = {
                 self:SetSelected(tab)
                 self.content:ReleaseChildren()
                 tabInfo.onClick(self.content, tabInfo)
-                self.content:DoLayout()
+                self.content:DoLayoutDeferred()
             end)
         end
 
         self:SetSelected()
-        self.tabs:DoLayout()
+        self.tabs:DoLayoutDeferred()
     end,
 }
 

@@ -109,15 +109,24 @@ local scripts = {
         if self:IsDisabled() or not info then
             return
         elseif self.menu then
-            if self.menu:IsVisible() then
-                self.menu:Hide()
-            else
-                self.menu:Show()
-            end
+            private:CloseMenus()
             return
         end
 
-        self:InitializeMenu()
+        self.menu = lib:New("ScrollFrame")
+        self.menu:SetParent(self)
+        self.menu:SetFrameStrata("DIALOG")
+        self.menu:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+        self.menu:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT")
+        self.menu:SetHeight(200)
+        -- self.menu:SetLayout("List")
+        self.menu:SetSpacing(0, 5)
+        self.menu:ApplyTemplate({ frame = { bgColor = private.assets.colors.elvBackdrop } }, "bordered")
+        self.menu:SetUserData("dropdown", self)
+        tinsert(menus, self.menu)
+
+        private:CloseMenus(self.menu)
+        self:RefreshMenu(info)
     end,
 
     OnEnter = function(self)
@@ -241,14 +250,14 @@ local methods = {
 
         for i, listButton in ipairs(info) do
             if not listButton.filter then
-                -- local group = self.menu:New("Group")
-                -- group:SetFullWidth(true)
-                -- group:SetSpacing(2, 0)
-                -- group:SetPadding(0, 0, 0, 0)
-                -- group:ApplyTemplate(defaults.listButton.normal)
+                local group = self.menu:New("Group")
+                group:SetFullWidth(true)
+                group:SetSpacing(2, 0)
+                group:SetPadding(0, 0, 0, 0)
+                group:ApplyTemplate(defaults.listButton.normal)
 
                 if listButton.isTitle then
-                    local header = self.menu:New("Header")
+                    local header = group:New("Header")
                     header:SetText(listButton.text)
                 else
                     local callback = function(checked)
@@ -273,7 +282,7 @@ local methods = {
 
                     local checkButton
                     if style.checkStyle then
-                        checkButton = self.menu:New("CheckButton")
+                        checkButton = group:New("CheckButton")
                         checkButton:SetChecked(private:ParseValue(listButton.checked, self))
                         checkButton:SetDisabled(private:ParseValue(listButton.disabled))
                         checkButton:SetStyle(style.checkStyle)
@@ -292,7 +301,7 @@ local methods = {
                         -- end)
                     end
 
-                    local label = self.menu:New("Label")
+                    local label = group:New("Label")
                     label:SetAutoWidth(false)
                     label:SetFillWidth(true)
                     label:SetText(listButton.text)
@@ -324,14 +333,14 @@ local methods = {
         end
 
         if (style.selectAll and style.multiSelect) or style.clear then
-            -- local group = self.menu:New("Group")
-            -- group:SetFullWidth(true)
-            -- group:SetSpacing(0, 0)
-            -- group:SetPadding(0, 0, 0, 0)
+            local group = self.menu:New("Group")
+            group:SetFullWidth(true)
+            group:SetSpacing(0, 0)
+            group:SetPadding(0, 0, 0, 0)
 
             local selectAll
             if style.selectAll and style.multiSelect then
-                selectAll = self.menu:New("Button")
+                selectAll = group:New("Button")
                 selectAll:SetText(locales and locales.selectAll or "Select All")
 
                 if not style.clear then
@@ -358,7 +367,7 @@ local methods = {
 
             local clear
             if style.clear then
-                clear = self.menu:New("Button")
+                clear = group:New("Button")
                 clear:SetText(locales and locales.clear or "Clear")
 
                 if not style.selectAll or not style.multiSelect then
@@ -385,6 +394,7 @@ local methods = {
         end
 
         self.menu:ResumeLayout()
+        self.menu:DoLayoutDeferred()
 
         -- private:CloseMenus(self.menu)
         -- self:RefreshMenu(info)
@@ -433,12 +443,12 @@ local methods = {
         self.menu:ReleaseChildren()
 
         if style.search then
-            -- local group = self.menu:New("Group")
-            -- group:SetFullWidth(true)
-            -- group:SetSpacing(0, 0)
-            -- group:SetPadding(0, 0, 0, 0)
+            local group = self.menu:New("Group")
+            group:SetFullWidth(true)
+            group:SetSpacing(0, 0)
+            group:SetPadding(0, 0, 0, 0)
 
-            local search = self.menu:New("SearchBox")
+            local search = group:New("SearchBox")
             search:SetFullWidth(true)
             search:SetText(self:GetUserData("searchText") or "")
             if focus then
@@ -455,20 +465,20 @@ local methods = {
                 self:RefreshMenu(info, self.menu:GetVerticalScroll())
             end)
 
-            -- search:SetCallback("OnTextChanged", function(_, userInput)
-            --     local text = search:GetText()
-            --     self:SetUserData("searchText", text)
-            --     self:FilterInfo()
-            --     if callbacks and callbacks.OnSearchChanged then
-            --         callbacks.OnSearchChanged(self, text)
-            --     end
+            search:SetCallback("OnTextChanged", function(_, userInput)
+                local text = search:GetText()
+                self:SetUserData("searchText", text)
+                self:FilterInfo()
+                if callbacks and callbacks.OnSearchChanged then
+                    callbacks.OnSearchChanged(self, text)
+                end
 
-            --     if not userInput then
-            --         return
-            --     end
+                if not userInput then
+                    return
+                end
 
-            --     self:RefreshMenu(info, self.menu:GetVerticalScroll(), true)
-            -- end)
+                self:RefreshMenu(info, self.menu:GetVerticalScroll(), true)
+            end)
 
             search:SetCallback("OnEditCleared", function()
                 self:SetUserData("searchText")
@@ -481,98 +491,96 @@ local methods = {
         end
 
         for i, listButton in ipairs(info) do
-            local button = self.menu:New("Button")
-            button:SetText(listButton.text)
-            -- if not listButton.filter then
-            --     -- local group = self.menu:New("Group")
-            --     -- group:SetFullWidth(true)
-            --     -- group:SetSpacing(2, 0)
-            --     -- group:SetPadding(0, 0, 0, 0)
-            --     -- group:ApplyTemplate(defaults.listButton.normal)
+            if not listButton.filter then
+                local group = self.menu:New("Group")
+                group:SetFullWidth(true)
+                group:SetSpacing(2, 0)
+                group:SetPadding(0, 0, 0, 0)
+                group:ApplyTemplate(defaults.listButton.normal)
 
-            --     if listButton.isTitle then
-            --         local header = self.menu:New("Header")
-            --         header:SetText(listButton.text)
-            --     else
-            --         local callback = function(checked)
-            --             self:SetSelected(i, checked)
-            --             if listButton.func then
-            --                 listButton.func(self, checked)
-            --             end
+                if listButton.isTitle then
+                    local header = group:New("Header")
+                    header:SetText(listButton.text)
+                else
+                    local callback = function(checked)
+                        self:SetSelected(i, checked)
+                        if listButton.func then
+                            listButton.func(self, checked)
+                        end
 
-            --             if style.hideOnClick then
-            --                 private:CloseMenus()
-            --             end
-            --         end
+                        if style.hideOnClick then
+                            private:CloseMenus()
+                        end
+                    end
 
-            --         -- group:SetCallback("OnEnter", function()
-            --         --     group:ApplyTemplate(defaults.listButton.highlight)
-            --         -- end)
+                    group:SetCallback("OnEnter", function()
+                        group:ApplyTemplate(defaults.listButton.highlight)
+                    end)
 
-            --         -- group:SetCallback("OnLeave", function()
-            --         --     group:ApplyTemplate(defaults.listButton.normal)
-            --         -- end)
+                    group:SetCallback("OnLeave", function()
+                        group:ApplyTemplate(defaults.listButton.normal)
+                    end)
 
-            --         local checkButton
-            --         if style.checkStyle then
-            --             checkButton = self.menu:New("CheckButton")
-            --             checkButton:SetChecked(private:ParseValue(listButton.checked, self))
-            --             checkButton:SetDisabled(private:ParseValue(listButton.disabled))
-            --             checkButton:SetStyle(style.checkStyle)
+                    local checkButton
+                    if style.checkStyle then
+                        checkButton = group:New("CheckButton")
+                        checkButton:SetChecked(private:ParseValue(listButton.checked, self))
+                        checkButton:SetDisabled(private:ParseValue(listButton.disabled))
+                        checkButton:SetStyle(style.checkStyle)
 
-            --             checkButton:SetCallback("OnClick", function()
-            --                 callback(checkButton:GetChecked())
-            --             end)
+                        checkButton:SetCallback("OnClick", function()
+                            callback(checkButton:GetChecked())
+                        end)
 
-            --             -- checkButton:SetCallback("OnEnter", function()
-            --             --     group:Fire("OnEnter")
-            --             -- end)
+                        checkButton:SetCallback("OnEnter", function()
+                            group:Fire("OnEnter")
+                        end)
 
-            --             -- checkButton:SetCallback("OnLeave", function()
-            --             --     group:Fire("OnLeave")
-            --             -- end)
-            --         end
+                        checkButton:SetCallback("OnLeave", function()
+                            group:Fire("OnLeave")
+                        end)
+                    end
 
-            --         local label = self.menu:New("Label")
-            --         label:SetAutoWidth(false)
-            --         label:SetFillWidth(true)
-            --         label:SetText(listButton.text)
-            --         label:SetIcon(listButton.icon, listButton.iconWidth or style.iconWidth, listButton.iconHeight or style.iconHeight, style.iconPoint)
-            --         label:SetInteractible(true)
-            --         label:SetDisabled(private:ParseValue(listButton.disabled))
+                    local label = group:New("Label")
+                    label:SetAutoWidth(false)
+                    label:SetFillWidth(true)
+                    label:SetText(listButton.text)
+                    label:SetIcon(listButton.icon, listButton.iconWidth or style.iconWidth, listButton.iconHeight or style.iconHeight, style.iconPoint)
+                    label:SetInteractible(true)
+                    label:SetDisabled(private:ParseValue(listButton.disabled))
 
-            --         -- label:SetCallback("OnEnter", function()
-            --         --     group:Fire("OnEnter")
-            --         -- end)
+                    label:SetCallback("OnEnter", function()
+                        group:Fire("OnEnter")
+                    end)
 
-            --         -- label:SetCallback("OnLeave", function()
-            --         --     group:Fire("OnLeave")
-            --         -- end)
+                    label:SetCallback("OnLeave", function()
+                        group:Fire("OnLeave")
+                    end)
 
-            --         label:SetCallback("OnMouseDown", function()
-            --             if checkButton then
-            --                 checkButton:Fire("OnClick")
-            --             else
-            --                 callback()
-            --             end
-            --         end)
+                    label:SetCallback("OnMouseDown", function()
+                        if checkButton then
+                            checkButton:Fire("OnClick")
+                        else
+                            callback()
+                        end
+                    end)
 
-            --         -- group:SetCallback("OnMouseDown", function()
-            --         --     label:Fire("OnMouseDown")
-            --         -- end)
-            --     end
-            -- end
+                    group:SetCallback("OnMouseDown", function()
+                        label:Fire("OnMouseDown")
+                    end)
+                end
+            end
         end
 
         if (style.selectAll and style.multiSelect) or style.clear then
-            -- local group = self.menu:New("Group")
-            -- group:SetFullWidth(true)
-            -- group:SetSpacing(0, 0)
-            -- group:SetPadding(0, 0, 0, 0)
+            local group = self.menu:New("Group")
+            group:SetFullWidth(true)
+            group:SetSpacing(0, 0)
+            group:SetPadding(0, 0, 0, 0)
 
             local selectAll
             if style.selectAll and style.multiSelect then
-                selectAll = self.menu:New("Button")
+                selectAll = group:New("Button")
                 selectAll:SetText(locales and locales.selectAll or "Select All")
 
                 if not style.clear then
@@ -598,7 +606,7 @@ local methods = {
 
             local clear
             if style.clear then
-                clear = self.menu:New("Button")
+                clear = group:New("Button")
                 clear:SetText(locales and locales.clear or "Clear")
 
                 if not style.selectAll or not style.multiSelect then

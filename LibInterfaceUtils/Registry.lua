@@ -17,11 +17,6 @@ local function GetNumObjects(self)
     return count
 end
 
-local function OnSizeChanged(self)
-    local object = self.widget.object
-    object:DoLayout()
-end
-
 local function Resetter(_, self)
     self:ClearAllPoints()
     self:Hide()
@@ -29,21 +24,26 @@ end
 
 local children = {}
 local ContainerMethods = {
-    AddChild = function(self, object, skipLayout)
+    AddChild = function(self, object)
         local parent = object:GetUserData("parent")
         if parent then
             parent:RemoveChild(object)
         end
         tinsert(self.children, object)
         object:SetUserData("parent", self)
-        if not skipLayout and not self:GetUserData("pauseLayout") then
+        self:DoLayoutDeferred()
+    end,
+
+    DoLayoutDeferred = function(self)
+        self:SetScript("OnUpdate", function()
             self:DoLayout()
-        end
+        end)
     end,
 
     DoLayout = function(self)
         local w, h = self:layoutFunc()
         self:Fire("OnLayoutFinished", w, h)
+        self:SetScript("OnUpdate", nil)
         return private:round(self:GetWidth()), private:round(self:GetHeight())
     end,
 
@@ -63,13 +63,11 @@ local ContainerMethods = {
         self:SetSize(usedWidth, usedHeight)
     end,
 
-    New = function(self, objectType, skipLayout)
+    New = function(self, objectType)
         local object = lib:New(objectType)
         tinsert(self.children, object)
         object:SetUserData("parent", self)
-        if not skipLayout and not self:GetUserData("pauseLayout") then
-            self:DoLayout()
-        end
+        self:DoLayoutDeferred()
         return object
     end,
 
@@ -88,7 +86,7 @@ local ContainerMethods = {
         for id, child in ipairs(self.children) do
             if child == object then
                 tremove(self.children, id)
-                self:DoLayout()
+                self:DoLayoutDeferred()
                 return
             end
         end
@@ -98,11 +96,9 @@ local ContainerMethods = {
         self:SetUserData("pauseLayout", true)
     end,
 
-    ResumeLayout = function(self, skipLayout)
+    ResumeLayout = function(self)
         self:SetUserData("pauseLayout")
-        if not skipLayout then
-            return self:DoLayout()
-        end
+        self:DoLayoutDeferred()
     end,
 
     SetLayout = function(self, layout, customFunc)

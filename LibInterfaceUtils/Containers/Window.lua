@@ -14,7 +14,6 @@ local forbidden = {
     SetBackdropBorderColor = true,
     SetBackdropColor = true,
     SetScale = true,
-    SetScript = true,
     UnregisterAllEvents = true,
     UnregisterEvent = true,
 }

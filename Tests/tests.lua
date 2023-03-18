@@ -267,7 +267,7 @@ function lib:CreateFrame()
     artwork:SetFullWidth(true)
     artwork:SetFullHeight(true)
 
-    frame:DoLayout()
+    frame:DoLayoutDeferred()
 end
 
 function lib:CreateTabWindow()

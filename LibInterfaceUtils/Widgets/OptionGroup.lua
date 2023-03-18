@@ -58,7 +58,7 @@ local methods = {
                 end)
             end
 
-            self:DoLayout()
+            self:DoLayoutDeferred()
         end
     end,
 

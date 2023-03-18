@@ -11,7 +11,6 @@ local forbidden = {
     RegisterAllEvents = true,
     RegisterEvent = true,
     SetScale = true,
-    SetScript = true,
     UnregisterAllEvents = true,
     UnregisterEvent = true,
 }

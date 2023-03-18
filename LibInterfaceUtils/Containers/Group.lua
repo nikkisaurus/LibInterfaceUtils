@@ -70,7 +70,7 @@ local childScripts = {
     content = {
         OnSizeChanged = function(self)
             local frame = self.widget.object
-            frame:DoLayout()
+            frame:DoLayoutDeferred()
         end,
     },
 }

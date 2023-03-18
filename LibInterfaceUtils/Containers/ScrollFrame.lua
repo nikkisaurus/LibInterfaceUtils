@@ -89,23 +89,8 @@ local childScripts = {
 }
 
 local scripts = {
-    OnUpdate = function(self)
-        -- Using OnUpdate instead of OnSizeChanged to throttle the DoLayout calls and provide a more responsive experience
-        local w, h = self:GetSize()
-        w = private:round(w)
-        h = private:round(h)
-        local width = self:GetUserData("width")
-        local height = self:GetUserData("height")
-        if not width or not height or w ~= width or h ~= height or self:GetUserData("scrollUpdate") then
-            self:SetUserData("width", w)
-            self:SetUserData("height", h)
-            self:DoLayout()
-            -- scrollUpdate needs to be here for after scrollbars change in order to update the layout, since widths and heights will change
-            -- very important that this is set to false AFTER DoLayout, or it'll continue to run every frame
-            self:SetUserData("scrollUpdate", false)
-        end
-
-        self:SetUserData("contentHeight", self.content:GetHeight())
+    OnSizeChanged = function(self)
+        self:DoLayoutDeferred()
     end,
 }
 
@@ -192,8 +177,6 @@ local methods = {
             verticalBar:Hide()
             verticalBox:SetPoint("RIGHT", -5, 0)
         end
-
-        self:SetUserData("scrollUpdate", true)
     end,
 
     SetScrollBars = function(self, template)
