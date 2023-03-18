@@ -78,8 +78,8 @@ local ContainerMethods = {
     end,
 
     ReleaseChildren = function(self)
-        for i = #self.children, 1, -1 do
-            self.children[i]:Release()
+        for i, child in ipairs_reverse(self.children) do
+            child:Release()
             tremove(self.children, i)
         end
     end,

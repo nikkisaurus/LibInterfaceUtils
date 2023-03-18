@@ -109,24 +109,15 @@ local scripts = {
         if self:IsDisabled() or not info then
             return
         elseif self.menu then
-            private:CloseMenus()
+            if self.menu:IsVisible() then
+                self.menu:Hide()
+            else
+                self.menu:Show()
+            end
             return
         end
 
-        self.menu = lib:New("ScrollFrame")
-        self.menu:SetParent(self)
-        self.menu:SetFrameStrata("DIALOG")
-        self.menu:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
-        self.menu:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT")
-        self.menu:SetHeight(200)
-        -- self.menu:SetLayout("List")
-        self.menu:SetSpacing(0, 5)
-        self.menu:ApplyTemplate({ frame = { bgColor = private.assets.colors.elvBackdrop } }, "bordered")
-        self.menu:SetUserData("dropdown", self)
-        tinsert(menus, self.menu)
-
-        private:CloseMenus(self.menu)
-        self:RefreshMenu(info)
+        self:InitializeMenu()
     end,
 
     OnEnter = function(self)
@@ -183,6 +174,220 @@ local methods = {
         else
             return selected
         end
+    end,
+
+    InitializeMenu = function(self)
+        self.menu = lib:New("ScrollFrame")
+        self.menu:SetParent(self)
+        self.menu:SetFrameStrata("DIALOG")
+        self.menu:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
+        self.menu:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT")
+        self.menu:SetHeight(200)
+        -- self.menu:SetLayout("List")
+        self.menu:SetSpacing(0, 5)
+        self.menu:ApplyTemplate({ frame = { bgColor = private.assets.colors.elvBackdrop } }, "bordered")
+        tinsert(menus, self.menu)
+
+        local style = self:GetUserData("style")
+        local info = self:GetUserData("info")
+        local callbacks = self:GetUserData("callbacks")
+        local locales = self:GetUserData("locales")
+
+        self.menu:PauseLayout()
+        self.menu:ReleaseChildren()
+
+        if style.search then
+            local search = self.menu:New("SearchBox")
+            search:SetFullWidth(true)
+            search:SetText(self:GetUserData("searchText") or "")
+            if focus then
+                search:SetFocus()
+            end
+
+            search:SetCallback("OnEnterPressed", function()
+                local text = search:GetText()
+                self:SetUserData("searchText", text)
+                self:FilterInfo()
+                if callbacks and callbacks.OnSearch then
+                    callbacks.OnSearch(self, text)
+                end
+                self:RefreshMenu(info, self.menu:GetVerticalScroll())
+            end)
+
+            -- search:SetCallback("OnTextChanged", function(_, userInput)
+            --     local text = search:GetText()
+            --     self:SetUserData("searchText", text)
+            --     self:FilterInfo()
+            --     if callbacks and callbacks.OnSearchChanged then
+            --         callbacks.OnSearchChanged(self, text)
+            --     end
+
+            --     if not userInput then
+            --         return
+            --     end
+
+            --     self:RefreshMenu(info, self.menu:GetVerticalScroll(), true)
+            -- end)
+
+            search:SetCallback("OnEditCleared", function()
+                self:SetUserData("searchText")
+                self:FilterInfo()
+                if callbacks and callbacks.OnSearchCleared then
+                    callbacks.OnSearchCleared(self)
+                end
+                -- self:RefreshMenu(info, self.menu:GetVerticalScroll())
+            end)
+        end
+
+        for i, listButton in ipairs(info) do
+            if not listButton.filter then
+                -- local group = self.menu:New("Group")
+                -- group:SetFullWidth(true)
+                -- group:SetSpacing(2, 0)
+                -- group:SetPadding(0, 0, 0, 0)
+                -- group:ApplyTemplate(defaults.listButton.normal)
+
+                if listButton.isTitle then
+                    local header = self.menu:New("Header")
+                    header:SetText(listButton.text)
+                else
+                    local callback = function(checked)
+                        self:SetSelected(i, checked)
+                        if listButton.func then
+                            listButton.func(self, checked)
+                        end
+
+                        if style.hideOnClick then
+                            self.menu:Hide()
+                            -- private:CloseMenus()
+                        end
+                    end
+
+                    -- group:SetCallback("OnEnter", function()
+                    --     group:ApplyTemplate(defaults.listButton.highlight)
+                    -- end)
+
+                    -- group:SetCallback("OnLeave", function()
+                    --     group:ApplyTemplate(defaults.listButton.normal)
+                    -- end)
+
+                    local checkButton
+                    if style.checkStyle then
+                        checkButton = self.menu:New("CheckButton")
+                        checkButton:SetChecked(private:ParseValue(listButton.checked, self))
+                        checkButton:SetDisabled(private:ParseValue(listButton.disabled))
+                        checkButton:SetStyle(style.checkStyle)
+                        checkButton:SetAutoWidth(true)
+
+                        checkButton:SetCallback("OnClick", function()
+                            callback(checkButton:GetChecked())
+                        end)
+
+                        -- checkButton:SetCallback("OnEnter", function()
+                        --     group:Fire("OnEnter")
+                        -- end)
+
+                        -- checkButton:SetCallback("OnLeave", function()
+                        --     group:Fire("OnLeave")
+                        -- end)
+                    end
+
+                    local label = self.menu:New("Label")
+                    label:SetAutoWidth(false)
+                    label:SetFillWidth(true)
+                    label:SetText(listButton.text)
+                    label:SetIcon(listButton.icon, listButton.iconWidth or style.iconWidth, listButton.iconHeight or style.iconHeight, style.iconPoint)
+                    label:SetInteractible(true)
+                    label:SetDisabled(private:ParseValue(listButton.disabled))
+
+                    -- label:SetCallback("OnEnter", function()
+                    --     group:Fire("OnEnter")
+                    -- end)
+
+                    -- label:SetCallback("OnLeave", function()
+                    --     group:Fire("OnLeave")
+                    -- end)
+
+                    label:SetCallback("OnMouseDown", function()
+                        if checkButton then
+                            checkButton:Fire("OnClick")
+                        else
+                            callback()
+                        end
+                    end)
+
+                    -- group:SetCallback("OnMouseDown", function()
+                    --     label:Fire("OnMouseDown")
+                    -- end)
+                end
+            end
+        end
+
+        if (style.selectAll and style.multiSelect) or style.clear then
+            -- local group = self.menu:New("Group")
+            -- group:SetFullWidth(true)
+            -- group:SetSpacing(0, 0)
+            -- group:SetPadding(0, 0, 0, 0)
+
+            local selectAll
+            if style.selectAll and style.multiSelect then
+                selectAll = self.menu:New("Button")
+                selectAll:SetText(locales and locales.selectAll or "Select All")
+
+                if not style.clear then
+                    selectAll:SetFullWidth(true)
+                else
+                    selectAll:SetRelativeWidth(0.5)
+                end
+
+                selectAll:SetCallback("OnClick", function()
+                    self:SelectAll()
+
+                    if callbacks and callbacks.OnSelectAll then
+                        callbacks.OnSelectAll(self)
+                    end
+
+                    if style.hideOnClick then
+                        -- private:CloseMenus()
+                        self.menu:Hide()
+                    else
+                        -- self:RefreshMenu(info, self.menu:GetVerticalScroll())
+                    end
+                end)
+            end
+
+            local clear
+            if style.clear then
+                clear = self.menu:New("Button")
+                clear:SetText(locales and locales.clear or "Clear")
+
+                if not style.selectAll or not style.multiSelect then
+                    clear:SetFullWidth(true)
+                else
+                    clear:SetRelativeWidth(0.5)
+                end
+
+                clear:SetCallback("OnClick", function()
+                    self:ClearSelected()
+
+                    if callbacks and callbacks.OnClear then
+                        callbacks.OnClear(self)
+                    end
+
+                    if style.hideOnClick then
+                        -- private:CloseMenus()
+                        self.menu:Hide()
+                    else
+                        -- self:RefreshMenu(info, self.menu:GetVerticalScroll())
+                    end
+                end)
+            end
+        end
+
+        self.menu:ResumeLayout()
+
+        -- private:CloseMenus(self.menu)
+        -- self:RefreshMenu(info)
     end,
 
     IsDisabled = function(self)
