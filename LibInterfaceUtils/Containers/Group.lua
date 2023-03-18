@@ -60,6 +60,11 @@ local childScripts = {
             local frame = self.widget.object
             frame:Fire("OnLeave")
         end,
+
+        OnMouseDown = function(self)
+            local frame = self.widget.object
+            frame:Fire("OnMouseDown")
+        end,
     },
 
     content = {
@@ -98,8 +103,8 @@ local methods = {
         return private:strcheck(self.label:GetText())
     end,
 
-    MarkDirty = function(self, _, height)
-        self:SetHeight(height + (self:HasLabel() and (self.label:GetHeight() + 5) or 0) + (self:GetUserData("top")) + (self:GetUserData("bottom")))
+    MarkDirty = function(self, usedWidth, usedHeight)
+        self:SetHeight(usedHeight + (self:HasLabel() and (self.label:GetHeight() + 5) or 0) + (self:GetUserData("top")) + (self:GetUserData("bottom")))
     end,
 
     SetLabel = function(self, text)
@@ -138,6 +143,7 @@ local function creationFunc()
     frame.container = private:CreateTextures(frame.container)
     frame.container:SetScript("OnEnter", childScripts.container.OnEnter)
     frame.container:SetScript("OnLeave", childScripts.container.OnLeave)
+    frame.container:SetScript("OnMouseDown", childScripts.container.OnMouseDown)
 
     frame.content = CreateFrame("Frame", nil, frame.container)
     frame.content:SetScript("OnSizeChanged", childScripts.content.OnSizeChanged)

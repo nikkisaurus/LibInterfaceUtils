@@ -29,19 +29,21 @@ end
 
 local children = {}
 local ContainerMethods = {
-    AddChild = function(self, object)
+    AddChild = function(self, object, skipLayout)
         local parent = object:GetUserData("parent")
         if parent then
             parent:RemoveChild(object)
         end
         tinsert(self.children, object)
         object:SetUserData("parent", self)
-        self:DoLayout()
+        if not skipLayout and not self:GetUserData("pauseLayout") then
+            self:DoLayout()
+        end
     end,
 
     DoLayout = function(self)
-        self:layoutFunc()
-        self:Fire("OnLayoutFinished")
+        local w, h = self:layoutFunc()
+        self:Fire("OnLayoutFinished", w, h)
         return private:round(self:GetWidth()), private:round(self:GetHeight())
     end,
 
@@ -57,15 +59,17 @@ local ContainerMethods = {
         return private:round(self.content:GetWidth())
     end,
 
-    MarkDirty = function(self, width, height)
-        self:SetSize(width, height)
+    MarkDirty = function(self, usedWidth, usedHeight)
+        self:SetSize(usedWidth, usedHeight)
     end,
 
-    New = function(self, objectType)
+    New = function(self, objectType, skipLayout)
         local object = lib:New(objectType)
         tinsert(self.children, object)
         object:SetUserData("parent", self)
-        self:DoLayout()
+        if not skipLayout and not self:GetUserData("pauseLayout") then
+            self:DoLayout()
+        end
         return object
     end,
 
@@ -90,6 +94,17 @@ local ContainerMethods = {
         end
     end,
 
+    PauseLayout = function(self)
+        self:SetUserData("pauseLayout", true)
+    end,
+
+    ResumeLayout = function(self, skipLayout)
+        self:SetUserData("pauseLayout")
+        if not skipLayout then
+            return self:DoLayout()
+        end
+    end,
+
     SetLayout = function(self, layout, customFunc)
         if self.content and self.content.SetLayout then
             self.content:SetLayout(layout, customFunc)
@@ -107,10 +122,17 @@ local ContainerMethods = {
 
 local ObjectMethods = {
     Fire = function(self, script, ...)
+        if self:GetUserData("isDisabled") then
+            return
+        end
+
         if self:HasScript(script) and self:GetScript(script) then
             self:GetScript(script)(self, ...)
         elseif self[script] then
             self[script](self, ...)
+            if self.widget.callbacks[script] then
+                self.widget.callbacks[script](self, ...)
+            end
         elseif self.target and self.target:HasScript(script) and self.target:GetScript(script) then
             self.target:GetScript(script)(self.target, ...)
         end
@@ -126,6 +148,14 @@ local ObjectMethods = {
 
     GetFullWidth = function(self)
         return self:GetUserData("fullWidth")
+    end,
+
+    GetRelativeHeight = function(self)
+        return self:GetUserData("relHeight")
+    end,
+
+    GetRelativeWidth = function(self)
+        return self:GetUserData("relWidth")
     end,
 
     GetUserData = function(self, key)
@@ -159,6 +189,12 @@ local ObjectMethods = {
         self.widget.callbacks[script] = handler
     end,
 
+    SetCallbacks = function(self, callbacks)
+        for script, handler in pairs(callbacks) do
+            self.widget.callbacks[script] = handler
+        end
+    end,
+
     SetFillWidth = function(self, fillWidth)
         self:SetUserData("fillWidth", fillWidth)
     end,
@@ -169,6 +205,14 @@ local ObjectMethods = {
 
     SetFullWidth = function(self, isFullWidth)
         self:SetUserData("fullWidth", isFullWidth)
+    end,
+
+    SetRelativeHeight = function(self, relHeight)
+        self:SetUserData("relHeight", relHeight)
+    end,
+
+    SetRelativeWidth = function(self, relWidth)
+        self:SetUserData("relWidth", relWidth)
     end,
 
     SetOffsets = function(self, xOffset, yOffset, xFill, yFill)

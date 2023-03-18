@@ -4,6 +4,53 @@ if not lib then
     return
 end
 
+local function GetDropdownInfo(text)
+    local info = {
+        -- {
+        --     value = 0,
+        --     text = "List Buttons",
+        --     isTitle = true,
+        -- },
+    }
+
+    -- for i = 1, fastrandom(5, 50) do
+    for i = 1, 50 do
+        tinsert(info, {
+            value = i,
+            text = "Value " .. i,
+            icon = 134400,
+            checked = function(self)
+                return self:IsValueSelected(i)
+            end,
+            disabled = fastrandom(1, 2) == 2,
+            func = function(self, checked)
+                print("Selected Value", i)
+                if text then
+                    self:SetSelectedText()
+                end
+            end,
+        })
+    end
+
+    local callbacks = {
+        OnClear = function(self)
+            if text then
+                self:SetSelectedText()
+            end
+            print(self:GetSelected())
+        end,
+        OnSelectAll = function(self)
+            if text then
+                self:SetSelectedText()
+            end
+            print(self:GetSelected())
+        end,
+        -- OnSearch = function(self, text) end,
+        -- OnSearchCleared = function(self, text) end,
+    }
+    return info, callbacks
+end
+
 function lib:CreateFrame()
     local frame = self:New("Frame")
     frame:SetPoint("CENTER")
@@ -31,12 +78,43 @@ function lib:CreateFrame()
     local header = frame:New("Header")
     header:SetText("Widgets")
 
+    local dropdowns = frame:New("CollapsibleGroup")
+    dropdowns:SetFullWidth(true)
+    dropdowns:SetSpacing(5, 5)
+    dropdowns:SetLabel("Dropdowns")
+    dropdowns:ApplyTemplate("bordered")
+    -- dropdowns:Collapse(true)
+
+    local info, callbacks = GetDropdownInfo()
+    local dropdown = dropdowns:New("Dropdown")
+    dropdown:SetDefaultText("Default")
+    dropdown:SetInitializer(info)
+
+    local info, callbacks = GetDropdownInfo(true)
+    local dropdown2 = dropdowns:New("Dropdown")
+    dropdown2:SetDefaultText("Select")
+    dropdown2:SetInitializer(info, callbacks)
+    dropdown2:SetStyle("select")
+
+    local info, callbacks = GetDropdownInfo(true)
+    local dropdown3 = dropdowns:New("Dropdown")
+    dropdown3:SetDefaultText("Select Left Icon")
+    dropdown3:SetInitializer(info, callbacks)
+    dropdown3:SetStyle({ iconPoint = "LEFT" }, "select")
+
+    local info, callbacks = GetDropdownInfo(true)
+    local dropdown4 = dropdowns:New("Dropdown")
+    dropdown4:SetDefaultText("MultiSelect")
+    -- dropdown4:SetInitializer(info, callbacks, { clear = "CLEAR", selectAll = "SELECT ALL" })
+    dropdown4:SetInitializer(info, callbacks)
+    dropdown4:SetStyle({ search = true }, "multiselect")
+
     local editBoxes = frame:New("CollapsibleGroup")
     editBoxes:SetFullWidth(true)
     editBoxes:SetSpacing(5, 5)
     editBoxes:SetLabel("EditBoxes")
     editBoxes:ApplyTemplate("bordered")
-    editBoxes:Collapse(true)
+    -- editBoxes:Collapse(true)
     -- editBoxes:SetLayout("List")
 
     local searchBox = editBoxes:New("SearchBox")
@@ -166,26 +244,26 @@ function lib:CreateFrame()
     divider:SetHeight(10)
     -- divider:SetColorTexture(0, 0, 1, 1)
 
-    local texture = frame:New("Texture")
-    texture:SetAtlas(format("Rune-0%d-light", fastrandom(1, 9)))
-    -- texture:SetAtlas("raceicon128-bloodelf-female")
+    -- local texture = frame:New("Texture")
+    -- texture:SetAtlas(format("Rune-0%d-light", fastrandom(1, 9)))
+    -- -- texture:SetAtlas("raceicon128-bloodelf-female")
 
-    local giftWrapping = frame:New("Texture")
-    giftWrapping:SetColorTexture(fastrandom(), fastrandom(), fastrandom(), 1)
-    giftWrapping:SetInteractible(true)
-    giftWrapping:SetCallback("OnMouseDown", function(...)
-        -- giftWrapping:Release()
-        giftWrapping:SetTexture(236547)
-    end)
+    -- local giftWrapping = frame:New("Texture")
+    -- giftWrapping:SetColorTexture(fastrandom(), fastrandom(), fastrandom(), 1)
+    -- giftWrapping:SetInteractible(true)
+    -- giftWrapping:SetCallback("OnMouseDown", function(...)
+    --     -- giftWrapping:Release()
+    --     giftWrapping:SetTexture(236547)
+    -- end)
 
-    local btn = frame:New("Button")
-    btn:SetText("Click")
-    btn:SetCallback("OnClick", function()
-        editBoxes:Release()
-    end)
+    -- local btn = frame:New("Button")
+    -- btn:SetText("Click")
+    -- btn:SetCallback("OnClick", function()
+    --     editBoxes:Release()
+    -- end)
 
     local artwork = frame:New("Texture")
-    artwork:SetAtlas("CreditsScreen-Keyart-9")
+    artwork:SetAtlas("charactercreate-startingzone-demonhunter")
     artwork:SetFullWidth(true)
     artwork:SetFullHeight(true)
 
@@ -334,9 +412,9 @@ end
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:SetScript("OnEvent", function()
-    -- lib:CreateFrame()
+    lib:CreateFrame()
     -- lib:CreateTabWindow()
-    lib:CreateTreeWindow()
+    -- lib:CreateTreeWindow()
 end)
 
 SLASH_LIBINTERFACEUTILS1 = "/liu"

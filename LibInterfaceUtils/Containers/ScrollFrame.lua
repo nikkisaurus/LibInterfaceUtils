@@ -104,6 +104,8 @@ local scripts = {
             -- very important that this is set to false AFTER DoLayout, or it'll continue to run every frame
             self:SetUserData("scrollUpdate", false)
         end
+
+        self:SetUserData("contentHeight", self.content:GetHeight())
     end,
 }
 
@@ -147,9 +149,21 @@ local methods = {
         return private:round(self.verticalBox:GetWidth())
     end,
 
+    GetHorizontalScroll = function(self)
+        return self.horizontalBar:GetScrollPercentage()
+    end,
+
+    GetVerticalScroll = function(self)
+        return self.verticalBar:GetScrollPercentage()
+    end,
+
     MarkDirty = function(self, usedWidth, usedHeight)
         self.content:SetSize(usedWidth, usedHeight)
         self.horizontalBox:SetSize(usedWidth, usedHeight)
+    end,
+
+    SetHorizontalScroll = function(self, percentage)
+        self.horizontalBar:SetScrollPercentage(percentage)
     end,
 
     SetScrollAnchors = function(self)
@@ -206,6 +220,10 @@ local methods = {
         else
             self.horizontalBar.Background.Main:Hide()
         end
+    end,
+
+    SetVerticalScroll = function(self, percentage)
+        self.verticalBar:SetScrollPercentage(percentage)
     end,
 }
 

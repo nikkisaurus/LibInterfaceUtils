@@ -98,6 +98,14 @@ function private:DrawBorders(borders, texture, color, size)
     end
 end
 
+function private:ParseValue(value, ...)
+    if type(value) == "function" then
+        return value(...)
+    else
+        return value
+    end
+end
+
 function private:ResetBorders(borders)
     for id, border in pairs(borders) do
         border:SetTexture()
@@ -248,4 +256,12 @@ end
 function private:strcheck(str)
     -- Validates string exists and is not empty
     return str and str ~= ""
+end
+
+function private:TransformTable(tbl, op)
+    local result = {}
+    for k, v in pairs(tbl) do
+        table.insert(result, op(v))
+    end
+    return result
 end

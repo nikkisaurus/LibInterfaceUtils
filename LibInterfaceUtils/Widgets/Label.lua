@@ -43,17 +43,20 @@ local registry = {
     OnShow = true,
 }
 
+local childScripts = {
+    icon = {
+        OnMouseDown = function(self)
+            local frame = self.widget.object
+            if frame:IsDisabled() then
+                return
+            end
+
+            frame:Fire("OnMouseDown")
+        end,
+    },
+}
+
 local scripts = {
-    OnMouseDown = function(self)
-        if self:IsDisabled() then
-            return
-        end
-
-        if self.widget.callbacks.OnCollapse then
-            self.widget.callbacks.OnCollapse(widget.object)
-        end
-    end,
-
     OnSizeChanged = function(self)
         self:SetAnchors()
     end,
@@ -62,6 +65,7 @@ local scripts = {
 local methods = {
     OnAcquire = function(self)
         self:SetSize(300, 20)
+        self:SetAutoWidth(true)
         self:ApplyTemplate()
         self:SetIcon()
         self:SetText()
@@ -122,6 +126,15 @@ local methods = {
                 self:SetHeight(self.label:GetStringHeight())
             end
         end
+
+        if self:GetUserData("autoWidth") then
+            self:SetWidth(self.label:GetStringWidth() + 30)
+        end
+    end,
+
+    SetAutoWidth = function(self, isAutoWidth)
+        self:SetUserData("autoWidth", isAutoWidth)
+        self:SetAnchors()
     end,
 
     SetDisabled = function(self, isDisabled)
@@ -148,6 +161,7 @@ local methods = {
     SetInteractible = function(self, isInteractible)
         self:EnableMouse(isInteractible or false)
         self.label:EnableMouse(isInteractible or false)
+        self.icon:EnableMouse(isInteractible or false)
     end,
 
     SetText = function(self, text)
@@ -161,6 +175,7 @@ local function creationFunc()
     frame = private:CreateTextures(frame)
 
     frame.icon = frame:CreateTexture(nil, "ARTWORK")
+    frame.icon:SetScript("OnMouseDown", childScripts.icon.OnMouseDown)
 
     frame.label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 
@@ -170,6 +185,8 @@ local function creationFunc()
         version = version,
         registry = registry,
     }
+
+    frame.icon.widget = widget
 
     private:Map(frame, frame.label, maps)
 

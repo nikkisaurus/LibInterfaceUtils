@@ -146,12 +146,12 @@ local methods = {
         return self:GetUserData("isDisabled")
     end,
 
-    MarkDirty = function(self, _, height)
+    MarkDirty = function(self, usedWidth, usedHeight)
         if not self:GetUserData("collapsed") then
-            height = height + self:GetUserData("top") + self:GetUserData("bottom")
+            usedHeight = usedHeight + self:GetUserData("top") + self:GetUserData("bottom")
         end
 
-        self.container:SetHeight(height)
+        self.container:SetHeight(usedHeight)
 
         local canWrap = self.label:CanWordWrap()
         if canWrap then
@@ -160,7 +160,7 @@ local methods = {
             self.header:SetHeight(20)
         end
 
-        self:SetHeight(height + self.header:GetHeight())
+        self:SetHeight(usedHeight + self.header:GetHeight())
     end,
 
     SetDisabled = function(self, isDisabled)

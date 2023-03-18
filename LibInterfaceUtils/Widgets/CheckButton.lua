@@ -9,6 +9,7 @@ end
 local defaults = {
     label = {
         justifyH = "LEFT",
+        disabledColor = private.assets.colors.dimmedWhite,
     },
 }
 
@@ -57,6 +58,7 @@ local methods = {
     ApplyTemplate = function(self, template)
         local label = CreateFromMixins(defaults.label, template or {})
         private:SetFont(self.label, label)
+        self:SetUserData("label", label)
     end,
 
     GetChecked = function(self)
@@ -67,14 +69,14 @@ local methods = {
         self.checkBox:ClearAllPoints()
         self.label:ClearAllPoints()
 
-        local iconPoint = self:GetUserData("iconPoint")
+        local checkPoint = self:GetUserData("checkPoint")
         local canWrap = self.label:CanWordWrap()
 
-        self.checkBox:SetPoint(iconPoint)
-        self.label:SetPoint(iconPoint, self.checkBox, private.points[iconPoint][1], private.points[iconPoint][2] * 5, private.points[iconPoint][3] * 5)
-        self.label:SetPoint(private.points[iconPoint][1], -(private.points[iconPoint][2] * 5), -(private.points[iconPoint][3] * 5))
+        self.checkBox:SetPoint(checkPoint)
+        self.label:SetPoint(checkPoint, self.checkBox, private.points[checkPoint][1], private.points[checkPoint][2] * 5, private.points[checkPoint][3] * 5)
+        self.label:SetPoint(private.points[checkPoint][1], -(private.points[checkPoint][2] * 5), -(private.points[checkPoint][3] * 5))
 
-        if private.points[iconPoint][3] ~= 0 then
+        if private.points[checkPoint][3] ~= 0 then
             self.label:SetPoint("LEFT")
             self.label:SetPoint("RIGHT")
             self.label:SetWidth(self:GetWidth())
@@ -95,6 +97,10 @@ local methods = {
         if self:GetUserData("autoWidth") then
             self:SetWidth(self.label:GetStringWidth() + 30)
         end
+
+        if not private:strcheck(self.label:GetText()) then
+            self:SetSize(self.checkBox:GetSize())
+        end
     end,
 
     SetAutoWidth = function(self, isAutoWidth)
@@ -103,7 +109,7 @@ local methods = {
     end,
 
     SetCheckAlignment = function(self, point)
-        self:SetUserData("iconPoint", point or "TOPLEFT")
+        self:SetUserData("checkPoint", point or "TOPLEFT")
         self:SetAnchors()
     end,
 
@@ -117,10 +123,13 @@ local methods = {
     end,
 
     SetDisabled = function(self, isDisabled)
+        local label = self:GetUserData("label")
         if isDisabled then
+            private:SetFont(self.label, CreateFromMixins(label, { color = label.disabledColor }))
             self.checked:SetAtlas("checkmark-minimal-disabled")
             self:Disable()
         else
+            private:SetFont(self.label, label)
             self.checked:SetAtlas("checkmark-minimal")
             self:Enable()
         end

@@ -66,12 +66,19 @@ local maps = {
         OnTabPressed = true,
         OnTextChanged = function(self, userInput)
             local frame = self.widget.object
-            if userInput then
+            if private:strcheck(self:GetText()) then
                 frame.button:Show()
+            else
+                frame.button:Hide()
             end
         end,
         OnTextSet = function(self)
-            self.widget.object.button:Hide()
+            local frame = self.widget.object
+            if private:strcheck(self:GetText()) then
+                frame.button:Show()
+            else
+                frame.button:Hide()
+            end
         end,
     },
 }
