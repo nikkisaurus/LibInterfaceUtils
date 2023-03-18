@@ -20,6 +20,7 @@
     <Script file="Widgets/MultiLineEditBox.lua"/>
     <Script file="Widgets/OptionGroup.lua"/>
     <Include file="Widgets/Scrollbar.xml"/>
+    <Script file="Widgets/ScrollList.lua"/>
     <Script file="Widgets/SearchBox.lua"/>
     <Script file="Widgets/Texture.lua"/>
 </Ui>

@@ -165,6 +165,8 @@ local ObjectMethods = {
     end,
 
     Release = function(self)
+        self:Fire("OnRelease")
+
         if self.ReleaseChildren then
             self:ReleaseChildren()
         end
@@ -177,8 +179,6 @@ local ObjectMethods = {
         lib.pool[self.widget.type]:Release(self)
         wipe(self.widget.userdata)
         wipe(self.widget.callbacks)
-
-        self:Fire("OnRelease")
     end,
 
     SetCallback = function(self, script, handler)

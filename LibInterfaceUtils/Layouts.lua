@@ -98,11 +98,13 @@ function private.Flow(self)
         end
 
         if relWidth then
-            child:SetWidth(availableWidth * relWidth)
+            childWidth = availableWidth * relWidth
+            child:SetWidth(childWidth)
         end
 
         if relHeight then
-            child:SetHeight(availableHeight * relHeight)
+            childHeight = availableHeight * relHeight
+            child:SetHeight(childHeight)
         end
 
         if i == 1 then
@@ -230,11 +232,13 @@ function private.List(self)
         end
 
         if relWidth then
-            child:SetWidth(availableWidth * relWidth)
+            childWidth = availableWidth * relWidth
+            child:SetWidth(childWidth)
         end
 
         if relHeight then
-            child:SetHeight(availableHeight * relHeight)
+            childHeight = availableHeight * relHeight
+            child:SetHeight(childHeight)
         end
 
         if value == 1 then
@@ -289,7 +293,7 @@ function private.List(self)
         end
     end
 
-    usedHeight = usedHeight + rowHeight
+    usedHeight = usedHeight + rowHeight - spacingV
 
     if self:GetUserData("collapsed") then
         self:MarkDirty(usedWidth, 0)
