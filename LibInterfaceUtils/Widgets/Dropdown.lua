@@ -422,24 +422,27 @@ local methods = {
         local callbacks = self:GetUserData("callbacks")
         local locales = self:GetUserData("locales")
 
-        -- self.menu:SetCallback("OnLayoutFinished", function(width, height)
-        --     if not self.menu then
-        --         return
-        --     end
+        self.menu:SetCallback("OnLayoutFinished", function(width, height)
+            if not self.menu then
+                return
+            end
 
-        --     local contentHeight = self.menu.content:GetHeight()
-        --     if contentHeight < style.maxHeight then
-        --         self.menu:SetHeight(contentHeight + 12)
-        --     elseif self:GetHeight() > style.maxHeight then
-        --         self.menu:SetHeight(style.maxHeight)
-        --     end
+            local contentHeight = self.menu.content:GetHeight()
+            if contentHeight < style.maxHeight then
+                self.menu:SetHeight(contentHeight + 12)
+            elseif self:GetHeight() > style.maxHeight then
+                self.menu:SetHeight(style.maxHeight)
+            end
 
-        --     if percentage then
-        --         self.menu:SetVerticalScroll(percentage)
-        --     end
-        -- end)
+            if percentage then
+                self.menu:SetVerticalScroll(percentage)
+            end
+        end)
 
-        self.menu:PauseLayout()
+        C_Timer.After(0.001, function()
+            self.menu:DoLayoutDeferred()
+        end)
+
         self.menu:ReleaseChildren()
 
         if style.search then
@@ -527,6 +530,7 @@ local methods = {
                         checkButton:SetChecked(private:ParseValue(listButton.checked, self))
                         checkButton:SetDisabled(private:ParseValue(listButton.disabled))
                         checkButton:SetStyle(style.checkStyle)
+                        checkButton:SetHeight(20)
 
                         checkButton:SetCallback("OnClick", function()
                             callback(checkButton:GetChecked())
@@ -542,6 +546,7 @@ local methods = {
                     end
 
                     local label = group:New("Label")
+                    label:SetHeight(20)
                     label:SetAutoWidth(false)
                     label:SetFillWidth(true)
                     label:SetText(listButton.text)
@@ -630,8 +635,6 @@ local methods = {
                 end)
             end
         end
-
-        self.menu:ResumeLayout()
     end,
 
     SelectAll = function(self)

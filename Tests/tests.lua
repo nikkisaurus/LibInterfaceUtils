@@ -14,7 +14,7 @@ local function GetDropdownInfo(text)
     }
 
     -- for i = 1, fastrandom(5, 50) do
-    for i = 1, 50 do
+    for i = 1, 5 do
         tinsert(info, {
             value = i,
             text = "Value " .. i,
