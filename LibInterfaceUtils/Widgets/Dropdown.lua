@@ -46,23 +46,6 @@ local defaults = {
 
 local menus = {}
 
-local registry = {
-    OnClick = true,
-    OnDoubleClick = true,
-    OnDragStart = true,
-    OnDragStop = true,
-    OnEnter = true,
-    OnHide = true,
-    OnLeave = true,
-    OnMouseDown = true,
-    OnMouseUp = true,
-    OnReceiveDrag = true,
-    OnShow = true,
-    OnSizeChanged = true,
-    PostClick = true,
-    PreClick = true,
-}
-
 local styles = {
     default = {
         checkStyle = false,
@@ -101,197 +84,6 @@ local styles = {
         iconPoint = "RIGHT",
     },
 }
-
-local function DrawListButton(self, frame, elementData, focusSearch)
-    local style = self:GetUserData("style")
-    local callbacks = elementData.callbacks
-    local localizations = elementData.localizations
-
-    local group = frame.group or lib:New("Group")
-    group:SetParent(frame)
-    group:SetAllPoints(frame)
-    group:SetSpacing(style.iconPoint == "LEFT" and 5 or 0, 0)
-    group:SetLayout("Flow")
-    group:ApplyTemplate(defaults.listButton.normal)
-    frame.group = group
-
-    group:SetCallback("OnEnter")
-    group:SetCallback("OnLeave")
-    group:SetCallback("OnMouseDown")
-    group:ReleaseChildren()
-
-    if elementData.type == "search" then
-        local search = group:New("SearchBox")
-        search:SetFullWidth(true)
-        search:SetText(self:GetUserData("searchText") or "")
-        if focusSearch then
-            search:SetFocus()
-        end
-
-        search:SetCallback("OnEnterPressed", function()
-            local text = search:GetText()
-            self:SetUserData("searchText", text)
-            self:FilterInfo()
-            self:SetDataProvider(self.menu:GetVerticalScroll())
-            if callbacks and callbacks.OnSearch then
-                callbacks.OnSearch(self, text)
-            end
-        end)
-
-        search:SetCallback("OnTextChanged", function(_, userInput)
-            if userInput then
-                local text = search:GetText()
-                self:SetUserData("searchText", text)
-                self:FilterInfo()
-                self:SetDataProvider(self.menu:GetVerticalScroll(), true)
-                if callbacks and callbacks.OnSearchChanged then
-                    callbacks.OnSearchChanged(self, text)
-                end
-            end
-        end)
-
-        search:SetCallback("OnEditCleared", function()
-            self:SetUserData("searchText")
-            self:FilterInfo()
-            self:SetDataProvider(self.menu:GetVerticalScroll())
-            if callbacks and callbacks.OnSearchCleared then
-                callbacks.OnSearchCleared(self)
-            end
-        end)
-    elseif elementData.type == "extra" then
-        group:SetSpacing(0, 0)
-
-        if style.selectAll and style.multiSelect then
-            local selectAll = group:New("Button")
-            selectAll:SetText(localizations and localizations.selectAll or "Select All")
-
-            if not style.clear then
-                selectAll:SetFullWidth(true)
-            else
-                selectAll:SetRelativeWidth(0.5)
-            end
-
-            selectAll:SetCallback("OnClick", function()
-                self:SelectAll()
-
-                if callbacks and callbacks.OnSelectAll then
-                    callbacks.OnSelectAll(self)
-                end
-
-                if style.hideOnClick then
-                    private:CloseMenus()
-                else
-                    self:SetDataProvider(self.menu:GetVerticalScroll())
-                end
-            end)
-        end
-
-        if style.clear then
-            local clear = group:New("Button")
-            clear:SetText(localizations and localizations.clear or "Clear")
-
-            if not style.selectAll or not style.multiSelect then
-                clear:SetFullWidth(true)
-            else
-                clear:SetRelativeWidth(0.5)
-            end
-
-            clear:SetCallback("OnClick", function()
-                self:ClearSelected()
-
-                if callbacks and callbacks.OnClear then
-                    callbacks.OnClear(self)
-                end
-
-                if style.hideOnClick then
-                    private:CloseMenus()
-                else
-                    self:SetDataProvider(self.menu:GetVerticalScroll())
-                end
-            end)
-        end
-    elseif elementData.isTitle then
-        local header = group:New("Header")
-        header:SetFullWidth(true)
-        header:SetText(elementData.text)
-    else
-        local callback = function(checked)
-            self:SetSelected(elementData.value, checked)
-            if elementData.func then
-                elementData.func(self, checked)
-            end
-
-            if style.hideOnClick then
-                private:CloseMenus()
-            end
-        end
-
-        group:SetCallback("OnEnter", function()
-            group:ApplyTemplate(defaults.listButton.highlight)
-        end)
-
-        group:SetCallback("OnLeave", function()
-            group:ApplyTemplate(defaults.listButton.normal)
-        end)
-
-        local checkButton
-        if style.checkStyle then
-            checkButton = group:New("CheckButton")
-            checkButton:SetChecked(private:ParseValue(elementData.checked, self))
-            checkButton:SetDisabled(private:ParseValue(elementData.disabled))
-            checkButton:SetStyle(style.checkStyle)
-            checkButton:SetHeight(20)
-
-            checkButton:SetCallback("OnClick", function()
-                callback(checkButton:GetChecked())
-            end)
-
-            checkButton:SetCallback("OnEnter", function()
-                group:Fire("OnEnter")
-            end)
-
-            checkButton:SetCallback("OnLeave", function()
-                group:Fire("OnLeave")
-            end)
-        end
-
-        local label = group:New("Label")
-        label:SetHeight(20)
-        label:SetAutoWidth(false)
-        label:SetFillWidth(true)
-        label:SetText(elementData.text)
-        label:SetIcon(elementData.icon, elementData.iconWidth or style.iconWidth, elementData.iconHeight or style.iconHeight, style.iconPoint)
-        label:SetInteractible(true)
-        label:SetDisabled(private:ParseValue(elementData.disabled))
-
-        label:SetCallback("OnEnter", function()
-            group:Fire("OnEnter")
-        end)
-
-        label:SetCallback("OnLeave", function()
-            group:Fire("OnLeave")
-        end)
-
-        label:SetCallback("OnMouseDown", function()
-            if checkButton then
-                checkButton:Fire("OnClick")
-            else
-                callback()
-            end
-        end)
-
-        group:SetCallback("OnMouseDown", function()
-            label:Fire("OnMouseDown")
-        end)
-    end
-
-    local height = self.menu.scrollBox:GetScrollTarget():GetHeight() + 10
-    if height < style.maxHeight then
-        self.menu:SetHeight(height)
-    elseif height > style.maxHeight then
-        self.menu:SetHeight(style.maxHeight)
-    end
-end
 
 local scripts = {
     OnClick = function(self)
@@ -344,11 +136,9 @@ local scripts = {
 
         self:SetDataProvider()
     end,
-
     OnEnter = function(self)
         self:SetState("highlight")
     end,
-
     OnLeave = function(self)
         self:SetState("normal")
     end,
@@ -379,6 +169,199 @@ local methods = {
             wipe(self:GetUserData("selected"))
         else
             self:SetUserData("selected")
+        end
+    end,
+
+    DrawListButton = function(self, frame, elementData, focusSearch)
+        local style = self:GetUserData("style")
+        local callbacks = elementData.callbacks
+        local localizations = elementData.localizations
+
+        local group = frame.group or lib:New("Group")
+        group:SetParent(frame)
+        group:SetAllPoints(frame)
+        group:SetSpacing(style.iconPoint == "LEFT" and 5 or 0, 0)
+        group:SetLayout("Flow")
+        group:ApplyTemplate(defaults.listButton.normal)
+        frame.group = group
+
+        group:SetCallback("OnEnter")
+        group:SetCallback("OnLeave")
+        group:SetCallback("OnMouseDown")
+        group:ReleaseChildren()
+
+        if elementData.type == "search" then
+            local search = group:New("SearchBox")
+            search:SetFullWidth(true)
+            search:SetText(self:GetUserData("searchText") or "")
+            if focusSearch then
+                search:SetFocus()
+            end
+
+            search:SetCallback("OnEnterPressed", function()
+                local text = search:GetText()
+                self:SetUserData("searchText", text)
+                self:FilterInfo()
+                self:SetDataProvider(self.menu:GetVerticalScroll())
+                if callbacks and callbacks.OnSearch then
+                    callbacks.OnSearch(self, text)
+                end
+            end)
+
+            search:SetCallback("OnTextChanged", function(_, userInput)
+                if userInput then
+                    local text = search:GetText()
+                    self:SetUserData("searchText", text)
+                    self:FilterInfo()
+                    self:SetDataProvider(self.menu:GetVerticalScroll(), true)
+                    if callbacks and callbacks.OnSearchChanged then
+                        callbacks.OnSearchChanged(self, text)
+                    end
+                end
+            end)
+
+            search:SetCallback("OnEditCleared", function()
+                self:SetUserData("searchText")
+                self:FilterInfo()
+                self:SetDataProvider(self.menu:GetVerticalScroll())
+                if callbacks and callbacks.OnSearchCleared then
+                    callbacks.OnSearchCleared(self)
+                end
+            end)
+        elseif elementData.type == "extra" then
+            group:SetSpacing(0, 0)
+
+            if style.selectAll and style.multiSelect then
+                local selectAll = group:New("Button")
+                selectAll:SetText(localizations and localizations.selectAll or "Select All")
+
+                if not style.clear then
+                    selectAll:SetFullWidth(true)
+                else
+                    selectAll:SetRelativeWidth(0.5)
+                end
+
+                selectAll:SetCallback("OnClick", function()
+                    self:SelectAll()
+
+                    if callbacks and callbacks.OnSelectAll then
+                        callbacks.OnSelectAll(self)
+                    end
+
+                    if style.hideOnClick then
+                        private:CloseMenus()
+                    else
+                        self:SetDataProvider(self.menu:GetVerticalScroll())
+                    end
+                end)
+            end
+
+            if style.clear then
+                local clear = group:New("Button")
+                clear:SetText(localizations and localizations.clear or "Clear")
+
+                if not style.selectAll or not style.multiSelect then
+                    clear:SetFullWidth(true)
+                else
+                    clear:SetRelativeWidth(0.5)
+                end
+
+                clear:SetCallback("OnClick", function()
+                    self:ClearSelected()
+
+                    if callbacks and callbacks.OnClear then
+                        callbacks.OnClear(self)
+                    end
+
+                    if style.hideOnClick then
+                        private:CloseMenus()
+                    else
+                        self:SetDataProvider(self.menu:GetVerticalScroll())
+                    end
+                end)
+            end
+        elseif elementData.isTitle then
+            local header = group:New("Header")
+            header:SetFullWidth(true)
+            header:SetText(elementData.text)
+        else
+            local callback = function(checked)
+                self:SetSelected(elementData.value, checked)
+                if elementData.func then
+                    elementData.func(self, checked)
+                end
+
+                if style.hideOnClick then
+                    private:CloseMenus()
+                end
+            end
+
+            group:SetCallback("OnEnter", function()
+                group:ApplyTemplate(defaults.listButton.highlight)
+            end)
+
+            group:SetCallback("OnLeave", function()
+                group:ApplyTemplate(defaults.listButton.normal)
+            end)
+
+            local checkButton
+            if style.checkStyle then
+                checkButton = group:New("CheckButton")
+                checkButton:SetChecked(private:ParseValue(elementData.checked, self))
+                checkButton:SetDisabled(private:ParseValue(elementData.disabled))
+                checkButton:SetStyle(style.checkStyle)
+                checkButton:SetHeight(20)
+
+                checkButton:SetCallback("OnClick", function()
+                    callback(checkButton:GetChecked())
+                end)
+
+                checkButton:SetCallback("OnEnter", function()
+                    group:Fire("OnEnter")
+                end)
+
+                checkButton:SetCallback("OnLeave", function()
+                    group:Fire("OnLeave")
+                end)
+            end
+
+            local label = group:New("Label")
+            label:SetHeight(20)
+            label:SetAutoWidth(false)
+            label:SetFillWidth(true)
+            label:SetText(elementData.text)
+            label:SetIcon(elementData.icon, elementData.iconWidth or style.iconWidth, elementData.iconHeight or style.iconHeight, style.iconPoint)
+            label:SetInteractible(true)
+            label:SetDisabled(private:ParseValue(elementData.disabled))
+
+            label:SetCallback("OnEnter", function()
+                group:Fire("OnEnter")
+            end)
+
+            label:SetCallback("OnLeave", function()
+                group:Fire("OnLeave")
+            end)
+
+            label:SetCallback("OnMouseDown", function()
+                if checkButton then
+                    checkButton:Fire("OnClick")
+                else
+                    callback()
+                end
+            end)
+
+            group:SetCallback("OnMouseDown", function()
+                label:Fire("OnMouseDown")
+            end)
+
+            -- ! Clicking on label runs callbacks twice
+        end
+
+        local height = self.menu.scrollBox:GetScrollTarget():GetHeight() + 10
+        if height < style.maxHeight then
+            self.menu:SetHeight(height)
+        elseif height > style.maxHeight then
+            self.menu:SetHeight(style.maxHeight)
         end
     end,
 
@@ -446,7 +429,7 @@ local methods = {
 
             return 20
         end, function(frame, elementData)
-            DrawListButton(self, frame, elementData, focusSearch)
+            self:DrawListButton(frame, elementData, focusSearch)
         end)
 
         self.menu:SetDataProvider(function(provider)
@@ -576,7 +559,6 @@ local function creationFunc()
         object = button,
         type = objectType,
         version = version,
-        registry = registry,
     }
 
     return private:RegisterWidget(widget, methods, scripts)

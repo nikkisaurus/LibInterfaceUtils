@@ -37,10 +37,6 @@ local defaults = {
     },
 }
 
-local forbidden = {
-    SetMultiLine = true,
-}
-
 local maps = {
     methods = {
         AddHistoryLine = true,
@@ -196,7 +192,6 @@ local function creationFunc()
         object = frame,
         type = objectType,
         version = version,
-        forbidden = forbidden,
     }
 
     frame.container.widget = widget

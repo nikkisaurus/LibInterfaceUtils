@@ -34,15 +34,6 @@ local maps = {
     },
 }
 
-local registry = {
-    OnEnter = true,
-    OnHide = true,
-    OnLeave = true,
-    -- OnMouseDown = true,
-    OnMouseUp = true,
-    OnShow = true,
-}
-
 local childScripts = {
     icon = {
         OnMouseDown = function(self)
@@ -183,7 +174,6 @@ local function creationFunc()
         object = frame,
         type = objectType,
         version = version,
-        registry = registry,
     }
 
     frame.icon.widget = widget

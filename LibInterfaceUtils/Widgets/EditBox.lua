@@ -36,10 +36,6 @@ local defaults = {
     },
 }
 
-local forbidden = {
-    SetMultiLine = true,
-}
-
 local maps = {
     methods = {
         AddHistoryLine = true,

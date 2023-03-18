@@ -6,17 +6,6 @@ if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
 
-local registry = {
-    OnEnter = true,
-    OnHide = true,
-    OnLeave = true,
-    OnMouseDown = true,
-    OnMouseUp = true,
-    OnReceiveDrag = true,
-    OnShow = true,
-    OnSizeChanged = true,
-}
-
 local templates = {
     bordered = {
         content = {

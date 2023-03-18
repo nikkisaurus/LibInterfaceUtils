@@ -13,17 +13,6 @@ local defaults = {
     },
 }
 
-local registry = {
-    OnEnter = true,
-    OnHide = true,
-    OnLeave = true,
-    OnMouseDown = true,
-    OnMouseUp = true,
-    OnReceiveDrag = true,
-    OnShow = true,
-    OnSizeChanged = true,
-}
-
 local templates = {
     default = {
         label = {

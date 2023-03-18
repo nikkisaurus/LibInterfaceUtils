@@ -35,15 +35,19 @@ local ContainerMethods = {
     end,
 
     DoLayoutDeferred = function(self)
-        self:SetScript("OnUpdate", function()
-            self:DoLayout()
+        local script = self:GetScript("OnUpdate")
+        self:SetScript("OnUpdate", function(...)
+            if script then
+                script(...)
+            end
+            self:DoLayout(script)
         end)
     end,
 
-    DoLayout = function(self)
+    DoLayout = function(self, script)
         local w, h = self:layoutFunc()
         self:Fire("OnLayoutFinished", w, h)
-        self:SetScript("OnUpdate", nil)
+        self:SetScript("OnUpdate", script or nil)
         return private:round(self:GetWidth()), private:round(self:GetHeight())
     end,
 
@@ -179,6 +183,7 @@ local ObjectMethods = {
         lib.pool[self.widget.type]:Release(self)
         wipe(self.widget.userdata)
         wipe(self.widget.callbacks)
+        private:InitializeScripts(self)
     end,
 
     SetCallback = function(self, script, handler)
@@ -223,8 +228,50 @@ local ObjectMethods = {
     end,
 }
 
+local defaultScripts = {
+    OnClick = true,
+    OnDoubleClick = true,
+    OnDragStart = true,
+    OnDragStop = true,
+    OnEnter = true,
+    OnHide = true,
+    OnLeave = true,
+    OnMouseDown = true,
+    OnMouseUp = true,
+    OnReceiveDrag = true,
+    OnShow = true,
+    OnSizeChanged = true,
+    -- OnUpdate = true,
+    PostClick = true,
+    PreClick = true,
+}
+
 function private:GetObjectName(objectType)
     return addonName .. objectType .. (lib.pool[objectType]:GetNumObjects() + 1)
+end
+
+-- ! Scripts are not properly calling callbacks
+function private:InitializeScripts(self)
+    local widget = self.widget
+    for script, handler in pairs(widget.scripts) do
+        if self:HasScript(script) then
+            self:SetScript(script, function(...)
+                if self:GetUserData("isDisabled") and script ~= "OnEnter" and script ~= "OnHide" and script ~= "OnLeave" and script ~= "OnShow" and script ~= "OnSizeChanged" then
+                    return
+                end
+
+                if type(handler) == "function" then
+                    handler(...)
+                end
+
+                local callback = widget.callbacks[script]
+                if callback then
+                    print(widget.type, script, callback)
+                    callback(...)
+                end
+            end)
+        end
+    end
 end
 
 function private:Map(parent, target, maps)
@@ -280,47 +327,9 @@ function private:RegisterWidget(widget, methods, scripts)
         widget.object = Mixin(widget.object, methods)
     end
 
-    local registry = widget.registry
-
-    if scripts then
-        for script, handler in pairs(scripts) do
-            assert(widget.object:HasScript(script), format("Script '%s' does not exist for object type '%s'.", script, widget.type))
-
-            widget.object:SetScript(script, function(...)
-                handler(...)
-
-                if registry and registry[script] and widget.callbacks[script] then
-                    widget.callbacks[script](...)
-                end
-            end)
-        end
-    end
-
-    if registry then
-        for script, _ in pairs(registry) do
-            if widget.object:HasScript(script) and not widget.object:GetScript(script) then
-                widget.object:SetScript(script, function(...)
-                    if widget.callbacks[script] then
-                        widget.callbacks[script](...)
-                    end
-                end)
-            end
-        end
-    end
-
-    if widget.forbidden then
-        for method, _ in pairs(widget.forbidden) do
-            local originalMethod = widget.object[method]
-
-            widget.object[method] = function(...)
-                if widget.object.overrideForbidden then
-                    return originalMethod(...)
-                else
-                    error(format("Method '%s' for object type '%s' is forbidden.", method, widget.type))
-                end
-            end
-        end
-    end
+    scripts = CreateFromMixins(defaultScripts, scripts or {})
+    widget.scripts = scripts
+    private:InitializeScripts(widget.object)
 
     return widget.object
 end

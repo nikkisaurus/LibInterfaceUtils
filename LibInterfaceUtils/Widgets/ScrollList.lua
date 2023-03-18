@@ -21,19 +21,6 @@ local templates = {
     },
 }
 
-local registry = {
-    OnDragStart = true,
-    OnDragStop = true,
-    OnEnter = true,
-    OnHide = true,
-    OnLeave = true,
-    OnMouseDown = true,
-    OnMouseUp = true,
-    OnReceiveDrag = true,
-    OnShow = true,
-    OnSizeChanged = true,
-}
-
 local childScripts = {
     horizontalBox = {
         OnMouseDown = function(self)

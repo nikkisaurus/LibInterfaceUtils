@@ -15,20 +15,6 @@ local forbidden = {
     UnregisterEvent = true,
 }
 
-local registry = {
-    OnDragStart = true,
-    OnDragStop = true,
-    OnEnter = true,
-    OnHide = true,
-    OnLeave = true,
-    OnMouseDown = true,
-    OnMouseUp = true,
-    OnReceiveDrag = true,
-    OnShow = true,
-    OnSizeChanged = true,
-    OnUpdate = true,
-}
-
 local templates = {
     default = {
         content = {
@@ -147,7 +133,6 @@ local scripts = {
     OnDragStart = function(self)
         self:StartMoving()
     end,
-
     OnDragStop = function(self)
         self:StopMovingOrSizing()
     end,

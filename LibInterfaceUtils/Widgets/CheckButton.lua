@@ -21,24 +21,10 @@ local maps = {
     },
 }
 
-local registry = {
-    OnClick = true,
-    OnDoubleClick = true,
-    OnEnter = true,
-    OnHide = true,
-    OnLeave = true,
-    OnMouseDown = true,
-    OnMouseUp = true,
-    OnShow = true,
-    PostClick = true,
-    PreClick = true,
-}
-
 local scripts = {
     OnClick = function(self)
         self:SetChecked(not self:GetUserData("checked"))
     end,
-
     OnSizeChanged = function(self)
         self:SetAnchors()
     end,
@@ -169,7 +155,6 @@ local function creationFunc()
         object = button,
         type = objectType,
         version = version,
-        registry = registry,
     }
 
     private:Map(button, button.label, maps)

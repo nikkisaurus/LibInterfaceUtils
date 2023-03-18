@@ -6,15 +6,6 @@ if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
 
-local registry = {
-    OnEnter = true,
-    OnHide = true,
-    OnLeave = true,
-    OnMouseDown = true,
-    OnMouseUp = true,
-    OnShow = true,
-}
-
 local methods = {
     OnAcquire = function(self)
         self:SetSize(100, 100)
@@ -39,7 +30,6 @@ local function creationFunc()
         object = texture,
         type = objectType,
         version = version,
-        registry = registry,
     }
 
     return private:RegisterWidget(widget, methods)

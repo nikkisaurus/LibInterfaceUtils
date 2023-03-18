@@ -90,10 +90,10 @@ local childScripts = {
             frame.tree:StopMovingOrSizing()
             frame:SetUserData("isSizing")
             frame:SetAnchors()
+            frame:DoLayoutDeferred()
         end,
     },
 }
-
 local scripts = {
     OnSizeChanged = function(self)
         local w, h = self:GetSize()
@@ -108,12 +108,13 @@ local scripts = {
         self.tree:SetResizeBounds(minWidth, h, maxWidth, h)
         self:SetAnchors()
     end,
+    -- OnUpdate = function(self)
+    --     if self:GetUserData("isSizing") then
+    --         self:SetAnchors()
+    --     end
+    -- end,
 
-    OnUpdate = function(self)
-        if self:GetUserData("isSizing") then
-            self:SetAnchors()
-        end
-    end,
+    -- ! Resizer is broken and possibly missing layout calls
 }
 
 local methods = {
@@ -350,7 +351,7 @@ local function creationFunc()
         version = version,
     }
 
-    return private:RegisterContainer(widget, methods, scripts)
+    return private:RegisterContainer(widget, methods)
 end
 
 private:RegisterWidgetPool(objectType, creationFunc)

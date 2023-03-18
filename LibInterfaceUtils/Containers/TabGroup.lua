@@ -143,14 +143,8 @@ local methods = {
             if tab ~= selectedTab then
                 -- TODO
                 tab:ApplyTemplate(template.tab)
-                -- tab:SetFont("normal", template.tab.normal)
-                -- tab:SetFont("highlight", template.tab.highlight)
-                -- tab:SetBackdrop(template.tab)
             else
                 tab:ApplyTemplate(template.selectedTab)
-                -- tab:SetFont("normal", template.selectedTab.normal)
-                -- tab:SetFont("highlight", template.selectedTab.highlight)
-                -- tab:SetBackdrop(template.selectedTab)
             end
         end
     end,

@@ -74,7 +74,6 @@ local function creationFunc()
         object = frame,
         type = objectType,
         version = version,
-        registry = registry,
     }
 
     return private:RegisterWidget(widget, methods)

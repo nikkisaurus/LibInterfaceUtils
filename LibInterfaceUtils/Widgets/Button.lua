@@ -26,39 +26,19 @@ local defaults = {
     },
 }
 
-local registry = {
-    OnClick = true,
-    OnDoubleClick = true,
-    OnDragStart = true,
-    OnDragStop = true,
-    OnEnter = true,
-    OnHide = true,
-    OnLeave = true,
-    OnMouseDown = true,
-    OnMouseUp = true,
-    OnReceiveDrag = true,
-    OnShow = true,
-    OnSizeChanged = true,
-    PostClick = true,
-    PreClick = true,
-}
-
 local scripts = {
     OnEnter = function(self)
         self:SetState("highlight")
     end,
-
     OnLeave = function(self)
         self:SetState("normal")
     end,
-
     OnMouseDown = function(self)
         if not self:IsDisabled() then
             local x, y = unpack(self:GetUserData("offset") or { 1, -1 })
             self.text:AdjustPointsOffset(x, y)
         end
     end,
-
     OnMouseUp = function(self)
         if not self:IsDisabled() then
             local x, y = unpack(self:GetUserData("offset") or { 1, -1 })
@@ -149,7 +129,6 @@ local function creationFunc()
         object = button,
         type = objectType,
         version = version,
-        registry = registry,
     }
 
     return private:RegisterWidget(widget, methods, scripts)

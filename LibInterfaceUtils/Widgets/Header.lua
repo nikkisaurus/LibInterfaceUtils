@@ -20,15 +20,6 @@ local scripts = {
     end,
 }
 
-local registry = {
-    OnEnter = true,
-    OnHide = true,
-    OnLeave = true,
-    OnMouseDown = true,
-    OnMouseUp = true,
-    OnShow = true,
-}
-
 local methods = {
     OnAcquire = function(self)
         self:SetSize(300, 20)
@@ -100,7 +91,6 @@ local function creationFunc()
         object = frame,
         type = objectType,
         version = version,
-        registry = registry,
     }
 
     return private:RegisterWidget(widget, methods, scripts)
