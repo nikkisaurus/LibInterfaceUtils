@@ -73,12 +73,6 @@ local ContainerMethods = {
 
     ParentChild = function(self, child)
         child:SetParent(self.content)
-        if child.SetFrameStrata then
-            child:SetFrameStrata(self:GetFrameStrata())
-        end
-        if child.SetFrameLevel then
-            child:SetFrameLevel(self:GetFrameLevel())
-        end
     end,
 
     ReleaseChildren = function(self)

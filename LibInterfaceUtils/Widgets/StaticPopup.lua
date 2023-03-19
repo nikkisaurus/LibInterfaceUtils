@@ -43,7 +43,7 @@ local methods = {
         self:SetPadding()
         self:InitializeButtons()
         self:SetAnchors()
-        self:SetFrameStrata("FULLSCREEN_DIALOG")
+        self:SetFrameStrata("TOOLTIP")
         private:HidePopups(self)
     end,
 

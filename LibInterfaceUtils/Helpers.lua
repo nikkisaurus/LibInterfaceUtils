@@ -129,7 +129,7 @@ local defaultBackdrop = {
     bgAtlas = false,
     bgTexCoord = { 0, 1, 0, 1 },
     bgTexture = private.assets.blankTexture,
-    bgColor = private.assets.colors.elvBackdrop,
+    bgColor = private.assets.colors.elvTransparent,
 
     bordersEnabled = true,
     bordersTexture = private.assets.blankTexture,
