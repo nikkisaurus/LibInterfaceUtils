@@ -179,12 +179,12 @@ local methods = {
         local style = self:GetUserData("style")
         local callbacks = elementData.callbacks
         local localizations = elementData.localizations
+        local disabled = private:ParseValue(elementData.disabled)
 
         local group = frame.group or lib:New("Group")
         group:SetParent(frame)
         group:SetAllPoints(frame)
         group:SetSpacing(style.iconPoint == "LEFT" and 5 or 0, 0)
-        group:SetLayout("Flow")
         group:ApplyTemplate(defaults.listButton.normal)
         frame.group = group
 
@@ -302,19 +302,21 @@ local methods = {
                 end
             end
 
-            group:SetCallback("OnEnter", function()
-                group:ApplyTemplate(defaults.listButton.highlight)
-            end)
+            if not disabled then
+                group:SetCallback("OnEnter", function()
+                    group:ApplyTemplate(defaults.listButton.highlight)
+                end)
 
-            group:SetCallback("OnLeave", function()
-                group:ApplyTemplate(defaults.listButton.normal)
-            end)
+                group:SetCallback("OnLeave", function()
+                    group:ApplyTemplate(defaults.listButton.normal)
+                end)
+            end
 
             local checkButton
             if style.checkStyle then
                 checkButton = group:New("CheckButton")
                 checkButton:SetChecked(private:ParseValue(elementData.checked, self))
-                checkButton:SetDisabled(private:ParseValue(elementData.disabled))
+                checkButton:SetDisabled(disabled)
                 checkButton:SetStyle(style.checkStyle)
                 checkButton:SetHeight(20)
 
@@ -338,7 +340,7 @@ local methods = {
             label:SetText(elementData.text)
             label:SetIcon(elementData.icon, elementData.iconWidth or style.iconWidth, elementData.iconHeight or style.iconHeight, style.iconPoint)
             label:SetInteractible(true)
-            label:SetDisabled(private:ParseValue(elementData.disabled))
+            label:SetDisabled(disabled)
 
             label:SetCallback("OnEnter", function()
                 group:Fire("OnEnter")
@@ -359,8 +361,6 @@ local methods = {
             group:SetCallback("OnMouseDown", function()
                 label:Fire("OnMouseDown")
             end)
-
-            -- ! Clicking on label runs callbacks twice
         end
 
         local height = self.menu.scrollBox:GetScrollTarget():GetHeight() + 10

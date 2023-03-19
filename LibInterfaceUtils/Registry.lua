@@ -273,7 +273,7 @@ function private:InitializeScripts(self)
     for script, handler in pairs(widget.scripts) do
         if self:HasScript(script) then
             self:SetScript(script, function(...)
-                if self:GetUserData("isDisabled") and script ~= "OnEnter" and script ~= "OnHide" and script ~= "OnLeave" and script ~= "OnShow" and script ~= "OnSizeChanged" then
+                if self:GetUserData("isDisabled") and script ~= "OnHide" and script ~= "OnShow" and script ~= "OnSizeChanged" then
                     return
                 end
 
@@ -291,7 +291,7 @@ function private:InitializeScripts(self)
 end
 
 function private:Map(parent, target, maps)
-    if maps.methods then
+    if maps and maps.methods then
         for method, _ in pairs(maps.methods) do
             parent[method] = function(self, ...)
                 return target[method](target, ...)
@@ -299,21 +299,22 @@ function private:Map(parent, target, maps)
         end
     end
 
-    if maps.scripts then
-        for script, func in pairs(maps.scripts) do
+    local scripts = CreateFromMixins(defaultScripts, maps and maps.scripts or {})
+    for script, func in pairs(scripts) do
+        if target:HasScript(script) then
             target:SetScript(script, function(self, ...)
                 local handler = parent:HasScript(script) and parent:GetScript(script)
                 if handler then
                     handler(parent, ...)
+                else
+                    local callback = parent.widget.callbacks[script]
+                    if callback then
+                        callback(parent, ...)
+                    end
                 end
 
                 if type(func) == "function" then
                     func(parent, ...)
-                end
-
-                local callback = parent.widget.callbacks[script]
-                if callback then
-                    callback(parent, ...)
                 end
             end)
         end

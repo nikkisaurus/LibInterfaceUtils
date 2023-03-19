@@ -24,14 +24,6 @@ local maps = {
         SetJustifyV = true,
         SetWordWrap = true,
     },
-    scripts = {
-        OnEnter = true,
-        OnHide = true,
-        OnLeave = true,
-        OnMouseDown = true,
-        OnMouseUp = true,
-        OnShow = true,
-    },
 }
 
 local childScripts = {
@@ -178,6 +170,7 @@ local function creationFunc()
 
     frame.icon.widget = widget
 
+    private:Map(frame, frame.icon)
     private:Map(frame, frame.label, maps)
 
     return private:RegisterWidget(widget, methods, scripts)

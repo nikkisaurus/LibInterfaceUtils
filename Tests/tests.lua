@@ -78,6 +78,13 @@ function lib:CreateFrame()
     local header = frame:New("Header")
     header:SetText("Widgets")
 
+    local label = frame:New("Label")
+    label:SetText("Click Me")
+    label:SetInteractible(true)
+    label:SetCallback("OnMouseDown", function()
+        print("Hi")
+    end)
+
     local dropdowns = frame:New("CollapsibleGroup")
     dropdowns:SetFullWidth(true)
     dropdowns:SetSpacing(5, 5)
