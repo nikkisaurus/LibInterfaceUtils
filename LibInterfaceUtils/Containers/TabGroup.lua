@@ -141,7 +141,6 @@ local methods = {
 
         for _, tab in pairs(self.tabs.children) do
             if tab ~= selectedTab then
-                -- TODO
                 tab:ApplyTemplate(template.tab)
             else
                 tab:ApplyTemplate(template.selectedTab)

@@ -29,8 +29,8 @@ end
 
 function lib:New(objectType)
     local object = self.pool[objectType]:Acquire()
-    object:Fire("OnAcquire")
     object:Show()
+    object:Fire("OnAcquire")
 
     return object
 end
