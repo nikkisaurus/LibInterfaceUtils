@@ -93,7 +93,6 @@ local scripts = {
             return
         elseif self:GetUserData("closeMenu") then
             self:SetUserData("closeMenu")
-            private:CloseMenu(self.menu)
             return
         end
 
@@ -173,6 +172,10 @@ local methods = {
     end,
 
     DrawListButton = function(self, frame, elementData, focusSearch)
+        if not self.menu then
+            return
+        end
+
         local style = self:GetUserData("style")
         local callbacks = elementData.callbacks
         local localizations = elementData.localizations
@@ -249,7 +252,8 @@ local methods = {
                     end
 
                     if style.hideOnClick then
-                        private:CloseMenus()
+                        self.menu:UnregisterAllEvents()
+                        private:CloseMenu(self.menu)
                     else
                         self:SetDataProvider(self.menu:GetVerticalScroll())
                     end
@@ -274,7 +278,8 @@ local methods = {
                     end
 
                     if style.hideOnClick then
-                        private:CloseMenus()
+                        self.menu:UnregisterAllEvents()
+                        private:CloseMenu(self.menu)
                     else
                         self:SetDataProvider(self.menu:GetVerticalScroll())
                     end
@@ -292,7 +297,8 @@ local methods = {
                 end
 
                 if style.hideOnClick then
-                    private:CloseMenus()
+                    self.menu:UnregisterAllEvents()
+                    private:CloseMenu(self.menu)
                 end
             end
 

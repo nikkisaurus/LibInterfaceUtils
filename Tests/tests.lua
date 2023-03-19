@@ -416,9 +416,9 @@ end
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:SetScript("OnEvent", function()
-    -- lib:CreateFrame()
+    lib:CreateFrame()
     -- lib:CreateTabWindow()
-    lib:CreateTreeWindow()
+    -- lib:CreateTreeWindow()
 end)
 
 SLASH_LIBINTERFACEUTILS1 = "/liu"
