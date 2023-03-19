@@ -411,6 +411,24 @@ local methods = {
         end
     end,
 
+    Select = function(self, value)
+        self:SetSelected(value, true)
+
+        local info = self:GetUserData("info")
+        if not info then
+            return
+        end
+
+        TableUtil.ExecuteUntil(info, function(v)
+            if v.value == value then
+                if not private:ParseValue(v.disabled) then
+                    v.func(self, true)
+                end
+                return true
+            end
+        end)
+    end,
+
     SelectAll = function(self)
         local info = self:GetUserData("info")
         local selected = self:GetUserData("selected")

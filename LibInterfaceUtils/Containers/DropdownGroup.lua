@@ -139,6 +139,10 @@ local methods = {
         end
     end,
 
+    Select = function(self, ...)
+        self.dropdown:Select(...)
+    end,
+
     SetAnchors = function(self)
         self.dropdown:SetParent(self)
         self.dropdown:SetPoint("TOPLEFT")
