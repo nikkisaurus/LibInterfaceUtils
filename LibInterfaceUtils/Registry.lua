@@ -102,12 +102,13 @@ local ContainerMethods = {
     end,
 
     SetLayout = function(self, layout, customFunc)
+        layout = type(layout) == "string" and layout:lower() or layout
         if self.content and self.content.SetLayout then
             self.content:SetLayout(layout, customFunc)
         end
 
-        self.layoutFunc = customFunc or private[layout or "Flow"]
-        self.layoutRef = customFunc and "custom" or layout or "Flow"
+        self.layoutFunc = customFunc or private.layouts[layout or "flow"]
+        self.layoutRef = customFunc and "custom" or layout or "flow"
     end,
 
     SetSpacing = function(self, spacingH, spacingV)
@@ -259,7 +260,7 @@ local defaultScripts = {
     OnReceiveDrag = true,
     OnShow = true,
     OnSizeChanged = true,
-    -- OnUpdate = true,
+    -- OnUpdate = true, -- Use :ScheduleUpdater instead
     PostClick = true,
     PreClick = true,
 }
