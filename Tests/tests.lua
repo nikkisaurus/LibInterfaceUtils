@@ -337,6 +337,33 @@ function lib:CreateTabWindow()
                             bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
                         },
                     })
+
+                    button:SetCallback("OnClick", function()
+                        local popup = lib:New("StaticPopup")
+                        popup:SetPoint("CENTER", 0, 400)
+                        if fastrandom(1, 2) == 2 then
+                            popup:SetLabel(format("You clicked %d? Ok cool. I need to make this popup longer so I can see what it looks like with some text wrapping. I should probably also implement an autoHeight option. That would probably make it look a lot better.", x))
+                        else
+                            popup:SetLabel(format("You clicked %d?", x))
+                        end
+                        -- popup:ApplyTemplate({ label = { color = private.assets.colors.green } })
+                        popup:InitializeButtons({
+                            {
+                                text = YES,
+                                OnClick = function(...)
+                                    print("Yes", ...)
+                                end,
+                            },
+                            {
+                                text = NO,
+                                OnClick = function(...)
+                                    print("No", ...)
+                                end,
+                            },
+                        }, function(...)
+                            print("Bye")
+                        end)
+                    end)
                 end
             end,
         })

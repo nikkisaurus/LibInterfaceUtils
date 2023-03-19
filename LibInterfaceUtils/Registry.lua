@@ -71,8 +71,14 @@ local ContainerMethods = {
         return object
     end,
 
-    ParentChild = function(self, child, parent)
+    ParentChild = function(self, child)
         child:SetParent(self.content)
+        if child.SetFrameStrata then
+            child:SetFrameStrata(self:GetFrameStrata())
+        end
+        if child.SetFrameLevel then
+            child:SetFrameLevel(self:GetFrameLevel())
+        end
     end,
 
     ReleaseChildren = function(self)
@@ -99,6 +105,10 @@ local ContainerMethods = {
     ResumeLayout = function(self)
         self:SetUserData("pauseLayout")
         self:DoLayoutDeferred()
+    end,
+
+    SetLayoutPoint = function(self, point)
+        self:SetUserData("point", point)
     end,
 
     SetLayout = function(self, layout, customFunc)
@@ -197,6 +207,7 @@ local ObjectMethods = {
             ticker:Cancel()
         end
 
+        -- self:SetParent(UIParent)
         lib.pool[self.widget.type]:Release(self)
         wipe(self.widget.userdata)
         wipe(self.widget.callbacks)

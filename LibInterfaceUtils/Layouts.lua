@@ -60,6 +60,8 @@ private.layouts = {
         local availableWidth = self:GetAvailableWidth()
         local availableHeight = self:GetAvailableHeight()
 
+        local point = self:GetUserData("point") or "TOPLEFT"
+        local points = private.points[point]
         local spacingH = self:GetUserData("spacingH") or 0
         local spacingV = self:GetUserData("spacingV") or 0
 
@@ -109,9 +111,9 @@ private.layouts = {
             end
 
             if i == 1 then
-                child:SetPoint("TOPLEFT", xOffset, yOffset)
+                child:SetPoint(point, points[2] * xOffset, points[3] * yOffset)
                 if isFullWidth or fillWidth then
-                    child:SetPoint("RIGHT", self:GetAnchorX(), "RIGHT")
+                    child:SetPoint(points[1], self:GetAnchorX(), points[1])
                     if child.DoLayout then
                         childWidth, childHeight = child:DoLayout()
                     else
@@ -126,9 +128,9 @@ private.layouts = {
                 usedHeight = usedHeight + rowHeight + spacingV
                 maxWidth = max(maxWidth, usedWidth)
                 usedWidth = 0
-                child:SetPoint("TOPLEFT", xOffset, -usedHeight + yOffset)
+                child:SetPoint(point, points[2] * xOffset, points[4] * (usedHeight + yOffset))
                 if isFullWidth or fillWidth then
-                    child:SetPoint("RIGHT", self:GetAnchorX(), "RIGHT")
+                    child:SetPoint(points[1], self:GetAnchorX(), points[1])
                     if child.DoLayout then
                         childWidth, childHeight = child:DoLayout()
                     else
@@ -139,9 +141,9 @@ private.layouts = {
                 usedWidth = childWidth + xOffset
                 rowHeight = childHeight + yOffset
             else
-                child:SetPoint("TOPLEFT", usedWidth + spacingH + xOffset, -usedHeight + yOffset)
+                child:SetPoint(point, points[2] * (usedWidth + spacingH + xOffset), points[4] * (usedHeight + yOffset))
                 if fillWidth then
-                    child:SetPoint("RIGHT", self:GetAnchorX(), "RIGHT")
+                    child:SetPoint(points[1], self:GetAnchorX(), points[1])
                     if child.DoLayout then
                         childWidth, childHeight = child:DoLayout()
                     else
@@ -156,7 +158,7 @@ private.layouts = {
 
             if (self.widget.type == "Group" or self.widget.type == "CollapsibleGroup") and childWidth > availableWidth then
                 -- Since groups can't have horizontal scrollbars, we want to make sure nothing gets cut off
-                child:SetPoint("RIGHT", self:GetAnchorX(), "RIGHT")
+                child:SetPoint(points[1], self:GetAnchorX(), points[1])
                 if child.DoLayout then
                     childWidth, childHeight = child:DoLayout()
                 else
@@ -303,42 +305,5 @@ private.layouts = {
             self:MarkDirty(usedWidth, usedHeight)
             return usedWidth, usedHeight
         end
-    end,
-
-    tabflow = function(self)
-        -- Used for TabGroup, so I'm not really bothered with customization as far as spacing and offsets go
-        local usedWidth = 0
-        local usedHeight = 0
-        local rowHeight = 0
-
-        local availableWidth = self:GetAvailableWidth()
-
-        for i, child in ipairs(self.children) do
-            self:ParentChild(child)
-            child:ClearAllPoints()
-
-            local childWidth = private:round(child:GetWidth())
-            local childHeight = private:round(child:GetHeight())
-
-            if i == 1 then
-                child:SetPoint("BOTTOMLEFT", usedWidth, usedHeight)
-                usedWidth = childWidth
-                rowHeight = childHeight
-            elseif usedWidth + childWidth > availableWidth then
-                usedHeight = usedHeight + rowHeight
-                usedWidth = 0
-                child:SetPoint("BOTTOMLEFT", usedWidth, usedHeight)
-                usedWidth = childWidth
-                rowHeight = childHeight
-            else
-                child:SetPoint("BOTTOMLEFT", usedWidth, usedHeight)
-                usedWidth = usedWidth + childWidth
-                rowHeight = max(rowHeight, childHeight)
-            end
-        end
-        usedHeight = usedHeight + rowHeight
-
-        self:MarkDirty(usedWidth, usedHeight)
-        return usedWidth, usedHeight
     end,
 }

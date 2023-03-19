@@ -57,8 +57,8 @@ local methods = {
     end,
 
     ApplyTemplate = function(self, template)
-        local frame = CreateFromMixins(defaults.frame, template or {})
-        local label = CreateFromMixins(defaults.label, template or {})
+        local frame = CreateFromMixins(defaults.frame, template and template.frame or {})
+        local label = CreateFromMixins(defaults.label, template and template.label or {})
 
         private:SetBackdrop(self, frame)
         private:SetFont(self.label, label)

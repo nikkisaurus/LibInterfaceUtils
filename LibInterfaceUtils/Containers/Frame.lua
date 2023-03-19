@@ -149,10 +149,11 @@ local methods = {
         self:EnableResize(true, 300, 300, w * 0.8, h * 0.8)
         self:SetDraggable(true, "LeftButton")
         self:SetClampedToScreen(true)
-        self:SetFrameStrata("HIGH")
         self:ApplyTemplate("default")
         self:SetTitle()
         self:SetStatus()
+        self:SetFrameStrata("FULLSCREEN_DIALOG")
+        self:SetFrameLevel(100)
     end,
 
     OnRelease = function(self)

@@ -64,7 +64,7 @@ local methods = {
 
     AcquireChildren = function(self)
         self.tabs = lib:New("ScrollFrame")
-        self.tabs:SetLayout("TabFlow")
+        self.tabs:SetLayoutPoint("BOTTOMLEFT")
         self.tabs:SetCallback("OnLayoutFinished", function(_, usedHeight)
             local maxHeight = (self:GetHeight() * (1 / 3))
             local numTabs = #self.tabs.children

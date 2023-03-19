@@ -43,39 +43,39 @@ private.assets = {
 }
 
 private.points = {
-    TOP = { "BOTTOM", 0, -1, true },
-    TOPLEFT = { "TOPRIGHT", 1, 0, false },
-    TOPRIGHT = { "TOPLEFT", -1, 0, false },
-    LEFT = { "RIGHT", 1, 0, false },
-    RIGHT = { "LEFT", -1, 0, false },
-    BOTTOMLEFT = { "BOTTOMRIGHT", 1, 0, false },
-    BOTTOMRIGHT = { "BOTTOMLEFT", -1, 0, false },
-    BOTTOM = { "TOP", 0, 1, true },
+    TOP = { "BOTTOM", 0, -1, -1 },
+    TOPLEFT = { "TOPRIGHT", 1, 0, -1 },
+    TOPRIGHT = { "TOPLEFT", -1, 0, -1 },
+    LEFT = { "RIGHT", 1, 0, -1 },
+    RIGHT = { "LEFT", -1, 0, -1 },
+    BOTTOMLEFT = { "BOTTOMRIGHT", 1, 0, 1 },
+    BOTTOMRIGHT = { "BOTTOMLEFT", -1, 0, 1 },
+    BOTTOM = { "TOP", 0, 1, 1 },
 }
 
 function private:CreateTextures(parent)
-    parent.bg = parent:CreateTexture("$parentBackground", "BACKGROUND")
+    parent.bg = parent:CreateTexture(nil, "BACKGROUND")
     parent.bg:SetAllPoints(parent)
 
     parent.borders = {}
 
-    parent.borders.top = parent:CreateTexture("$parentBorderTop", "BORDER")
+    parent.borders.top = parent:CreateTexture(nil, "BORDER")
     parent.borders.top:SetPoint("TOPLEFT")
     parent.borders.top:SetPoint("TOPRIGHT")
 
-    parent.borders.left = parent:CreateTexture("$parentBorderLeft", "BORDER")
+    parent.borders.left = parent:CreateTexture(nil, "BORDER")
     parent.borders.left:SetPoint("TOPLEFT")
     parent.borders.left:SetPoint("BOTTOMLEFT")
 
-    parent.borders.right = parent:CreateTexture("$parentBorderRight", "BORDER")
+    parent.borders.right = parent:CreateTexture(nil, "BORDER")
     parent.borders.right:SetPoint("TOPRIGHT")
     parent.borders.right:SetPoint("BOTTOMRIGHT")
 
-    parent.borders.bottom = parent:CreateTexture("$parentBorderBottom", "BORDER")
+    parent.borders.bottom = parent:CreateTexture(nil, "BORDER")
     parent.borders.bottom:SetPoint("BOTTOMLEFT")
     parent.borders.bottom:SetPoint("BOTTOMRIGHT")
 
-    parent.highlight = parent:CreateTexture("$parentHighlight", "HIGHLIGHT")
+    parent.highlight = parent:CreateTexture(nil, "HIGHLIGHT")
     parent.highlight:SetAllPoints(parent)
 
     return parent
@@ -129,7 +129,7 @@ local defaultBackdrop = {
     bgAtlas = false,
     bgTexCoord = { 0, 1, 0, 1 },
     bgTexture = private.assets.blankTexture,
-    bgColor = private.assets.colors.elvTransparent,
+    bgColor = private.assets.colors.elvBackdrop,
 
     bordersEnabled = true,
     bordersTexture = private.assets.blankTexture,

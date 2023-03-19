@@ -97,7 +97,7 @@ local scripts = {
         end
 
         self.menu = lib:New("ScrollList")
-        self.menu:SetFrameStrata("DIALOG")
+        self.menu:SetFrameStrata("TOOLTIP")
         self.menu:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
         self.menu:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT")
         self.menu:SetHeight(200)
@@ -606,7 +606,6 @@ function private:CloseMenu(closeMenu)
             if dropdown then
                 dropdown.menu = nil
             end
-            menu:SetFrameStrata("HIGH")
             menu:Release()
             tremove(menus, id)
             return
@@ -621,7 +620,6 @@ function private:CloseMenus(ignoredMenu)
             if dropdown then
                 dropdown.menu = nil
             end
-            menu:SetFrameStrata("HIGH")
             menu:Release()
             tremove(menus, id)
         end

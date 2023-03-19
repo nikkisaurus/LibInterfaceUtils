@@ -87,6 +87,8 @@ local methods = {
         self:SetSize(500, 300)
         self:ApplyTemplate("default")
         self:SetResizable(false)
+        self:SetFrameStrata("FULLSCREEN_DIALOG")
+        self:SetFrameLevel(100)
     end,
 
     ApplyTemplate = function(self, templateName, mixin)
