@@ -57,7 +57,7 @@ function lib:CreateFrame()
     frame:SetSize(800, 600)
     frame:SetTitle("Frame")
     frame:SetSpacing(5, 5)
-    frame:SetCallback("OnUpdate", function()
+    frame:ScheduleUpdater(function()
         frame:SetStatus(date("%x %X", time()))
     end)
     -- frame:SetLayout("List")
@@ -310,6 +310,8 @@ function lib:CreateTabWindow()
     local tabGroup = window:New("TabGroup")
     tabGroup:SetTabs(tabs)
     -- tabGroup:SetLayout("List")
+
+    window:DoLayoutDeferred()
 end
 
 function lib:CreateTreeWindow()
@@ -385,7 +387,7 @@ function lib:CreateTreeWindow()
             onClick = function(content)
                 for x = 1, fastrandom(1, 200) do
                     local button = content:New("Button")
-                    -- button:SetFullWidth(true)
+                    button:SetFullWidth(true)
                     button:SetText(x)
                     button:SetDisabled(fastrandom(1, 2) == 1)
                     button:ApplyTemplate({
@@ -407,14 +409,16 @@ function lib:CreateTreeWindow()
 
     local treeGroup = window:New("TreeGroup")
     treeGroup:SetTree(tree)
+
+    window:DoLayoutDeferred()
 end
 
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:SetScript("OnEvent", function()
-    lib:CreateFrame()
+    -- lib:CreateFrame()
     -- lib:CreateTabWindow()
-    -- lib:CreateTreeWindow()
+    lib:CreateTreeWindow()
 end)
 
 SLASH_LIBINTERFACEUTILS1 = "/liu"

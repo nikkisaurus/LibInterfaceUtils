@@ -98,7 +98,6 @@ local scripts = {
         end
 
         self.menu = lib:New("ScrollList")
-        self.menu:SetParent(self)
         self.menu:SetFrameStrata("DIALOG")
         self.menu:SetPoint("TOPLEFT", self, "BOTTOMLEFT")
         self.menu:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT")
@@ -151,6 +150,7 @@ local methods = {
         self:SetText("")
         self:SetStyle()
         self:SetInitializer()
+        self:SetDisabled()
     end,
 
     ApplyTemplate = function(self, template)

@@ -27,6 +27,11 @@ local defaults = {
 }
 
 local scripts = {
+    -- OnClick = function(self, ...)
+    --     if self.widget.callbacks.OnClick then
+    --         self.widget.callbacks.OnClick(self, ...)
+    --     end
+    -- end,
     OnEnter = function(self)
         self:SetState("highlight")
     end,
@@ -56,6 +61,7 @@ local methods = {
         self:RegisterForDrag()
         self:SetPushedTextOffsets()
         self:ApplyTemplate()
+        self:SetDisabled()
     end,
 
     ApplyTemplate = function(self, template)

@@ -39,6 +39,7 @@ local methods = {
         self:SetAutoWidth(true)
         self:SetText()
         self:SetChecked()
+        self:SetDisabled()
     end,
 
     ApplyTemplate = function(self, template)

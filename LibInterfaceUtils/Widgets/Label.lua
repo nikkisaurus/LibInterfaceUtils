@@ -60,7 +60,7 @@ local methods = {
         self:ApplyTemplate()
         self:SetIcon()
         self:SetText()
-        self:SetInteractible()
+        self:SetDisabled()
     end,
 
     ApplyTemplate = function(self, template)

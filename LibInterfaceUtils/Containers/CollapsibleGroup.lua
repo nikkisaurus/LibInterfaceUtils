@@ -114,7 +114,7 @@ local methods = {
 
         local parent = self:GetUserData("parent")
         while parent do
-            parent:DoLayout()
+            parent:DoLayoutDeferred()
             parent = parent:GetUserData("parent")
         end
     end,

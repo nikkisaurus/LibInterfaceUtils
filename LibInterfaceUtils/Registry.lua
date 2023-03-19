@@ -35,19 +35,15 @@ local ContainerMethods = {
     end,
 
     DoLayoutDeferred = function(self)
-        local script = self:GetScript("OnUpdate")
         self:SetScript("OnUpdate", function(...)
-            if script then
-                script(...)
-            end
-            self:DoLayout(script)
+            self:DoLayout()
         end)
     end,
 
-    DoLayout = function(self, script)
+    DoLayout = function(self)
         local w, h = self:layoutFunc()
         self:Fire("OnLayoutFinished", w, h)
-        self:SetScript("OnUpdate", script or nil)
+        self:SetScript("OnUpdate", nil)
         return private:round(self:GetWidth()), private:round(self:GetHeight())
     end,
 
@@ -180,10 +176,32 @@ local ObjectMethods = {
             parent:RemoveChild(self)
         end
 
+        local ticker = self:GetUserData("ticker")
+        if ticker then
+            ticker:Cancel()
+        end
+
         lib.pool[self.widget.type]:Release(self)
         wipe(self.widget.userdata)
         wipe(self.widget.callbacks)
         private:InitializeScripts(self)
+    end,
+
+    ScheduleUpdater = function(self, callback, seconds, iterations)
+        local ticker = self:GetUserData("ticker")
+        if ticker then
+            ticker:Cancel()
+            self:SetUserData("ticker")
+        end
+
+        if callback then
+            callback(self) -- Initialize by running instantly
+
+            local ticker = C_Timer.NewTicker(seconds or 1, function()
+                callback(self)
+            end, iterations)
+            self:SetUserData("ticker", ticker)
+        end
     end,
 
     SetCallback = function(self, script, handler)
@@ -250,7 +268,6 @@ function private:GetObjectName(objectType)
     return addonName .. objectType .. (lib.pool[objectType]:GetNumObjects() + 1)
 end
 
--- ! Scripts are not properly calling callbacks
 function private:InitializeScripts(self)
     local widget = self.widget
     for script, handler in pairs(widget.scripts) do
@@ -266,7 +283,6 @@ function private:InitializeScripts(self)
 
                 local callback = widget.callbacks[script]
                 if callback then
-                    print(widget.type, script, callback)
                     callback(...)
                 end
             end)
