@@ -26,12 +26,17 @@ local scripts = {
     OnDragStop = function(self)
         self:StopMovingOrSizing()
     end,
-    OnHide = function(self)
-        local onEscape = self:GetUserData("onEscape")
-        if not self:GetUserData("userReleased") and onEscape then
-            onEscape(self)
+    OnKeyDown = function(self, key)
+        if not self:GetUserData("frame").hideOnEscape or key ~= "ESCAPE" then
+            self:SetPropagateKeyboardInput(true)
+        else
+            self:SetPropagateKeyboardInput(false)
+            local onEscape = self:GetUserData("onEscape")
+            if onEscape then
+                onEscape(self)
+            end
+            self:Release()
         end
-        self:Release()
     end,
 }
 
@@ -56,11 +61,7 @@ local methods = {
         private:SetBackdrop(self, frame)
         private:SetFont(self.label, label)
 
-        if frame.hideOnEscape then
-            tinsert(UISpecialFrames, self:GetName())
-        else
-            tDeleteItem(UISpecialFrames, self:GetName())
-        end
+        self:SetUserData("frame", frame)
     end,
 
     InitializeButtons = function(self, buttons, onEscape)
@@ -87,7 +88,6 @@ local methods = {
                     if buttonInfo.OnClick then
                         buttonInfo.OnClick(self)
                     end
-                    self:SetUserData("userReleased", true)
                     self:Release()
                 end)
             end

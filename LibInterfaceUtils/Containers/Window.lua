@@ -139,8 +139,6 @@ local scripts = {
 
 local methods = {
     OnAcquire = function(self, ...)
-        self.content = lib:New("ScrollFrame")
-
         local w, h = GetPhysicalScreenSize()
         self:SetLayout()
         self:SetSpecialFrame()
@@ -154,7 +152,7 @@ local methods = {
     end,
 
     OnRelease = function(self)
-        self.content:Release()
+        self.content:ReleaseChildren()
     end,
 
     AddChild = function(self, ...)
@@ -300,6 +298,8 @@ local function creationFunc()
     frame.titleBar.close:SetNormalAtlas("PlayerDeadBlip")
     frame.titleBar.close:SetHighlightAtlas("PlayerDeadBlip", "ADD")
     frame.titleBar.close:SetScript("OnClick", childScripts.close.OnClick)
+
+    frame.content = lib:New("ScrollFrame")
 
     frame.resizer = CreateFrame("Button", nil, frame)
     frame.resizer:SetNormalTexture([[INTERFACE\CHATFRAME\UI-CHATIM-SIZEGRABBER-DOWN]])
