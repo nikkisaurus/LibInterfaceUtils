@@ -132,6 +132,8 @@ local ObjectMethods = {
             end
         elseif self.target and self.target:HasScript(script) and self.target:GetScript(script) then
             self.target:GetScript(script)(self.target, ...)
+        elseif self.widget.callbacks[script] then
+            self.widget.callbacks[script](self, ...)
         end
     end,
 

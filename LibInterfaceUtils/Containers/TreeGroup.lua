@@ -180,6 +180,31 @@ local methods = {
         self.content:RemoveChild(...)
     end,
 
+    Select = function(self, nodeValue, childValue)
+        TableUtil.ExecuteUntil(self.tree.children, function(node)
+            local nodeInfo = node:GetUserData("info")
+            if nodeInfo.value == nodeValue and not private:ParseValue(nodeInfo.disabled) then
+                node:Collapse()
+
+                if childValue then
+                    local childKey, container = FindInTableIf(node.children, function(child)
+                        local childInfo = child:GetUserData("info")
+                        if childInfo and childInfo.value == childValue and not private:ParseValue(childInfo.disabled) then
+                            return true
+                        end
+                    end)
+
+                    if childKey then
+                        container:Fire("OnMouseDown")
+                        return true
+                    end
+                end
+                node:Fire("OnCollapse")
+                return true
+            end
+        end)
+    end,
+
     SetAnchors = function(self)
         self.tree:ClearAllPoints()
         self.resizer:ClearAllPoints()
@@ -209,7 +234,7 @@ local methods = {
     SetSelected = function(self, selectedNode, selectedChild)
         local template = self:GetUserData("template")
 
-        for _, node in pairs(self.tree.children) do
+        for _, node in ipairs(self.tree.children) do
             if not node:IsDisabled() then
                 if node == selectedNode and not selectedChild then
                     node:ApplyTemplate(template.selectedNode)
@@ -253,6 +278,7 @@ local methods = {
             node:SetIcon(treeInfo.icon, 14, 14)
             node:SetLabel(treeInfo.text)
             node:Collapse(true)
+            node:SetUserData("info", treeInfo)
 
             local disabledNode = treeInfo.disabled
             if type(disabledNode) == "boolean" then
@@ -266,6 +292,7 @@ local methods = {
                     local container = node:New("Group")
                     container:SetFullWidth(true)
                     container:SetPadding(2, 2, 2, 2)
+                    container:SetUserData("info", childInfo)
 
                     local child = container:New("Label")
                     child:SetFillWidth(true)
@@ -286,8 +313,8 @@ local methods = {
                         self.content:ReleaseChildren()
                         if childInfo.onClick then
                             childInfo.onClick(self.content, childInfo)
+                            self.content:DoLayoutDeferred()
                         end
-                        self.content:DoLayoutDeferred()
                     end)
 
                     container:SetCallback("OnEnter", function()
@@ -320,8 +347,8 @@ local methods = {
                 self.content:ReleaseChildren()
                 if treeInfo.onClick then
                     treeInfo.onClick(self.content, treeInfo)
+                    self.content:DoLayoutDeferred()
                 end
-                self.content:DoLayoutDeferred()
             end)
         end
 

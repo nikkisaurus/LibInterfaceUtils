@@ -125,7 +125,7 @@ local methods = {
         self.content:RemoveChild(...)
     end,
 
-    SelectTab = function(self, value)
+    Select = function(self, value)
         for _, tab in ipairs(self.tabs.children) do
             if tab:GetUserData("info").value == value then
                 tab:Fire("OnClick")
@@ -185,8 +185,8 @@ local methods = {
                 self.content:ReleaseChildren()
                 if tabInfo.onClick then
                     tabInfo.onClick(self.content, tabInfo)
+                    self.content:DoLayoutDeferred()
                 end
-                self.content:DoLayoutDeferred()
             end)
         end
 

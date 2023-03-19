@@ -345,7 +345,7 @@ function lib:CreateTabWindow()
     local tabGroup = window:New("TabGroup")
     tabGroup:SetTabs(tabs)
     -- tabGroup:SetLayout("List")
-    tabGroup:SelectTab(3)
+    tabGroup:Select(3)
 
     window:DoLayoutDeferred()
 end
@@ -362,6 +362,7 @@ function lib:CreateTreeWindow()
     local tree = {}
     for i = 1, fastrandom(1, 40) do
         tinsert(tree, {
+            value = i,
             -- text = "Node " .. i .. (fastrandom(1, 2) == 1 and " long node name so I can check out the wrapping situation" or ""),
             text = "Node " .. i,
             -- icon = fastrandom(1, 2) == 1 and 134400,
@@ -369,6 +370,7 @@ function lib:CreateTreeWindow()
             disabled = fastrandom(1, 2) == 1,
             children = fastrandom(1, 2) == 1 and {
                 {
+                    value = 1,
                     text = "Child " .. 1,
                     -- icon = fastrandom(1, 2) == 1 and 134400,
                     icon = 134400,
@@ -395,6 +397,7 @@ function lib:CreateTreeWindow()
                     end,
                 },
                 {
+                    value = 2,
                     text = "Child " .. 2,
                     -- icon = fastrandom(1, 2) == 1 and 134400,
                     icon = 134400,
@@ -446,6 +449,7 @@ function lib:CreateTreeWindow()
 
     local treeGroup = window:New("TreeGroup")
     treeGroup:SetTree(tree)
+    treeGroup:Select(1, 1)
 
     window:DoLayoutDeferred()
 end
@@ -508,8 +512,8 @@ frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:SetScript("OnEvent", function()
     -- lib:CreateFrame()
     -- lib:CreateTabWindow()
-    -- lib:CreateTreeWindow()
-    lib:CreateDropdownWindow()
+    lib:CreateTreeWindow()
+    -- lib:CreateDropdownWindow()
 end)
 
 SLASH_LIBINTERFACEUTILS1 = "/liu"
