@@ -88,7 +88,6 @@ local methods = {
         self:ApplyTemplate("default")
         self:SetResizable(false)
         self:SetFrameStrata("FULLSCREEN_DIALOG")
-        self:SetFrameLevel(100)
     end,
 
     ApplyTemplate = function(self, templateName, mixin)
@@ -201,6 +200,7 @@ local methods = {
 
 local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
+    frame:SetToplevel(true)
     frame = private:CreateTextures(frame)
 
     frame.horizontalBar = CreateFrame("EventFrame", nil, frame, "LibInterfaceUtilsHorizontalScrollBar")

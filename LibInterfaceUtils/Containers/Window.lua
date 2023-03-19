@@ -151,7 +151,6 @@ local methods = {
         self:ApplyTemplate("default")
         self:SetTitle()
         self:SetFrameStrata("FULLSCREEN_DIALOG")
-        self:SetFrameLevel(100)
     end,
 
     OnRelease = function(self)
@@ -286,6 +285,7 @@ local methods = {
 
 local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
+    frame:SetToplevel(true)
     frame = private:CreateTextures(frame)
 
     frame.titleBar = CreateFrame("Frame", nil, frame)
