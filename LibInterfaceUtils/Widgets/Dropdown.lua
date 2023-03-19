@@ -320,6 +320,10 @@ local methods = {
                 checkButton:SetStyle(style.checkStyle)
                 checkButton:SetHeight(20)
 
+                if elementData.tooltip then
+                    checkButton:SetTooltip(unpack(elementData.tooltip))
+                end
+
                 checkButton:SetCallback("OnClick", function()
                     callback(checkButton:GetChecked())
                 end)
@@ -341,6 +345,11 @@ local methods = {
             label:SetIcon(elementData.icon, elementData.iconWidth or style.iconWidth, elementData.iconHeight or style.iconHeight, style.iconPoint)
             label:SetInteractible(true)
             label:SetDisabled(disabled)
+
+            if elementData.tooltip then
+                label:SetTooltip(unpack(elementData.tooltip))
+                group:SetTooltip(unpack(elementData.tooltip))
+            end
 
             label:SetCallback("OnEnter", function()
                 group:Fire("OnEnter")

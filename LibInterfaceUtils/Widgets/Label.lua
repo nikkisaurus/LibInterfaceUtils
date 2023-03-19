@@ -20,6 +20,7 @@ local defaults = {
 local maps = {
     methods = {
         EnableMouse = true,
+        GetText = true,
         SetJustifyH = true,
         SetJustifyV = true,
         SetWordWrap = true,
@@ -67,6 +68,10 @@ local methods = {
 
     IsDisabled = function(self)
         return self:GetUserData("isDisabled")
+    end,
+
+    IsTruncated = function(self)
+        return (self.label:GetStringWidth()) > self:GetWidth()
     end,
 
     SetAnchors = function(self)
@@ -149,6 +154,10 @@ local methods = {
     SetText = function(self, text)
         self.label:SetText(text or "")
         self:SetAnchors()
+    end,
+
+    ShowTruncatedText = function(self, show)
+        self:SetUserData("showTruncatedText", show)
     end,
 }
 

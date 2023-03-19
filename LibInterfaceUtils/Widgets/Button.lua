@@ -26,12 +26,13 @@ local defaults = {
     },
 }
 
+local maps = {
+    methods = {
+        GetText = true,
+    },
+}
+
 local scripts = {
-    -- OnClick = function(self, ...)
-    --     if self.widget.callbacks.OnClick then
-    --         self.widget.callbacks.OnClick(self, ...)
-    --     end
-    -- end,
     OnEnter = function(self)
         self:SetState("highlight")
     end,
@@ -83,6 +84,10 @@ local methods = {
         return self:GetUserData("isDisabled")
     end,
 
+    IsTruncated = function(self)
+        return (self.text:GetStringWidth()) > self:GetWidth()
+    end,
+
     SetBackdrop = function(self, backdrop)
         private:SetBackdrop(self, CreateFromMixins(defaults.backdrop.normal, backdrop or {}))
     end,
@@ -121,6 +126,10 @@ local methods = {
             self:SetWidth(self.text:GetStringWidth() + 20)
         end
     end,
+
+    ShowTruncatedText = function(self, show)
+        self:SetUserData("showTruncatedText", show)
+    end,
 }
 
 local function creationFunc()
@@ -136,6 +145,8 @@ local function creationFunc()
         type = objectType,
         version = version,
     }
+
+    private:Map(button, button.text, maps)
 
     return private:RegisterWidget(widget, methods, scripts)
 end

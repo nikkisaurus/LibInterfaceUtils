@@ -4,6 +4,8 @@ if not lib then
     return
 end
 
+local tooltipFrame = CreateFrame("GameTooltip", addonName .. "TooltipFrame", UIParent, "GameTooltipTemplate")
+
 local function GetDropdownInfo(text)
     local info = {
         -- {
@@ -22,6 +24,11 @@ local function GetDropdownInfo(text)
             checked = function(self)
                 return self:IsValueSelected(i)
             end,
+            -- tooltip = {
+            --     function(_, tooltip)
+            --         tooltip:AddLine("Value " .. i)
+            --     end,
+            -- },
             disabled = fastrandom(1, 2) == 2,
             func = function(self, checked)
                 print("Selected Value", i)
@@ -108,6 +115,9 @@ function lib:CreateFrame()
     -- dropdown4:SetInitializer(info, callbacks, { clear = "CLEAR", selectAll = "SELECT ALL" })
     dropdown4:SetInitializer(info, callbacks)
     dropdown4:SetStyle({ search = true }, "multiselect")
+    dropdown4:SetTooltip(function(_, tooltip)
+        tooltip:AddLine("Select multiple things")
+    end)
 
     local editBoxes = frame:New("CollapsibleGroup")
     editBoxes:SetFullWidth(true)
@@ -168,6 +178,11 @@ function lib:CreateFrame()
         tinsert(info, {
             label = "Option " .. i,
             width = 150,
+            tooltip = {
+                function(_, tooltip)
+                    tooltip:AddLine("Option " .. i)
+                end,
+            },
             func = function(group)
                 print(i, "Selected:", group:GetSelected())
             end,
@@ -220,6 +235,7 @@ function lib:CreateFrame()
         local label = labels:New("Label")
         label:SetFullWidth(true)
         label:SetWordWrap(false)
+        -- label:ShowTruncatedText(true)
         label:SetText("Amet fugiat dolore deserunt et consectetur irure. Commodo occaecat occaecat ullamco magna dolor voluptate qui et. Pariatur consectetur non nulla consequat deserunt et nostrud magna incididunt id aliquip reprehenderit. Non do est occaecat velit sunt nostrud cillum et eu labore deserunt.")
         label:SetIcon(134400, nil, nil, v)
     end
@@ -232,8 +248,26 @@ function lib:CreateFrame()
 
     for i = 1, 50 do
         local button = buttons:New("Button")
-        button:SetText(i)
-        -- button:SetBackdrop({ bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom()) })
+        button:SetText("Button " .. i)
+        button:ShowTruncatedText(true)
+        button:SetWidth(fastrandom(50, 150))
+        -- button:SetAutoWidth(true)
+        -- button:SetTooltip(function(self, tooltip)
+        --     tooltip:AddLine(self:GetText())
+        -- end)
+        -- end, { tooltip = tooltipFrame, anchor = "ANCHOR_RIGHT" })
+        button:ApplyTemplate({
+            disabled = {
+                bgColor = private.assets.colors.darkest,
+            },
+            highlight = {
+                bordersColor = private.assets.colors.black,
+                bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+            },
+            normal = {
+                bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+            },
+        })
         -- button:SetWidth(500)
         button:SetCallback("OnClick", function()
             print("Clicked", i)

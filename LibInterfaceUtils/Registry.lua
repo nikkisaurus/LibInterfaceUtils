@@ -159,6 +159,19 @@ local ObjectMethods = {
         return self.widget.userdata[key]
     end,
 
+    HideTooltip = function(self)
+        local truncated = self:GetUserData("showTruncatedText")
+        local tooltipInitializer = self:GetUserData("tooltipInitializer")
+        if (not truncated or not self:IsTruncated()) and not tooltipInitializer then
+            return
+        end
+
+        local info = self:GetUserData("tooltip")
+        local tooltip = info and info.tooltip or GameTooltip
+        tooltip:ClearLines()
+        tooltip:Hide()
+    end,
+
     InitUserData = function(self, key, value)
         if not self:GetUserData(key) then
             self:SetUserData(key, value)
@@ -242,8 +255,35 @@ local ObjectMethods = {
         self:SetUserData("yFill", yFill)
     end,
 
+    SetTooltip = function(self, initializer, tooltip)
+        self:SetUserData("tooltip", tooltip)
+        self:SetUserData("tooltipInitializer", initializer)
+    end,
+
     SetUserData = function(self, key, value)
         self.widget.userdata[key] = value
+    end,
+
+    ShowTooltip = function(self)
+        local truncated = self:GetUserData("showTruncatedText")
+        local tooltipInitializer = self:GetUserData("tooltipInitializer")
+        if (not truncated or not self:IsTruncated()) and not tooltipInitializer then
+            return
+        end
+
+        local info = self:GetUserData("tooltip")
+        local tooltip = info and info.tooltip or GameTooltip
+        local anchor = info and info.anchor or "ANCHOR_RIGHT"
+        local x = info and info.x or 0
+        local y = info and info.y or 0
+        tooltip:SetOwner(self, anchor, x, y)
+        if truncated then
+            tooltip:AddLine(self:GetText())
+        end
+        if tooltipInitializer then
+            tooltipInitializer(self, tooltip)
+        end
+        tooltip:Show()
     end,
 }
 
@@ -280,6 +320,14 @@ function private:InitializeScripts(self)
 
                 if type(handler) == "function" then
                     handler(...)
+                end
+
+                if script == "OnEnter" then
+                    self:ShowTooltip()
+                end
+
+                if script == "OnLeave" then
+                    self:HideTooltip()
                 end
 
                 local callback = widget.callbacks[script]

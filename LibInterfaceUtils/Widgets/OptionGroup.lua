@@ -48,6 +48,10 @@ local methods = {
                     checkButton:SetWidth(option.width)
                 end
 
+                if option.tooltip then
+                    checkButton:SetTooltip(unpack(option.tooltip))
+                end
+
                 checkButton:SetCallback("OnClick", function(...)
                     if not isMultiSelect then
                         for _, optionButton in ipairs(options) do
