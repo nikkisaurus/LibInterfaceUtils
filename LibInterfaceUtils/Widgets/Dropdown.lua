@@ -184,7 +184,7 @@ local methods = {
         local group = frame.group or lib:New("Group")
         group:SetParent(frame)
         group:SetAllPoints(frame)
-        group:SetSpacing(style.iconPoint == "LEFT" and 5 or 0, 0)
+        group:SetSpacing(5, 0)
         group:ApplyTemplate(defaults.listButton.normal)
         frame.group = group
 

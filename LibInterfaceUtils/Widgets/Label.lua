@@ -80,22 +80,21 @@ local methods = {
         if hasIcon then
             self.icon:SetPoint(iconPoint)
             self.label:SetPoint(iconPoint, self.icon, private.points[iconPoint][1], private.points[iconPoint][2] * 5, private.points[iconPoint][3] * 5)
-            self.label:SetPoint(private.points[iconPoint][1], -(private.points[iconPoint][2] * 5), -(private.points[iconPoint][3] * 5))
+            self.label:SetPoint(private.points[iconPoint][1])
 
             if private.points[iconPoint][3] ~= 0 then
                 self.label:SetPoint("LEFT")
                 self.label:SetPoint("RIGHT")
                 self.label:SetWidth(self:GetWidth())
                 if canWrap then
-                    self:SetHeight(self.icon:GetHeight() + self.label:GetStringHeight() + 10)
+                    self:SetHeight(self.icon:GetHeight() + self.label:GetStringHeight() + 5)
                 else
-                    self:SetHeight(self.icon:GetHeight() + self.label:GetHeight() + 10)
+                    self:SetHeight(self.icon:GetHeight() + self.label:GetHeight() + 5)
                 end
             else
-                -- TODO FIX ME label height is cutting off
                 self.label:SetWidth(self:GetWidth() - self.icon:GetWidth() - 5)
                 if canWrap then
-                    self:SetHeight(max(self.icon:GetHeight(), self.label:GetStringHeight()))
+                    self:SetHeight(max(self.icon:GetHeight(), self.label:GetStringHeight() + 5))
                 else
                     self:SetHeight(self.icon:GetHeight())
                 end
@@ -111,7 +110,7 @@ local methods = {
         end
 
         if self:GetUserData("autoWidth") then
-            self:SetWidth(self.label:GetStringWidth() + 30)
+            self:SetWidth(self.label:GetStringWidth() + 20)
         end
     end,
 
