@@ -321,6 +321,7 @@ function lib:CreateTreeWindow()
     window:SetTitle("Tree Group")
     window:SetSpacing(5, 5)
     window:SetLayout("Fill")
+    window:SetSpecialFrame(true)
 
     local tree = {}
     for i = 1, fastrandom(1, 40) do

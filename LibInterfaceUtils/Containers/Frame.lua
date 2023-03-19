@@ -144,6 +144,7 @@ local methods = {
 
         local w, h = GetPhysicalScreenSize()
         self:SetLayout()
+        self:SetSpecialFrame()
         self:SetSize(300, 300)
         self:EnableResize(true, 300, 300, w * 0.8, h * 0.8)
         self:SetDraggable(true, "LeftButton")
@@ -272,6 +273,14 @@ local methods = {
 
     SetSpacing = function(self, ...)
         self.content:SetSpacing(...)
+    end,
+
+    SetSpecialFrame = function(self, isSpecial)
+        if isSpecial then
+            tinsert(UISpecialFrames, self:GetName())
+        else
+            tDeleteItem(UISpecialFrames, self:GetName())
+        end
     end,
 
     SetStatus = function(self, text)
