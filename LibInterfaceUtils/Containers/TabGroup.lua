@@ -63,10 +63,22 @@ local methods = {
     end,
 
     AcquireChildren = function(self)
-        self.tabs = lib:New("Group")
-        self.tabs:SetHeight(1)
-        self.tabs:SetPadding(0, 0, 0, 0)
+        self.tabs = lib:New("ScrollFrame")
         self.tabs:SetLayout("TabFlow")
+        self.tabs:SetCallback("OnLayoutFinished", function(_, usedHeight)
+            local maxHeight = (self:GetHeight() * (1 / 3))
+            local numTabs = #self.tabs.children
+            local availableWidth = self.tabs:GetAvailableWidth()
+            local tabWidth, tabHeight = self.tabs.children[1]:GetSize()
+            local tabsPerRow = floor(availableWidth / tabWidth)
+            local rows = ceil(numTabs / tabsPerRow)
+            local height = (tabHeight * rows) + 10
+            height = min(height, maxHeight)
+
+            if self.tabs:GetHeight() ~= height then
+                self.tabs:SetHeight(height)
+            end
+        end)
 
         self.content = lib:New("ScrollFrame")
     end,
@@ -140,7 +152,7 @@ local methods = {
         self.tabs:SetPoint("TOPRIGHT")
 
         self.content:SetParent(self)
-        self.content:SetPoint("TOP", self.tabs, "BOTTOM")
+        self.content:SetPoint("TOP", self.tabs, "BOTTOM", 0, 6)
         self.content:SetPoint("LEFT")
         self.content:SetPoint("BOTTOMRIGHT")
     end,
@@ -204,7 +216,7 @@ local function creationFunc()
         version = version,
     }
 
-    return private:RegisterContainer(widget, methods)
+    return private:RegisterContainer(widget, methods, scripts)
 end
 
 private:RegisterWidgetPool(objectType, creationFunc)
