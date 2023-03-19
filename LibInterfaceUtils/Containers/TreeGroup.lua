@@ -128,6 +128,8 @@ local methods = {
         self.content:ReleaseChildren()
     end,
 
+    AddChild = function(self, ...) end,
+
     ApplyTemplate = function(self, templateName, mixin)
         templateName = type(templateName) == "string" and templateName:lower() or templateName
         local template
@@ -164,9 +166,7 @@ local methods = {
         self.content:MarkDirty(...)
     end,
 
-    New = function(self, ...)
-        return self.content:New(...)
-    end,
+    New = function(self, ...) end,
 
     ParentChild = function(self, ...)
         self.content:ParentChild(...)
@@ -284,7 +284,9 @@ local methods = {
                     container:SetCallback("OnMouseDown", function()
                         self:SetSelected(node, child)
                         self.content:ReleaseChildren()
-                        childInfo.onClick(self.content, childInfo)
+                        if childInfo.onClick then
+                            childInfo.onClick(self.content, childInfo)
+                        end
                         self.content:DoLayoutDeferred()
                     end)
 
@@ -316,7 +318,9 @@ local methods = {
             node:SetCallback("OnCollapse", function()
                 self:SetSelected(node)
                 self.content:ReleaseChildren()
-                treeInfo.onClick(self.content, treeInfo)
+                if treeInfo.onClick then
+                    treeInfo.onClick(self.content, treeInfo)
+                end
                 self.content:DoLayoutDeferred()
             end)
         end

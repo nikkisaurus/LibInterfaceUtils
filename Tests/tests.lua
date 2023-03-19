@@ -316,8 +316,9 @@ function lib:CreateTabWindow()
     local tabs = {}
     for i = 1, fastrandom(1, 40) do
         tinsert(tabs, {
+            value = i,
             text = "Tab " .. i,
-            disabled = fastrandom(1, 2) == 1,
+            disabled = i ~= 3 and fastrandom(1, 2) == 1,
             onClick = function(content)
                 for x = 1, fastrandom(1, 200) do
                     local button = content:New("Button")
@@ -344,6 +345,7 @@ function lib:CreateTabWindow()
     local tabGroup = window:New("TabGroup")
     tabGroup:SetTabs(tabs)
     -- tabGroup:SetLayout("List")
+    tabGroup:SelectTab(3)
 
     window:DoLayoutDeferred()
 end
@@ -448,12 +450,65 @@ function lib:CreateTreeWindow()
     window:DoLayoutDeferred()
 end
 
+function lib:CreateDropdownWindow()
+    local window = self:New("Window")
+    window:SetPoint("CENTER")
+    window:SetSize(800, 600)
+    window:SetTitle("Dropdown Group")
+    window:SetSpacing(5, 5)
+    window:SetLayout("Fill")
+    window:SetSpecialFrame(true)
+
+    local menu = {}
+    for i = 1, fastrandom(1, 20) do
+        tinsert(menu, {
+            value = i,
+            text = "Value " .. i,
+            checked = function(self)
+                return self:IsValueSelected(i)
+            end,
+            disabled = fastrandom(1, 2) == 2,
+            onClick = function(content)
+                for x = 1, fastrandom(1, 200) do
+                    local button = content:New("Button")
+                    -- button:SetFullWidth(true)
+                    button:SetText(x)
+                    button:SetDisabled(fastrandom(1, 2) == 1)
+                    button:ApplyTemplate({
+                        disabled = {
+                            bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 0.1),
+                        },
+                        highlight = {
+                            bordersColor = private.assets.colors.black,
+                            bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                        },
+                        normal = {
+                            bgColor = CreateColor(fastrandom(), fastrandom(), fastrandom(), 1),
+                        },
+                    })
+                end
+            end,
+        })
+    end
+
+    local dropdownGroup = window:New("DropdownGroup")
+    dropdownGroup:SetMenu(menu)
+    dropdownGroup:SetStyle({ clear = true })
+    dropdownGroup:InitializeContent(function(content)
+        local header = content:New("Header")
+        header:SetText("Dropdown")
+    end)
+
+    window:DoLayoutDeferred()
+end
+
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:SetScript("OnEvent", function()
-    lib:CreateFrame()
-    -- lib:CreateTabWindow()
+    -- lib:CreateFrame()
+    lib:CreateTabWindow()
     -- lib:CreateTreeWindow()
+    -- lib:CreateDropdownWindow()
 end)
 
 SLASH_LIBINTERFACEUTILS1 = "/liu"
@@ -463,6 +518,8 @@ SlashCmdList["LIBINTERFACEUTILS"] = function(input)
         lib:CreateTabWindow()
     elseif input == "treewindow" then
         lib:CreateTreeWindow()
+    elseif input == "dropdownwindow" then
+        lib:CreateDropdownWindow()
     else
         lib:CreateFrame()
     end

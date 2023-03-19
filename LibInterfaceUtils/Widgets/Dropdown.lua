@@ -149,7 +149,6 @@ local methods = {
         self:SetText("")
         self:SetStyle()
         self:SetInitializer()
-        self:SetDisabled()
     end,
 
     ApplyTemplate = function(self, template)
@@ -485,6 +484,7 @@ local methods = {
     end,
 
     SetInitializer = function(self, info, callbacks, localizations)
+        self:SetDisabled(not info or #info == 0)
         self:SetUserData("info", info)
         self:SetUserData("callbacks", callbacks)
         self:SetUserData("localizations", localizations)

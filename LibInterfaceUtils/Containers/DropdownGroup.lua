@@ -1,7 +1,7 @@
 local addonName, private = ...
 local lib, minor = LibStub:GetLibrary(addonName)
 
-local objectType, version = "TabGroup", 1
+local objectType, version = "DropdownGroup", 1
 if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
@@ -53,26 +53,22 @@ local methods = {
         self:SetLayout()
         self:SetSize(300, 300)
         self:ApplyTemplate("default")
-        self:SetTabs()
         self:SetAnchors()
+        self:SetMenu()
     end,
 
     OnRelease = function(self)
-        self.tabs:Release()
+        self.dropdown:Release()
         self.content:Release()
     end,
 
     AcquireChildren = function(self)
-        self.tabs = lib:New("Group")
-        self.tabs:SetHeight(1)
-        self.tabs:SetPadding(0, 0, 0, 0)
-        self.tabs:SetLayout("TabFlow")
-
+        self.dropdown = lib:New("Dropdown")
         self.content = lib:New("ScrollFrame")
     end,
 
     AddChild = function(self, ...)
-        assert(false, "The method 'AddChild' is forbidden for widget type 'TabGroup'.")
+        assert(false, "The method 'AddChild' is forbidden for widget type 'DropdownGroup'. Use 'InitializeContent' to set a default content state.")
     end,
 
     ApplyTemplate = function(self, templateName, mixin)
@@ -105,12 +101,21 @@ local methods = {
         return self.content:GetAvailableWidth()
     end,
 
+    GetSelected = function(self, ...)
+        return self.dropdown:GetSelected(...)
+    end,
+
+    InitializeContent = function(self, callback)
+        self:SetUserData("defaultContent", callback)
+        self:ResetContent()
+    end,
+
     MarkDirty = function(self, ...)
         self.content:MarkDirty(...)
     end,
 
     New = function(self, ...)
-        assert(false, "The method 'New' is forbidden for widget type 'TabGroup'.")
+        assert(false, "The method 'New' is forbidden for widget type 'DropdownGroup'. Use 'InitializeContent' to set a default content state.")
     end,
 
     ParentChild = function(self, ...)
@@ -125,23 +130,21 @@ local methods = {
         self.content:RemoveChild(...)
     end,
 
-    SelectTab = function(self, value)
-        for _, tab in ipairs(self.tabs.children) do
-            if tab:GetUserData("info").value == value then
-                tab:Fire("OnClick")
-                return
-            end
+    ResetContent = function(self)
+        local callback = self:GetUserData("defaultContent")
+        self.content:ReleaseChildren()
+        if callback then
+            callback(self.content)
+            self.content:DoLayoutDeferred()
         end
     end,
 
     SetAnchors = function(self)
-        self.tabs:SetParent(self)
-        self.tabs:SetPoint("TOPLEFT")
-        self.tabs:SetPoint("TOPRIGHT")
+        self.dropdown:SetParent(self)
+        self.dropdown:SetPoint("TOPLEFT")
 
         self.content:SetParent(self)
-        self.content:SetPoint("TOP", self.tabs, "BOTTOM")
-        self.content:SetPoint("LEFT")
+        self.content:SetPoint("TOPLEFT", self.dropdown, "BOTTOMLEFT")
         self.content:SetPoint("BOTTOMRIGHT")
     end,
 
@@ -149,49 +152,39 @@ local methods = {
         self.content:SetLayout(...)
     end,
 
-    SetSelected = function(self, selectedTab)
-        local template = self:GetUserData("template")
-
-        for _, tab in pairs(self.tabs.children) do
-            if tab ~= selectedTab then
-                tab:ApplyTemplate(template.tab)
-            else
-                tab:ApplyTemplate(template.selectedTab)
+    SetMenu = function(self, initializer, callbacks, localizations)
+        if initializer then
+            for i, info in ipairs(initializer) do
+                initializer[i].func = function()
+                    self:SetSelectedText()
+                    self.content:ReleaseChildren()
+                    if info.onClick then
+                        info.onClick(self.content, info)
+                        self.content:DoLayoutDeferred()
+                    end
+                end
             end
         end
+
+        callbacks = callbacks or {}
+        local OnClear = callbacks.OnClear
+        callbacks.OnClear = function(...)
+            self:SetSelectedText()
+            self:ResetContent()
+            if OnClear then
+                OnClear(...)
+            end
+        end
+
+        self.dropdown:SetInitializer(initializer, callbacks, localizations)
     end,
 
-    SetTabs = function(self, tabs)
-        self.tabs:ReleaseChildren()
+    SetSelectedText = function(self, ...)
+        self.dropdown:SetSelectedText(...)
+    end,
 
-        if not tabs then
-            return
-        end
-
-        for _, tabInfo in ipairs(tabs) do
-            local tab = self.tabs:New("Button")
-            tab:SetText(tabInfo.text)
-            tab:SetUserData("info", tabInfo)
-
-            local disabled = tabInfo.disabled
-            if type(disabled) == "boolean" then
-                tab:SetDisabled(disabled)
-            elseif type(disabled) == "function" then
-                tab:SetDisabled(disabled())
-            end
-
-            tab:SetCallback("OnClick", function()
-                self:SetSelected(tab)
-                self.content:ReleaseChildren()
-                if tabInfo.onClick then
-                    tabInfo.onClick(self.content, tabInfo)
-                end
-                self.content:DoLayoutDeferred()
-            end)
-        end
-
-        self:SetSelected()
-        self.tabs:DoLayoutDeferred()
+    SetStyle = function(self, ...)
+        self.dropdown:SetStyle(...)
     end,
 }
 
