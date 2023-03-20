@@ -63,6 +63,7 @@ local methods = {
         self:SetPushedTextOffsets()
         self:ApplyTemplate()
         self:SetDisabled()
+        self:SetPadding()
     end,
 
     ApplyTemplate = function(self, template)
@@ -110,6 +111,11 @@ local methods = {
         end
     end,
 
+    SetPadding = function(self, left, right, top, bottom)
+        self.text:SetPoint("TOPLEFT", left or 0, -(top or 0))
+        self.text:SetPoint("BOTTOMRIGHT", -(right or 0), bottom or 0)
+    end,
+
     SetPushedTextOffsets = function(self, x, y)
         self:SetUserData("offset", { x or 1, y or -1 })
     end,
@@ -137,8 +143,6 @@ local function creationFunc()
     button = private:CreateTextures(button)
 
     button.text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    button.text:SetPoint("TOPLEFT")
-    button.text:SetPoint("BOTTOMRIGHT")
 
     local widget = {
         object = button,

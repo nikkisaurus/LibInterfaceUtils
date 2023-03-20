@@ -71,6 +71,7 @@ local methods = {
     end,
 
     IsTruncated = function(self)
+        -- TODO need to calculate icon width when possible to see if it's being cut off
         return (self.label:GetStringWidth()) > self:GetWidth()
     end,
 

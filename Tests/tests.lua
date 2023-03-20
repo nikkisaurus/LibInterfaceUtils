@@ -64,6 +64,7 @@ function lib:CreateFrame()
     frame:SetSize(800, 600)
     frame:SetTitle("Frame")
     frame:SetSpacing(5, 5)
+    frame:SetSpecialFrame(true)
     frame:ScheduleUpdater(function()
         frame:SetStatus(date("%x %X", time()))
     end)
@@ -311,6 +312,7 @@ function lib:CreateTabWindow()
     window:SetTitle("Tab Group")
     window:SetSpacing(5, 5)
     window:SetLayout("Fill")
+    window:SetSpecialFrame(true)
     -- window:ApplyTemplate("transparent")
 
     local tabs = {}
@@ -376,7 +378,7 @@ function lib:CreateTabWindow()
     -- tabGroup:SetFullHeight(true)
     tabGroup:SetTabs(tabs)
     -- tabGroup:SetLayout("List")
-    -- tabGroup:Select(3)
+    tabGroup:Select(3)
 
     window:DoLayoutDeferred()
 end
@@ -480,7 +482,7 @@ function lib:CreateTreeWindow()
 
     local treeGroup = window:New("TreeGroup")
     treeGroup:SetTree(tree)
-    -- treeGroup:Select(1, 1)
+    treeGroup:Select(1, 1)
 
     window:DoLayoutDeferred()
 end
@@ -529,7 +531,7 @@ function lib:CreateDropdownWindow()
     local dropdownGroup = window:New("DropdownGroup")
     dropdownGroup:SetMenu(menu)
     dropdownGroup:SetStyle({ clear = true })
-    -- dropdownGroup:Select(1)
+    dropdownGroup:Select(1)
     -- dropdownGroup:InitializeContent(function(content)
     --     local header = content:New("Header")
     --     header:SetText("Dropdown")
@@ -538,13 +540,52 @@ function lib:CreateDropdownWindow()
     window:DoLayoutDeferred()
 end
 
+function lib:CreateTableWindow()
+    local window = self:New("Window")
+    window:SetPoint("CENTER")
+    window:SetSize(800, 600)
+    window:SetTitle("Table")
+    window:SetSpacing(5, 5)
+    window:SetLayout("Fill")
+    window:SetSpecialFrame(true)
+
+    local data = {}
+    local headerInfo = {}
+    for col = 1, 10 do
+        tinsert(headerInfo, {
+            header = true,
+            col = col,
+            text = "Header " .. col,
+            width = fastrandom(75, 150),
+        })
+    end
+    tinsert(data, headerInfo)
+    for row = 1, 50 do
+        local rowInfo = {}
+        for col = 1, 10 do
+            tinsert(rowInfo, {
+                col = col,
+                text = format("Cell (%d, %d)", col, row),
+                icon = 134400,
+            })
+        end
+        tinsert(data, rowInfo)
+    end
+
+    local tbl = window:New("Table")
+    tbl:SetDataProvider(data)
+
+    window:DoLayoutDeferred()
+end
+
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:SetScript("OnEvent", function()
-    lib:CreateFrame()
+    -- lib:CreateFrame()
     -- lib:CreateTabWindow()
     -- lib:CreateTreeWindow()
     -- lib:CreateDropdownWindow()
+    lib:CreateTableWindow()
 end)
 
 SLASH_LIBINTERFACEUTILS1 = "/liu"
@@ -556,6 +597,8 @@ SlashCmdList["LIBINTERFACEUTILS"] = function(input)
         lib:CreateTreeWindow()
     elseif input == "dropdownwindow" then
         lib:CreateDropdownWindow()
+    elseif input == "tablewindow" then
+        lib:CreateTableWindow()
     else
         lib:CreateFrame()
     end

@@ -24,5 +24,6 @@
     <Script file="Widgets/ScrollList.lua"/>
     <Script file="Widgets/SearchBox.lua"/>
     <Script file="Widgets/StaticPopup.lua"/>
+    <Script file="Widgets/Table.lua"/>
     <Script file="Widgets/Texture.lua"/>
 </Ui>

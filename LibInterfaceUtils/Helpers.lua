@@ -98,6 +98,10 @@ function private:DrawBorders(borders, texture, color, size)
     end
 end
 
+function private:GetPixel(size)
+    return PixelUtil.GetNearestPixelSize(size, UIParent:GetEffectiveScale(), 1)
+end
+
 function private:ParseValue(value, ...)
     if type(value) == "function" then
         return value(...)

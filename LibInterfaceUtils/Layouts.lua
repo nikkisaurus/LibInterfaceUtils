@@ -296,7 +296,7 @@ private.layouts = {
             end
         end
 
-        usedHeight = usedHeight + rowHeight - spacingV
+        usedHeight = usedHeight + rowHeight
 
         if self:GetUserData("collapsed") then
             self:MarkDirty(usedWidth, 0)
@@ -305,5 +305,29 @@ private.layouts = {
             self:MarkDirty(usedWidth, usedHeight)
             return usedWidth, usedHeight
         end
+    end,
+
+    row = function(self)
+        local w = 0
+        local h = 0
+
+        local spacingH = self:GetUserData("spacingH") or 0
+
+        for i, child in ipairs(self.children) do
+            local xOffset = child:GetUserData("xOffset") or 0
+            self:ParentChild(child)
+            child:ClearAllPoints()
+
+            if i == 1 then
+                child:SetPoint("LEFT")
+            else
+                child:SetPoint("LEFT", self.children[i - 1], "RIGHT", xOffset + spacingH, 0)
+            end
+            w = w + child:GetWidth() + xOffset + spacingH
+            h = max(h, child:GetHeight())
+        end
+
+        self:MarkDirty(w, h)
+        return w, h
     end,
 }

@@ -122,6 +122,13 @@ local ContainerMethods = {
 }
 
 local ObjectMethods = {
+    CancelUpdater = function(self)
+        local ticker = self:GetUserData("ticker")
+        if ticker then
+            ticker:Cancel()
+        end
+    end,
+
     Fire = function(self, script, ...)
         if self:GetUserData("isDisabled") then
             return
@@ -196,10 +203,7 @@ local ObjectMethods = {
             parent:RemoveChild(self)
         end
 
-        local ticker = self:GetUserData("ticker")
-        if ticker then
-            ticker:Cancel()
-        end
+        self:CancelUpdater()
 
         -- self:SetParent(UIParent)
         lib.pool[self.widget.type]:Release(self)
