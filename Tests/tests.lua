@@ -322,7 +322,8 @@ function lib:CreateTabWindow()
             text = "Tab " .. i,
             disabled = i ~= 3 and fastrandom(1, 2) == 1,
             onClick = function(content)
-                for x = 1, fastrandom(1, 200) do
+                for x = 1, 500 do
+                    -- for x = 1, fastrandom(1, 200) do
                     local button = content:New("Button")
                     -- button:SetFullWidth(true)
                     button:SetText(x)

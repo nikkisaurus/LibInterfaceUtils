@@ -105,13 +105,14 @@ local methods = {
             local col = self:New("Group")
             col:SetResizable(true)
             col:SetSpacing(0, 0)
-            col:SetPadding(colID == 1 and private:GetPixel(1) or 0, colID == #data[1] and private:GetPixel(1) or 0, 0, private:GetPixel(1)) -- enables "border" around the table
+            -- col:SetPadding(colID == 1 and private:GetPixel(1) or 0, colID == #data[1] and private:GetPixel(1) or 0, 0, private:GetPixel(1)) -- enables "border" around the table
+            col:SetPadding(0, 0, 0, 0)
             col:SetLayout("List")
             col:SetWidth(colInfo.width)
             col:ApplyTemplate("bordered")
 
             local headerRow = col:New("Group")
-            headerRow:SetUserData("xOffset", (colID == 1 and -private:GetPixel(1)) or (colID == #data[1] and private:GetPixel(1)) or 0)
+            -- headerRow:SetUserData("xOffset", (colID == 1 and -private:GetPixel(1)) or (colID == #data[1] and private:GetPixel(1)) or 0)
             headerRow:SetSpacing(0, 0)
             headerRow:SetPadding(0, 0, 0, 0)
             headerRow:SetFullWidth(true)
@@ -124,22 +125,22 @@ local methods = {
             resizer:SetWidth(5)
             resizer:RegisterForDrag("LeftButton")
             resizer:SetCallback("OnDragStart", function()
-                -- col:SetUserData("left", col:GetLeft())
-                -- col:StartSizing("RIGHT")
-                -- col:ScheduleUpdater(function()
-                --     print("running")
-                --     if col:GetLeft() < col:GetUserData("left") or col:GetWidth() < 20 then
-                --         col:SetWidth(20)
-                --     end
-                -- end, 0.01)
+                col:SetUserData("left", col:GetLeft())
+                col:StartSizing("RIGHT")
+                col:ScheduleUpdater(function()
+                    print("running")
+                    if col:GetLeft() < col:GetUserData("left") or col:GetWidth() < 20 then
+                        col:SetWidth(20)
+                    end
+                end, 0.01)
             end)
             resizer:SetCallback("OnDragStop", function()
-                -- col:StopMovingOrSizing()
-                -- if col:GetLeft() < col:GetUserData("left") or col:GetWidth() < 20 then
-                --     col:SetWidth(20)
-                -- end
-                -- col:CancelUpdater()
-                -- self:DoLayoutDeferred()
+                col:StopMovingOrSizing()
+                if col:GetLeft() < col:GetUserData("left") or col:GetWidth() < 20 then
+                    col:SetWidth(20)
+                end
+                col:CancelUpdater()
+                self:DoLayoutDeferred()
             end)
 
             for row = 2, #data do
@@ -165,7 +166,7 @@ local methods = {
             end
         end
 
-        self:DoLayoutDeferred()
+        -- self:DoLayoutDeferred()
     end,
 
     SetSpacing = function(self, spacingH, spacingV)
