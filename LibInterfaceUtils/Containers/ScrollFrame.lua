@@ -76,9 +76,10 @@ local childScripts = {
 }
 
 local scripts = {
-    OnSizeChanged = function(self)
-        self:DoLayoutDeferred()
-    end,
+    -- OnSizeChanged = function(self)
+    --     self:SetUserData("scrollUpdate")
+    --     -- self:DoLayoutDeferred()
+    -- end,
 }
 
 local methods = {
@@ -89,6 +90,13 @@ local methods = {
         self:SetResizable(false)
         self:SetFrameStrata("FULLSCREEN_DIALOG")
     end,
+
+    -- OnLayoutFinished = function(self)
+    --     if not self:GetUserData("scrollUpdate") then
+    --         -- self:SetScrollAnchors()
+    --     else
+    --     end
+    -- end,
 
     ApplyTemplate = function(self, templateName, mixin)
         templateName = type(templateName) == "string" and templateName:lower() or templateName or templateName
@@ -104,10 +112,6 @@ local methods = {
         private:SetScrollBarBackdrop(self.horizontalBar, template.scrollBars and template.scrollBars.horizontal)
 
         self:SetUserData("template", template)
-    end,
-
-    OnLayoutFinished = function(self)
-        self:SetScrollAnchors()
     end,
 
     GetAnchorX = function(self)
@@ -140,31 +144,33 @@ local methods = {
     end,
 
     SetScrollAnchors = function(self)
-        local content = self.content
-        local horizontalBar = self.horizontalBar
-        local verticalBar = self.verticalBar
-        local verticalBox = self.verticalBox
+        -- local content = self.content
+        -- local horizontalBar = self.horizontalBar
+        -- local verticalBar = self.verticalBar
+        -- local verticalBox = self.verticalBox
 
-        self.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
-        verticalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
+        -- self.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
+        -- verticalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
 
-        if private:round(content:GetWidth()) > private:round(verticalBox:GetWidth()) then
-            horizontalBar:Show()
-            verticalBox:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 5)
-            verticalBar:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 2)
-        else
-            horizontalBar:Hide()
-            verticalBox:SetPoint("BOTTOM", 0, 5)
-            verticalBar:SetPoint("BOTTOM", 0, 2)
-        end
+        -- self:SetUserData("scrollUpdate", true)
 
-        if private:round(content:GetHeight()) > private:round(verticalBox:GetHeight()) then
-            verticalBar:Show()
-            verticalBox:SetPoint("RIGHT", verticalBar, "LEFT", -5, 0)
-        else
-            verticalBar:Hide()
-            verticalBox:SetPoint("RIGHT", -5, 0)
-        end
+        -- if private:round(content:GetWidth()) > private:round(verticalBox:GetWidth()) then
+        --     horizontalBar:Show()
+        --     verticalBox:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 5)
+        --     verticalBar:SetPoint("BOTTOM", horizontalBar, "TOP", 0, 2)
+        -- else
+        --     horizontalBar:Hide()
+        --     verticalBox:SetPoint("BOTTOM", 0, 5)
+        --     verticalBar:SetPoint("BOTTOM", 0, 2)
+        -- end
+
+        -- if private:round(content:GetHeight()) > private:round(verticalBox:GetHeight()) then
+        --     verticalBar:Show()
+        --     verticalBox:SetPoint("RIGHT", verticalBar, "LEFT", -5, 0)
+        -- else
+        --     verticalBar:Hide()
+        --     verticalBox:SetPoint("RIGHT", -5, 0)
+        -- end
     end,
 
     SetScrollBars = function(self, template)

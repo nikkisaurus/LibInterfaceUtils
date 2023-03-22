@@ -175,7 +175,7 @@ function lib:CreateFrame()
     -- end
 
     local info = {}
-    for i = 1, 50 do
+    for i = 1, 500 do
         tinsert(info, {
             label = "Option " .. i,
             width = 150,
@@ -560,8 +560,7 @@ function lib:CreateTableWindow()
             width = fastrandom(75, 150),
         })
     end
-    tinsert(data, headerInfo)
-    for row = 1, 50 do
+    for row = 1, 500 do
         local rowInfo = {}
         for col = 1, 10 do
             tinsert(rowInfo, {
@@ -573,8 +572,9 @@ function lib:CreateTableWindow()
         tinsert(data, rowInfo)
     end
 
+    -- local tbl = lib:New("Table")
     local tbl = window:New("Table")
-    tbl:SetDataProvider(data)
+    -- tbl:InitializeDataProvider(headerInfo, data)
 
     window:DoLayoutDeferred()
 end

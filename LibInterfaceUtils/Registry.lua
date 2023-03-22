@@ -31,16 +31,26 @@ local ContainerMethods = {
         end
         tinsert(self.children, object)
         object:SetUserData("parent", self)
-        self:DoLayoutDeferred()
+        -- self:DoLayoutDeferred()
     end,
 
     DoLayoutDeferred = function(self)
+        if self:GetUserData("pauseLayout") then
+            print("NO", self.widget.type)
+            return
+        end
+
         self:SetScript("OnUpdate", function(...)
             self:DoLayout()
         end)
     end,
 
     DoLayout = function(self)
+        if self:GetUserData("pauseLayout") then
+            print("I SAID NO", self.widget.type)
+            return
+        end
+
         local w, h = self:layoutFunc()
         self:Fire("OnLayoutFinished", w, h)
         self:SetScript("OnUpdate", nil)
@@ -67,7 +77,7 @@ local ContainerMethods = {
         local object = lib:New(objectType)
         tinsert(self.children, object)
         object:SetUserData("parent", self)
-        self:DoLayoutDeferred()
+        -- self:DoLayoutDeferred()
         return object
     end,
 
@@ -86,7 +96,7 @@ local ContainerMethods = {
         for id, child in ipairs(self.children) do
             if child == object then
                 tremove(self.children, id)
-                self:DoLayoutDeferred()
+                -- self:DoLayoutDeferred()
                 return
             end
         end
@@ -98,7 +108,7 @@ local ContainerMethods = {
 
     ResumeLayout = function(self)
         self:SetUserData("pauseLayout")
-        self:DoLayoutDeferred()
+        -- self:DoLayoutDeferred()
     end,
 
     SetLayoutPoint = function(self, point)
@@ -325,6 +335,7 @@ function private:InitializeScripts(self)
     for script, handler in pairs(widget.scripts) do
         if self:HasScript(script) then
             self:SetScript(script, function(...)
+                -- print(widget.type, script)
                 if self:GetUserData("isDisabled") and script ~= "OnHide" and script ~= "OnShow" and script ~= "OnSizeChanged" then
                     return
                 end
