@@ -22,20 +22,66 @@ local function Resetter(_, self)
     self:Hide()
 end
 
+local ContainerMixin = {}
+
+function ContainerMixin:InitContainer()
+    self.layout = "flow"
+    self.padding = {
+        left = 5,
+        right = 5,
+        top = 5,
+        bottom = 5,
+    }
+end
+
+function private:MixinContainer(object)
+    object = Mixin(object, ContainerMixin)
+    object:InitContainer()
+    return object
+end
+
+local UserDataMixin = {}
+
+function UserDataMixin:InitUserData()
+    self.userdata = {}
+end
+
+function UserDataMixin:Get(key)
+    return self.userdata[key]
+end
+
+function UserDataMixin:Set(key, value)
+    self.userdata[key] = value
+    return self.userdata[key]
+end
+
+function private:MixinUserData(object)
+    object = Mixin(object, UserDataMixin)
+    object:InitUserData()
+    return object
+end
+
+function private:Mixin(object, ...)
+    for _, method in ipairs({ ... }) do
+        object = private["Mixin" .. method](private, object)
+    end
+    return object
+end
+
 local children = {}
 local ContainerMethods = {
     AddChild = function(self, object)
-        local parent = object:GetUserData("parent")
+        local parent = object:Get("parent")
         if parent then
             parent:RemoveChild(object)
         end
         tinsert(self.children, object)
-        object:SetUserData("parent", self)
+        object:Set("parent", self)
         -- self:DoLayoutDeferred()
     end,
 
     DoLayoutDeferred = function(self)
-        if self:GetUserData("pauseLayout") then
+        if self:Get("pauseLayout") then
             print("NO", self.widget.type)
             return
         end
@@ -46,7 +92,7 @@ local ContainerMethods = {
     end,
 
     DoLayout = function(self)
-        if self:GetUserData("pauseLayout") then
+        if self:Get("pauseLayout") then
             print("I SAID NO", self.widget.type)
             return
         end
@@ -76,7 +122,7 @@ local ContainerMethods = {
     New = function(self, objectType)
         local object = lib:New(objectType)
         tinsert(self.children, object)
-        object:SetUserData("parent", self)
+        object:Set("parent", self)
         -- self:DoLayoutDeferred()
         return object
     end,
@@ -103,16 +149,16 @@ local ContainerMethods = {
     end,
 
     PauseLayout = function(self)
-        self:SetUserData("pauseLayout", true)
+        self:Set("pauseLayout", true)
     end,
 
     ResumeLayout = function(self)
-        self:SetUserData("pauseLayout")
+        self:Set("pauseLayout")
         -- self:DoLayoutDeferred()
     end,
 
     SetLayoutPoint = function(self, point)
-        self:SetUserData("point", point)
+        self:Set("point", point)
     end,
 
     SetLayout = function(self, layout, customFunc)
@@ -126,21 +172,21 @@ local ContainerMethods = {
     end,
 
     SetSpacing = function(self, spacingH, spacingV)
-        self:SetUserData("spacingH", spacingH)
-        self:SetUserData("spacingV", spacingV)
+        self:Set("spacingH", spacingH)
+        self:Set("spacingV", spacingV)
     end,
 }
 
 local ObjectMethods = {
     CancelUpdater = function(self)
-        local ticker = self:GetUserData("ticker")
+        local ticker = self:Get("ticker")
         if ticker then
             ticker:Cancel()
         end
     end,
 
     Fire = function(self, script, ...)
-        if self:GetUserData("isDisabled") then
+        if self:Get("isDisabled") then
             return
         end
 
@@ -159,45 +205,41 @@ local ObjectMethods = {
     end,
 
     GetFillWidth = function(self)
-        return self:GetUserData("fillWidth")
+        return self:Get("fillWidth")
     end,
 
     GetFullHeight = function(self)
-        return self:GetUserData("fullHeight")
+        return self:Get("fullHeight")
     end,
 
     GetFullWidth = function(self)
-        return self:GetUserData("fullWidth")
+        return self:Get("fullWidth")
     end,
 
     GetRelativeHeight = function(self)
-        return self:GetUserData("relHeight")
+        return self:Get("relHeight")
     end,
 
     GetRelativeWidth = function(self)
-        return self:GetUserData("relWidth")
-    end,
-
-    GetUserData = function(self, key)
-        return self.widget.userdata[key]
+        return self:Get("relWidth")
     end,
 
     HideTooltip = function(self)
-        local truncated = self:GetUserData("showTruncatedText")
-        local tooltipInitializer = self:GetUserData("tooltipInitializer")
+        local truncated = self:Get("showTruncatedText")
+        local tooltipInitializer = self:Get("tooltipInitializer")
         if (not truncated or not self:IsTruncated()) and not tooltipInitializer then
             return
         end
 
-        local info = self:GetUserData("tooltip")
+        local info = self:Get("tooltip")
         local tooltip = info and info.tooltip or GameTooltip
         tooltip:ClearLines()
         tooltip:Hide()
     end,
 
     InitUserData = function(self, key, value)
-        if not self:GetUserData(key) then
-            self:SetUserData(key, value)
+        if not self:Get(key) then
+            self:Set(key, value)
         end
     end,
 
@@ -208,7 +250,7 @@ local ObjectMethods = {
             self:ReleaseChildren()
         end
 
-        local parent = self:GetUserData("parent")
+        local parent = self:Get("parent")
         if parent then
             parent:RemoveChild(self)
         end
@@ -223,10 +265,10 @@ local ObjectMethods = {
     end,
 
     ScheduleUpdater = function(self, callback, seconds, iterations)
-        local ticker = self:GetUserData("ticker")
+        local ticker = self:Get("ticker")
         if ticker then
             ticker:Cancel()
-            self:SetUserData("ticker")
+            self:Set("ticker")
         end
 
         if callback then
@@ -235,7 +277,7 @@ local ObjectMethods = {
             local ticker = C_Timer.NewTicker(seconds or 1, function()
                 callback(self)
             end, iterations)
-            self:SetUserData("ticker", ticker)
+            self:Set("ticker", ticker)
         end
     end,
 
@@ -250,49 +292,45 @@ local ObjectMethods = {
     end,
 
     SetFillWidth = function(self, fillWidth)
-        self:SetUserData("fillWidth", fillWidth)
+        self:Set("fillWidth", fillWidth)
     end,
 
     SetFullHeight = function(self, isFullHeight)
-        self:SetUserData("fullHeight", isFullHeight)
+        self:Set("fullHeight", isFullHeight)
     end,
 
     SetFullWidth = function(self, isFullWidth)
-        self:SetUserData("fullWidth", isFullWidth)
+        self:Set("fullWidth", isFullWidth)
     end,
 
     SetRelativeHeight = function(self, relHeight)
-        self:SetUserData("relHeight", relHeight)
+        self:Set("relHeight", relHeight)
     end,
 
     SetRelativeWidth = function(self, relWidth)
-        self:SetUserData("relWidth", relWidth)
+        self:Set("relWidth", relWidth)
     end,
 
     SetOffsets = function(self, xOffset, yOffset, xFill, yFill)
-        self:SetUserData("xOffset", xOffset)
-        self:SetUserData("yOffset", yOffset)
-        self:SetUserData("xFill", xFill)
-        self:SetUserData("yFill", yFill)
+        self:Set("xOffset", xOffset)
+        self:Set("yOffset", yOffset)
+        self:Set("xFill", xFill)
+        self:Set("yFill", yFill)
     end,
 
     SetTooltip = function(self, initializer, tooltip)
-        self:SetUserData("tooltip", tooltip)
-        self:SetUserData("tooltipInitializer", initializer)
-    end,
-
-    SetUserData = function(self, key, value)
-        self.widget.userdata[key] = value
+        self:Set("tooltip", tooltip)
+        self:Set("tooltipInitializer", initializer)
     end,
 
     ShowTooltip = function(self)
-        local truncated = self:GetUserData("showTruncatedText")
-        local tooltipInitializer = self:GetUserData("tooltipInitializer")
+        local truncated = self:Get("showTruncatedText")
+        local tooltipInitializer = self:Get("tooltipInitializer")
         if (not truncated or not self:IsTruncated()) and not tooltipInitializer then
             return
         end
 
-        local info = self:GetUserData("tooltip")
+        local info = self:Get("tooltip")
         local tooltip = info and info.tooltip or GameTooltip
         local anchor = info and info.anchor or "ANCHOR_RIGHT"
         local x = info and info.x or 0
@@ -336,7 +374,7 @@ function private:InitializeScripts(self)
         if self:HasScript(script) then
             self:SetScript(script, function(...)
                 -- print(widget.type, script)
-                if self:GetUserData("isDisabled") and script ~= "OnHide" and script ~= "OnShow" and script ~= "OnSizeChanged" then
+                if self:Get("isDisabled") and script ~= "OnHide" and script ~= "OnShow" and script ~= "OnSizeChanged" then
                     return
                 end
 

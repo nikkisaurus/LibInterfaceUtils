@@ -85,7 +85,7 @@ local methods = {
         private:SetFont(self.label, template.label)
         private:SetBackdrop(self.container, template.content)
 
-        self:SetUserData("template", template)
+        self:Set("template", template)
     end,
 
     HasLabel = function(self)
@@ -93,7 +93,7 @@ local methods = {
     end,
 
     MarkDirty = function(self, usedWidth, usedHeight)
-        self:SetHeight(usedHeight + (self:HasLabel() and (self.label:GetHeight() + 5) or 0) + (self:GetUserData("top")) + (self:GetUserData("bottom")))
+        self:SetHeight(usedHeight + (self:HasLabel() and (self.label:GetHeight() + 5) or 0) + (self:Get("top")) + (self:Get("bottom")))
     end,
 
     SetLabel = function(self, text)
@@ -109,10 +109,10 @@ local methods = {
     end,
 
     SetPadding = function(self, left, right, top, bottom)
-        self:SetUserData("left", left or 5)
-        self:SetUserData("right", right or 5)
-        self:SetUserData("top", top or 5)
-        self:SetUserData("bottom", bottom or 5)
+        self:Set("left", left or 5)
+        self:Set("right", right or 5)
+        self:Set("top", top or 5)
+        self:Set("bottom", bottom or 5)
         self.content:SetPoint("TOPLEFT", left or 5, -(top or 5))
         self.content:SetPoint("BOTTOMRIGHT", -(right or 5), -(bottom or 5))
     end,

@@ -50,6 +50,47 @@ private.layouts = {
         return self:GetWidth(), usedHeight
     end,
 
+    -- flow = function(self)
+    --     local width = 0
+    --     local height = 0
+    --     local offset = 0
+
+    --     local layoutFunction = function(index, frame, offset, scrollTarget)
+    --         -- local indent = self:GetElementIndent(frame)
+    --         -- local setPoint = self:IsHorizontal() and ScrollBoxViewUtil.SetHorizontalPoint or ScrollBoxViewUtil.SetVerticalPoint
+    --         -- return setPoint(frame, offset, indent, scrollTarget)
+    --     end
+
+    --     local scrollTarget = self.verticalBox:GetScrollTarget()
+    --     local offset = self.verticalBox:GetDerivedScrollOffset()
+
+    --     for index, frame in ipairs(self.children) do
+    --         if height < self.verticalBox:GetHeight() or (height > offset and height < (self.verticalBox:GetHeight() + offset)) then
+    --             frame:SetParent(scrollTarget)
+    --             frame:ClearAllPoints()
+    --             frame:SetPoint("TOPLEFT", scrollTarget, "TOPLEFT", 0, -height)
+    --             frame:SetPoint("TOPRIGHT", scrollTarget, "TOPRIGHT", 0, -height)
+    --         end
+    --         height = height + frame:GetHeight()
+
+    --         -- if frameLevelCounter then
+    --         --     frame:SetFrameLevel(frameLevelCounter())
+    --         -- end
+    --     end
+    --     -- self.horizontalBox:SetHeight(height)
+    --     -- for _, child in ipairs(self.children) do
+    --     --     child:SetParent(self.content)
+    --     --     child:ClearAllPoints()
+    --     --     child:SetHeight(20)
+    --     --     child:SetPoint("TOPLEFT", 0, -height)
+    --     --     width = max(width, child:GetWidth())
+    --     --     print(child:GetHeight())
+    --     --     height = height + child:GetHeight()
+    --     -- end
+
+    --     self:MarkDirty(width, height)
+    -- end,
+
     flow = function(self)
         local usedWidth = 0
         local usedHeight = 0
@@ -60,14 +101,14 @@ private.layouts = {
         local availableWidth = self:GetAvailableWidth()
         local availableHeight = self:GetAvailableHeight()
 
-        local point = self:GetUserData("point") or "TOPLEFT"
+        local point = self:Get("point") or "TOPLEFT"
         local points = private.points[point]
-        local spacingH = self:GetUserData("spacingH") or 0
-        local spacingV = self:GetUserData("spacingV") or 0
+        local spacingH = self:Get("spacingH") or 0
+        local spacingV = self:Get("spacingV") or 0
 
         for i, child in ipairs(self.children) do
-            local xOffset = child:GetUserData("xOffset") or 0
-            local yOffset = child:GetUserData("yOffset") or 0
+            local xOffset = child:Get("xOffset") or 0
+            local yOffset = child:Get("yOffset") or 0
             local isFullWidth = child:GetFullWidth() or child.widget.type == "Divider" or child.widget.type == "Header"
             local fillWidth = child:GetFillWidth()
             local isFullHeight = child:GetFullHeight()
@@ -77,12 +118,12 @@ private.layouts = {
             self:ParentChild(child)
             child:ClearAllPoints()
 
-            if child:GetUserData("width") then
-                child:SetWidth(child:GetUserData("width"))
+            if child:Get("width") then
+                child:SetWidth(child:Get("width"))
             end
 
-            if child:GetUserData("height") then
-                child:SetHeight(child:GetUserData("height"))
+            if child:Get("height") then
+                child:SetHeight(child:Get("height"))
             end
 
             local childWidth = private:round(child:GetWidth())
@@ -178,7 +219,7 @@ private.layouts = {
 
         usedHeight = usedHeight + rowHeight
 
-        if self:GetUserData("collapsed") then
+        if self:Get("collapsed") then
             self:MarkDirty(usedWidth, 0)
             return usedWidth, 0
         else
@@ -197,11 +238,11 @@ private.layouts = {
         local availableWidth = self:GetAvailableWidth()
         local availableHeight = self:GetAvailableHeight()
 
-        local spacingV = self:GetUserData("spacingV") or 0
+        local spacingV = self:Get("spacingV") or 0
 
         for id, child in ipairs(self.children) do
-            local xOffset = child:GetUserData("xOffset") or 0
-            local yOffset = child:GetUserData("yOffset") or 0
+            local xOffset = child:Get("xOffset") or 0
+            local yOffset = child:Get("yOffset") or 0
             local isFullWidth = child:GetFullWidth() or child.widget.type == "Divider" or child.widget.type == "Header"
             local fillWidth = child:GetFillWidth()
             local isFullHeight = child:GetFullHeight()
@@ -211,12 +252,12 @@ private.layouts = {
             self:ParentChild(child)
             child:ClearAllPoints()
 
-            if child:GetUserData("width") then
-                child:SetWidth(child:GetUserData("width"))
+            if child:Get("width") then
+                child:SetWidth(child:Get("width"))
             end
 
-            if child:GetUserData("height") then
-                child:SetHeight(child:GetUserData("height"))
+            if child:Get("height") then
+                child:SetHeight(child:Get("height"))
             end
 
             local childWidth = private:round(child:GetWidth())
@@ -298,7 +339,7 @@ private.layouts = {
 
         usedHeight = usedHeight + rowHeight
 
-        if self:GetUserData("collapsed") then
+        if self:Get("collapsed") then
             self:MarkDirty(usedWidth, 0)
             return usedWidth, 0
         else
@@ -311,10 +352,10 @@ private.layouts = {
         local w = 0
         local h = 0
 
-        local spacingH = self:GetUserData("spacingH") or 0
+        local spacingH = self:Get("spacingH") or 0
 
         for i, child in ipairs(self.children) do
-            local xOffset = child:GetUserData("xOffset") or 0
+            local xOffset = child:Get("xOffset") or 0
             self:ParentChild(child)
             child:ClearAllPoints()
 

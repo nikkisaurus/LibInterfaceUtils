@@ -87,12 +87,12 @@ local styles = {
 
 local scripts = {
     OnClick = function(self)
-        local info = self:GetUserData("info")
+        local info = self:Get("info")
 
         if self:IsDisabled() or not info then
             return
-        elseif self:GetUserData("closeMenu") then
-            self:SetUserData("closeMenu")
+        elseif self:Get("closeMenu") then
+            self:Set("closeMenu")
             return
         end
 
@@ -102,7 +102,7 @@ local scripts = {
         self.menu:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT")
         self.menu:SetHeight(200)
         self.menu:ApplyTemplate({ frame = { bgColor = private.assets.colors.elvBackdrop } }, "bordered")
-        self.menu:SetUserData("dropdown", self)
+        self.menu:Set("dropdown", self)
         tinsert(menus, self.menu)
         private:CloseMenus(self.menu)
 
@@ -124,7 +124,7 @@ local scripts = {
 
                 -- If cursor is inside of button:
                 if cx > 0 and cx < 1 and cy > 0 and cy < 1 then
-                    self:SetUserData("closeMenu", true)
+                    self:Set("closeMenu", true)
                 end
 
                 menu:UnregisterAllEvents()
@@ -156,17 +156,17 @@ local methods = {
         local highlight = CreateFromMixins(defaults.highlight, template and template.highlight or {})
         local disabled = CreateFromMixins(defaults.disabled, template and template.disabled or {})
 
-        self:SetUserData("normal", normal)
-        self:SetUserData("highlight", highlight)
-        self:SetUserData("disabled", disabled)
+        self:Set("normal", normal)
+        self:Set("highlight", highlight)
+        self:Set("disabled", disabled)
         self:SetState(self:IsDisabled() and "disabled" or "normal")
     end,
 
     ClearSelected = function(self)
-        if self:GetUserData("style").multiSelect then
-            wipe(self:GetUserData("selected"))
+        if self:Get("style").multiSelect then
+            wipe(self:Get("selected"))
         else
-            self:SetUserData("selected")
+            self:Set("selected")
         end
     end,
 
@@ -175,7 +175,7 @@ local methods = {
             return
         end
 
-        local style = self:GetUserData("style")
+        local style = self:Get("style")
         local callbacks = elementData.callbacks
         local localizations = elementData.localizations
         local disabled = private:ParseValue(elementData.disabled)
@@ -195,14 +195,14 @@ local methods = {
         if elementData.type == "search" then
             local search = group:New("SearchBox")
             search:SetFullWidth(true)
-            search:SetText(self:GetUserData("searchText") or "")
+            search:SetText(self:Get("searchText") or "")
             if focusSearch then
                 search:SetFocus()
             end
 
             search:SetCallback("OnEnterPressed", function()
                 local text = search:GetText()
-                self:SetUserData("searchText", text)
+                self:Set("searchText", text)
                 self:FilterInfo()
                 self:SetDataProvider(self.menu:GetVerticalScroll())
                 if callbacks and callbacks.OnSearch then
@@ -213,7 +213,7 @@ local methods = {
             search:SetCallback("OnTextChanged", function(_, userInput)
                 if userInput then
                     local text = search:GetText()
-                    self:SetUserData("searchText", text)
+                    self:Set("searchText", text)
                     self:FilterInfo()
                     self:SetDataProvider(self.menu:GetVerticalScroll(), true)
                     if callbacks and callbacks.OnSearchChanged then
@@ -223,7 +223,7 @@ local methods = {
             end)
 
             search:SetCallback("OnEditCleared", function()
-                self:SetUserData("searchText")
+                self:Set("searchText")
                 self:FilterInfo()
                 self:SetDataProvider(self.menu:GetVerticalScroll())
                 if callbacks and callbacks.OnSearchCleared then
@@ -380,9 +380,9 @@ local methods = {
     end,
 
     FilterInfo = function(self)
-        local info = self:GetUserData("info")
-        local selected = self:GetUserData("selected")
-        local searchText = self:GetUserData("searchText")
+        local info = self:Get("info")
+        local selected = self:Get("selected")
+        local searchText = self:Get("searchText")
 
         for i, listButton in ipairs(info) do
             info[i].filter = searchText and not strfind(listButton.text:lower(), searchText:lower())
@@ -390,7 +390,7 @@ local methods = {
     end,
 
     GetSelected = function(self)
-        local selected = self:GetUserData("selected")
+        local selected = self:Get("selected")
         if type(selected) == "table" then
             return unpack(selected)
         else
@@ -399,11 +399,11 @@ local methods = {
     end,
 
     IsDisabled = function(self)
-        return self:GetUserData("isDisabled")
+        return self:Get("isDisabled")
     end,
 
     IsValueSelected = function(self, value)
-        local selected = self:GetUserData("selected")
+        local selected = self:Get("selected")
         if type(selected) == "table" then
             return tContains(selected, value)
         else
@@ -414,7 +414,7 @@ local methods = {
     Select = function(self, value)
         self:SetSelected(value, true)
 
-        local info = self:GetUserData("info")
+        local info = self:Get("info")
         if not info then
             return
         end
@@ -430,8 +430,8 @@ local methods = {
     end,
 
     SelectAll = function(self)
-        local info = self:GetUserData("info")
-        local selected = self:GetUserData("selected")
+        local info = self:Get("info")
+        local selected = self:Get("selected")
 
         for i, listButton in ipairs(info) do
             if not listButton.isTitle and not private:ParseValue(listButton.disabled) then
@@ -449,10 +449,10 @@ local methods = {
             return
         end
 
-        local style = self:GetUserData("style")
-        local info = self:GetUserData("info")
-        local callbacks = self:GetUserData("callbacks")
-        local localizations = self:GetUserData("localizations")
+        local style = self:Get("style")
+        local info = self:Get("info")
+        local callbacks = self:Get("callbacks")
+        local localizations = self:Get("localizations")
 
         self.menu:Initialize(function(index, elementData)
             if elementData.type == "search" or elementData.type == "extra" then
@@ -486,12 +486,12 @@ local methods = {
     end,
 
     SetDefaultText = function(self, text)
-        self:SetUserData("defaultText", text)
+        self:Set("defaultText", text)
         self:SetText(text)
     end,
 
     SetDisabled = function(self, isDisabled)
-        self:SetUserData("isDisabled", isDisabled)
+        self:Set("isDisabled", isDisabled)
         if isDisabled then
             self:Disable()
             self:SetState("disabled")
@@ -503,27 +503,27 @@ local methods = {
 
     SetInitializer = function(self, info, callbacks, localizations)
         self:SetDisabled(not info or #info == 0)
-        self:SetUserData("info", info)
-        self:SetUserData("callbacks", callbacks)
-        self:SetUserData("localizations", localizations)
+        self:Set("info", info)
+        self:Set("callbacks", callbacks)
+        self:Set("localizations", localizations)
     end,
 
     SetSelected = function(self, value, isSelected)
-        if self:GetUserData("style").multiSelect then
-            local selected = self:GetUserData("selected")
+        if self:Get("style").multiSelect then
+            local selected = self:Get("selected")
             if isSelected then
                 tInsertUnique(selected, value)
             else
                 tDeleteItem(selected, value)
             end
         else
-            self:SetUserData("selected", value)
+            self:Set("selected", value)
         end
     end,
 
     SetSelectedText = function(self)
-        local info = self:GetUserData("info")
-        local selected = self:GetUserData("selected")
+        local info = self:Get("info")
+        local selected = self:Get("selected")
 
         local str
         if type(selected) == "table" then
@@ -543,14 +543,14 @@ local methods = {
         end
 
         if not private:strcheck(str) then
-            str = self:GetUserData("defaultText")
+            str = self:Get("defaultText")
         end
 
         self:SetText(str)
     end,
 
     SetState = function(self, state)
-        local template = self:GetUserData(state)
+        local template = self:Get(state)
         private:SetBackdrop(self, template)
         private:SetFont(self.text, template)
     end,
@@ -564,8 +564,8 @@ local methods = {
             style = styles[styleName or "default"] or styles.default
         end
 
-        self:SetUserData("style", style)
-        self:SetUserData("selected", style.multiSelect and {})
+        self:Set("style", style)
+        self:Set("selected", style.multiSelect and {})
     end,
 
     SetText = function(self, text)
@@ -602,7 +602,7 @@ private:RegisterWidgetPool(objectType, creationFunc)
 function private:CloseMenu(closeMenu)
     for id, menu in ipairs(menus) do
         if menu == closeMenu then
-            local dropdown = menu:GetUserData("dropdown")
+            local dropdown = menu:Get("dropdown")
             if dropdown then
                 dropdown.menu = nil
             end
@@ -616,7 +616,7 @@ end
 function private:CloseMenus(ignoredMenu)
     for id, menu in ipairs_reverse(menus) do
         if menu ~= ignoredMenu then
-            local dropdown = menu:GetUserData("dropdown")
+            local dropdown = menu:Get("dropdown")
             if dropdown then
                 dropdown.menu = nil
             end

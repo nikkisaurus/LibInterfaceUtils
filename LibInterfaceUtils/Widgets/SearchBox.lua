@@ -93,7 +93,7 @@ local childScripts = {
 
         OnEnter = function(self)
             local frame = self.widget.object
-            local button = frame:GetUserData("button")
+            local button = frame:Get("button")
             if button then
                 self:GetNormalTexture():SetVertexColor(button.highlightColor:GetRGBA())
             end
@@ -101,7 +101,7 @@ local childScripts = {
 
         OnLeave = function(self)
             local frame = self.widget.object
-            local button = frame:GetUserData("button")
+            local button = frame:Get("button")
             if button then
                 self:GetNormalTexture():SetVertexColor(button.color:GetRGBA())
             end
@@ -140,7 +140,7 @@ local methods = {
         private:SetFont(self.editbox, editbox)
         private:SetBackdrop(self.editbox, editbox)
         self.button:GetNormalTexture():SetVertexColor(button.color:GetRGBA())
-        self:SetUserData("button", button)
+        self:Set("button", button)
     end,
 
     HasLabel = function(self)

@@ -82,13 +82,13 @@ local childScripts = {
         OnMouseDown = function(self)
             local frame = self.frame
             frame.tree:StartSizing("RIGHT")
-            frame:SetUserData("isSizing", true)
+            frame:Set("isSizing", true)
         end,
 
         OnMouseUp = function(self)
             local frame = self.frame
             frame.tree:StopMovingOrSizing()
-            frame:SetUserData("isSizing")
+            frame:Set("isSizing")
             frame:SetAnchors()
         end,
     },
@@ -112,7 +112,7 @@ local scripts = {
 local methods = {
     OnAcquire = function(self)
         self:ScheduleUpdater(function(self)
-            if self:GetUserData("isSizing") then
+            if self:Get("isSizing") then
                 self:SetAnchors()
             end
         end, 0.01)
@@ -142,7 +142,7 @@ local methods = {
         private:SetBackdrop(self, template.frame)
         self.resizer:ApplyTemplate(template.resizer)
 
-        self:SetUserData("template", template)
+        self:Set("template", template)
         self:SetAnchors()
     end,
 
@@ -182,13 +182,13 @@ local methods = {
 
     Select = function(self, nodeValue, childValue)
         TableUtil.ExecuteUntil(self.tree.children, function(node)
-            local nodeInfo = node:GetUserData("info")
+            local nodeInfo = node:Get("info")
             if nodeInfo.value == nodeValue and not private:ParseValue(nodeInfo.disabled) then
                 node:Collapse()
 
                 if childValue then
                     local childKey, container = FindInTableIf(node.children, function(child)
-                        local childInfo = child:GetUserData("info")
+                        local childInfo = child:Get("info")
                         if childInfo and childInfo.value == childValue and not private:ParseValue(childInfo.disabled) then
                             return true
                         end
@@ -232,7 +232,7 @@ local methods = {
     end,
 
     SetSelected = function(self, selectedNode, selectedChild)
-        local template = self:GetUserData("template")
+        local template = self:Get("template")
 
         for _, node in ipairs(self.tree.children) do
             if not node:IsDisabled() then
@@ -248,10 +248,10 @@ local methods = {
                     if not child:IsDisabled() then
                         if child == selectedChild then
                             container:ApplyTemplate(template.selectedChild)
-                            container:SetUserData("selected", true)
+                            container:Set("selected", true)
                         else
                             container:ApplyTemplate(template.child)
-                            container:SetUserData("selected")
+                            container:Set("selected")
                         end
                     end
                 end
@@ -266,7 +266,7 @@ local methods = {
             return
         end
 
-        local template = self:GetUserData("template")
+        local template = self:Get("template")
 
         for _, treeInfo in ipairs(tree) do
             local node = self.tree:New("CollapsibleGroup")
@@ -278,7 +278,7 @@ local methods = {
             node:SetIcon(treeInfo.icon, 14, 14)
             node:SetLabel(treeInfo.text)
             node:Collapse(true)
-            node:SetUserData("info", treeInfo)
+            node:Set("info", treeInfo)
 
             local disabledNode = treeInfo.disabled
             if type(disabledNode) == "boolean" then
@@ -292,7 +292,7 @@ local methods = {
                     local container = node:New("Group")
                     container:SetFullWidth(true)
                     container:SetPadding(2, 2, 2, 2)
-                    container:SetUserData("info", childInfo)
+                    container:Set("info", childInfo)
 
                     local child = container:New("Label")
                     child:SetFillWidth(true)
@@ -322,7 +322,7 @@ local methods = {
                     end)
 
                     container:SetCallback("OnLeave", function()
-                        container:ApplyTemplate(template[container:GetUserData("selected") and "selectedChild" or "child"])
+                        container:ApplyTemplate(template[container:Get("selected") and "selectedChild" or "child"])
                     end)
 
                     child:SetCallback("OnMouseDown", function()

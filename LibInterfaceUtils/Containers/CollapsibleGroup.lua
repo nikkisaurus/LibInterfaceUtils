@@ -50,7 +50,7 @@ local childScripts = {
         OnClick = function(self)
             local widget = self.widget
             local frame = widget.object
-            frame:Collapse(not frame:GetUserData("collapsed"))
+            frame:Collapse(not frame:Get("collapsed"))
 
             if widget.callbacks.OnCollapse then
                 widget.callbacks.OnCollapse(widget.object)
@@ -59,7 +59,7 @@ local childScripts = {
 
         OnEnter = function(self)
             local frame = self.widget.object
-            local label = frame:GetUserData("label")
+            local label = frame:Get("label")
             if label.highlightColor then
                 frame.label:SetTextColor(label.highlightColor:GetRGBA())
             end
@@ -67,7 +67,7 @@ local childScripts = {
 
         OnLeave = function(self)
             local frame = self.widget.object
-            local label = frame:GetUserData("label")
+            local label = frame:Get("label")
             if label.highlightColor then
                 frame.label:SetTextColor(label.color:GetRGBA())
             end
@@ -98,11 +98,11 @@ local methods = {
         private:SetFont(self.label, label)
         private:SetBackdrop(self.container, content)
 
-        self:SetUserData("label", CopyTable(label))
+        self:Set("label", CopyTable(label))
     end,
 
     Collapse = function(self, collapsed)
-        self:SetUserData("collapsed", collapsed)
+        self:Set("collapsed", collapsed)
 
         if collapsed then
             self.container:Hide()
@@ -112,15 +112,15 @@ local methods = {
             self.container:Show()
         end
 
-        local parent = self:GetUserData("parent")
+        local parent = self:Get("parent")
         while parent do
             parent:DoLayoutDeferred()
-            parent = parent:GetUserData("parent")
+            parent = parent:Get("parent")
         end
     end,
 
     EnableIndicator = function(self, isEnabled)
-        self:SetUserData("enableIndicator", isEnabled)
+        self:Set("enableIndicator", isEnabled)
 
         if isEnabled then
             self.indicator:Show()
@@ -132,12 +132,12 @@ local methods = {
     end,
 
     IsDisabled = function(self)
-        return self:GetUserData("isDisabled")
+        return self:Get("isDisabled")
     end,
 
     MarkDirty = function(self, usedWidth, usedHeight)
-        if not self:GetUserData("collapsed") then
-            usedHeight = usedHeight + self:GetUserData("top") + self:GetUserData("bottom")
+        if not self:Get("collapsed") then
+            usedHeight = usedHeight + self:Get("top") + self:Get("bottom")
         end
 
         self.container:SetHeight(usedHeight)
@@ -153,9 +153,9 @@ local methods = {
     end,
 
     SetDisabled = function(self, isDisabled)
-        self:SetUserData("isDisabled", isDisabled)
+        self:Set("isDisabled", isDisabled)
 
-        local label = self:GetUserData("label")
+        local label = self:Get("label")
         if isDisabled then
             self.label:SetTextColor(label.disabledColor:GetRGBA())
             self.indicator:SetVertexColor(label.disabledColor:GetRGBA())
@@ -185,10 +185,10 @@ local methods = {
     end,
 
     SetPadding = function(self, left, right, top, bottom)
-        self:SetUserData("left", left or 5)
-        self:SetUserData("right", right or 5)
-        self:SetUserData("top", top or 5)
-        self:SetUserData("bottom", bottom or 5)
+        self:Set("left", left or 5)
+        self:Set("right", right or 5)
+        self:Set("top", top or 5)
+        self:Set("bottom", bottom or 5)
         self.content:SetPoint("TOPLEFT", left or 5, -(top or 5))
         self.content:SetPoint("BOTTOMRIGHT", -(right or 5), (bottom or 5))
     end,

@@ -41,13 +41,13 @@ local scripts = {
     end,
     OnMouseDown = function(self)
         if not self:IsDisabled() then
-            local x, y = unpack(self:GetUserData("offset") or { 1, -1 })
+            local x, y = unpack(self:Get("offset") or { 1, -1 })
             self.text:AdjustPointsOffset(x, y)
         end
     end,
     OnMouseUp = function(self)
         if not self:IsDisabled() then
-            local x, y = unpack(self:GetUserData("offset") or { 1, -1 })
+            local x, y = unpack(self:Get("offset") or { 1, -1 })
             self.text:AdjustPointsOffset(-x, -y)
         end
     end,
@@ -71,18 +71,18 @@ local methods = {
         local highlight = CreateFromMixins(defaults.highlight, template and template.highlight or {})
         local disabled = CreateFromMixins(defaults.disabled, template and template.disabled or {})
 
-        self:SetUserData("normal", normal)
-        self:SetUserData("highlight", highlight)
-        self:SetUserData("disabled", disabled)
+        self:Set("normal", normal)
+        self:Set("highlight", highlight)
+        self:Set("disabled", disabled)
         self:SetState(self:IsDisabled() and "disabled" or "normal")
     end,
 
     IsAutoWidth = function(self)
-        return self:GetUserData("autoWidth")
+        return self:Get("autoWidth")
     end,
 
     IsDisabled = function(self)
-        return self:GetUserData("isDisabled")
+        return self:Get("isDisabled")
     end,
 
     IsTruncated = function(self)
@@ -94,14 +94,14 @@ local methods = {
     end,
 
     SetAutoWidth = function(self, isAutoWidth)
-        self:SetUserData("autoWidth", isAutoWidth)
+        self:Set("autoWidth", isAutoWidth)
         if isAutoWidth then
             self:SetWidth(self.text:GetStringWidth() + 20)
         end
     end,
 
     SetDisabled = function(self, isDisabled)
-        self:SetUserData("isDisabled", isDisabled)
+        self:Set("isDisabled", isDisabled)
         if isDisabled then
             self:Disable()
             self:SetState("disabled")
@@ -117,11 +117,11 @@ local methods = {
     end,
 
     SetPushedTextOffsets = function(self, x, y)
-        self:SetUserData("offset", { x or 1, y or -1 })
+        self:Set("offset", { x or 1, y or -1 })
     end,
 
     SetState = function(self, state)
-        local template = self:GetUserData(state)
+        local template = self:Get(state)
         private:SetBackdrop(self, template)
         private:SetFont(self.text, template)
     end,
@@ -134,7 +134,7 @@ local methods = {
     end,
 
     ShowTruncatedText = function(self, show)
-        self:SetUserData("showTruncatedText", show)
+        self:Set("showTruncatedText", show)
     end,
 }
 

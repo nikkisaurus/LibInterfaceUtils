@@ -82,7 +82,7 @@ local methods = {
 
         self.content:ApplyTemplate(template)
 
-        self:SetUserData("template", template)
+        self:Set("template", template)
     end,
 
     DoLayout = function(self, ...)
@@ -106,7 +106,7 @@ local methods = {
     end,
 
     InitializeContent = function(self, callback)
-        self:SetUserData("defaultContent", callback)
+        self:Set("defaultContent", callback)
         self:ResetContent()
     end,
 
@@ -131,7 +131,7 @@ local methods = {
     end,
 
     ResetContent = function(self)
-        local callback = self:GetUserData("defaultContent")
+        local callback = self:Get("defaultContent")
         self.content:ReleaseChildren()
         if callback then
             callback(self.content)

@@ -27,11 +27,11 @@ local scripts = {
         self:StopMovingOrSizing()
     end,
     OnKeyDown = function(self, key)
-        if not self:GetUserData("frame").hideOnEscape or key ~= "ESCAPE" then
+        if not self:Get("frame").hideOnEscape or key ~= "ESCAPE" then
             self:SetPropagateKeyboardInput(true)
         else
             self:SetPropagateKeyboardInput(false)
-            local onEscape = self:GetUserData("onEscape")
+            local onEscape = self:Get("onEscape")
             if onEscape then
                 onEscape(self)
             end
@@ -57,27 +57,27 @@ local methods = {
         local frame = CreateFromMixins(defaults.frame, template and template.frame or {})
         local label = CreateFromMixins(defaults.label, template and template.label or {})
 
-        self:SetUserData("button", button)
+        self:Set("button", button)
         private:SetBackdrop(self, frame)
         private:SetFont(self.label, label)
 
-        self:SetUserData("frame", frame)
+        self:Set("frame", frame)
     end,
 
     InitializeButtons = function(self, buttons, onEscape)
         self.buttons:ReleaseChildren()
 
-        self:SetUserData("onEscape", onEscape)
+        self:Set("onEscape", onEscape)
 
         if type(buttons) ~= "table" then
             local button = self.buttons:New("Button")
             button:SetText(CLOSE)
-            button:ApplyTemplate(template)
+            button:ApplyTemplate(t)
             button:SetCallback("OnClick", function()
                 self:Release()
             end)
         else
-            local template = self:GetUserData("button")
+            local template = self:Get("button")
 
             for i = 2, 1, -1 do
                 local buttonInfo = buttons[i]
@@ -100,13 +100,13 @@ local methods = {
         self.buttons:ClearAllPoints()
         self.label:ClearAllPoints()
 
-        local left = self:GetUserData("left")
-        local right = self:GetUserData("right")
-        local top = self:GetUserData("top")
-        local bottom = self:GetUserData("bottom")
+        local left = self:Get("left")
+        local right = self:Get("right")
+        local top = self:Get("top")
+        local bottom = self:Get("bottom")
 
-        local spacingH = self:GetUserData("spacingH")
-        local spacingV = self:GetUserData("spacingV")
+        local spacingH = self:Get("spacingH")
+        local spacingV = self:Get("spacingV")
 
         self.buttons:SetPoint("BOTTOMLEFT", left, bottom)
         self.buttons:SetPoint("BOTTOMRIGHT", -right, bottom)
@@ -126,15 +126,15 @@ local methods = {
     end,
 
     SetPadding = function(self, left, right, top, bottom)
-        self:SetUserData("left", left or 20)
-        self:SetUserData("right", right or 20)
-        self:SetUserData("top", top or 20)
-        self:SetUserData("bottom", bottom or 20)
+        self:Set("left", left or 20)
+        self:Set("right", right or 20)
+        self:Set("top", top or 20)
+        self:Set("bottom", bottom or 20)
     end,
 
     SetSpacing = function(self, spacingH, spacingV)
-        self:SetUserData("spacingH", spacingH or 5)
-        self:SetUserData("spacingV", spacingV or 20)
+        self:Set("spacingH", spacingH or 5)
+        self:Set("spacingV", spacingV or 20)
     end,
 }
 

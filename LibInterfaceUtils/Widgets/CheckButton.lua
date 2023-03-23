@@ -23,7 +23,7 @@ local maps = {
 
 local scripts = {
     OnClick = function(self)
-        self:SetChecked(not self:GetUserData("checked"))
+        self:SetChecked(not self:Get("checked"))
     end,
     OnSizeChanged = function(self)
         self:SetAnchors()
@@ -45,18 +45,18 @@ local methods = {
     ApplyTemplate = function(self, template)
         local label = CreateFromMixins(defaults.label, template or {})
         private:SetFont(self.label, label)
-        self:SetUserData("label", label)
+        self:Set("label", label)
     end,
 
     GetChecked = function(self)
-        return self:GetUserData("checked")
+        return self:Get("checked")
     end,
 
     SetAnchors = function(self)
         self.checkBox:ClearAllPoints()
         self.label:ClearAllPoints()
 
-        local checkPoint = self:GetUserData("checkPoint")
+        local checkPoint = self:Get("checkPoint")
         local canWrap = self.label:CanWordWrap()
 
         self.checkBox:SetPoint(checkPoint)
@@ -81,7 +81,7 @@ local methods = {
             end
         end
 
-        if self:GetUserData("autoWidth") then
+        if self:Get("autoWidth") then
             self:SetWidth(self.label:GetStringWidth() + 30)
         end
 
@@ -91,17 +91,17 @@ local methods = {
     end,
 
     SetAutoWidth = function(self, isAutoWidth)
-        self:SetUserData("autoWidth", isAutoWidth)
+        self:Set("autoWidth", isAutoWidth)
         self:SetAnchors()
     end,
 
     SetCheckAlignment = function(self, point)
-        self:SetUserData("checkPoint", point or "TOPLEFT")
+        self:Set("checkPoint", point or "TOPLEFT")
         self:SetAnchors()
     end,
 
     SetChecked = function(self, isChecked)
-        self:SetUserData("checked", isChecked)
+        self:Set("checked", isChecked)
         if isChecked then
             self.checked:Show()
         else
@@ -110,7 +110,7 @@ local methods = {
     end,
 
     SetDisabled = function(self, isDisabled)
-        local label = self:GetUserData("label")
+        local label = self:Get("label")
         if isDisabled then
             private:SetFont(self.label, CreateFromMixins(label, { color = label.disabledColor }))
             self.checked:SetAtlas("checkmark-minimal-disabled")

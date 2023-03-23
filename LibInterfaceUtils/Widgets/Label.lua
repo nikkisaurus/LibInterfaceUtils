@@ -60,14 +60,14 @@ local methods = {
         local frame = CreateFromMixins(defaults.frame, template and template.frame or {})
         local label = CreateFromMixins(defaults.label, template and template.label or {})
 
-        private:SetBackdrop(self, frame)
+        -- private:SetBackdrop(self, frame)
         private:SetFont(self.label, label)
 
-        self:SetUserData("label", label)
+        self:Set("label", label)
     end,
 
     IsDisabled = function(self)
-        return self:GetUserData("isDisabled")
+        return self:Get("isDisabled")
     end,
 
     IsTruncated = function(self)
@@ -79,8 +79,8 @@ local methods = {
         self.icon:ClearAllPoints()
         self.label:ClearAllPoints()
 
-        local iconPoint = self:GetUserData("iconPoint")
-        local hasIcon = self:GetUserData("icon")
+        local iconPoint = self:Get("iconPoint")
+        local hasIcon = self:Get("icon")
         local canWrap = self.label:CanWordWrap()
 
         if hasIcon then
@@ -115,20 +115,20 @@ local methods = {
             end
         end
 
-        if self:GetUserData("autoWidth") then
+        if self:Get("autoWidth") then
             self:SetWidth(self.label:GetStringWidth() + 20)
         end
     end,
 
     SetAutoWidth = function(self, isAutoWidth)
-        self:SetUserData("autoWidth", isAutoWidth)
+        self:Set("autoWidth", isAutoWidth)
         self:SetAnchors()
     end,
 
     SetDisabled = function(self, isDisabled)
-        self:SetUserData("isDisabled", isDisabled)
+        self:Set("isDisabled", isDisabled)
         self:SetInteractible(not isDisabled)
-        local label = self:GetUserData("label")
+        local label = self:Get("label")
         if isDisabled then
             private:SetFont(self.label, CreateFromMixins(label, { color = label.disabledColor }))
         else
@@ -137,11 +137,11 @@ local methods = {
     end,
 
     SetIcon = function(self, icon, width, height, point)
-        self:SetUserData("icon", icon)
+        self:Set("icon", icon)
         self.icon:SetTexture(icon)
         self.icon:SetWidth(width or 20)
         self.icon:SetHeight(height or 20)
-        self:SetUserData("iconPoint", point or "TOPLEFT")
+        self:Set("iconPoint", point or "TOPLEFT")
 
         self:SetAnchors()
     end,
@@ -158,12 +158,13 @@ local methods = {
     end,
 
     ShowTruncatedText = function(self, show)
-        self:SetUserData("showTruncatedText", show)
+        self:Set("showTruncatedText", show)
     end,
 }
 
 local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
+    private:Mixin(frame, "UserData")
     frame = private:CreateTextures(frame)
 
     frame.icon = frame:CreateTexture(nil, "ARTWORK")

@@ -73,9 +73,9 @@ local maps = {
         OnTabPressed = true,
         OnTextChanged = function(self, userInput)
             local frame = self.widget.object
-            if userInput and frame:GetUserData("enableButton") then
+            if userInput and frame:Get("enableButton") then
                 frame.button:Show()
-            elseif not frame:GetUserData("enableButton") then
+            elseif not frame:Get("enableButton") then
                 frame.button:Hide()
             end
         end,
@@ -125,7 +125,7 @@ local methods = {
     end,
 
     EnableButton = function(self, isEnabled)
-        self:SetUserData("enableButton", isEnabled)
+        self:Set("enableButton", isEnabled)
         self.button:Hide()
         self.button:SetPushedTextOffsets(0, 0)
         self:SetTextInsets()
@@ -169,7 +169,7 @@ local methods = {
     end,
 
     SetTextInsets = function(self, left, right, top, bottom)
-        self.editbox:SetTextInsets(left or 6, (right or 6) + (self:GetUserData("enableButton") and self.button:GetWidth() or 0), top or 6, bottom or 6)
+        self.editbox:SetTextInsets(left or 6, (right or 6) + (self:Get("enableButton") and self.button:GetWidth() or 0), top or 6, bottom or 6)
     end,
 }
 

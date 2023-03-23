@@ -37,7 +37,7 @@ local methods = {
     end,
 
     SetAnchors = function(self)
-        local style = self:GetUserData("style") or self.label:ClearAllPoints()
+        local style = self:Get("style") or self.label:ClearAllPoints()
         self.left:ClearAllPoints()
         self.right:ClearAllPoints()
         self.bottom:ClearAllPoints()
@@ -69,7 +69,7 @@ local methods = {
     end,
 
     SetStyle = function(self, style)
-        self:SetUserData("style", style)
+        self:Set("style", style)
         self:SetAnchors()
     end,
 

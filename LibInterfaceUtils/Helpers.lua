@@ -4,6 +4,18 @@ if not lib then
     return
 end
 
+private.UIParent = _G["LiuUIParent"] or CreateFrame("Frame", "LiuUIParent", UIParent)
+private.UIParent:SetAllPoints(UIParent)
+private.UIParent:SetFrameLevel(0)
+private.UIParent:RegisterEvent("UI_SCALE_CHANGED")
+private.UIParent:SetScript("OnEvent", function(self, event)
+    local res = GetCVar("gxWindowedResolution")
+    if res then
+        local _, h = string.match(res, "(%d+)x(%d+)")
+        self:SetScale((768 / h) / self:GetScale())
+    end
+end)
+
 private.assets = {
     blankTexture = [[INTERFACE\BUTTONS\WHITE8X8]],
     colors = {
@@ -75,26 +87,154 @@ function private:CreateTextures(parent)
     parent.borders.bottom:SetPoint("BOTTOMLEFT")
     parent.borders.bottom:SetPoint("BOTTOMRIGHT")
 
-    parent.highlight = parent:CreateTexture(nil, "HIGHLIGHT")
+    parent.highlight = parent:CreateTexture(nil, "OVERLAY")
     parent.highlight:SetAllPoints(parent)
+    parent.highlight:Hide()
 
     return parent
 end
 
-function private:DrawBorders(borders, texture, color, size)
-    for id, border in pairs(borders) do
-        border:SetTexture(texture)
-        border:SetVertexColor(color:GetRGBA())
+local defaultBackdrop = {
+    bg = {
+        enabled = true,
+        atlas = false,
+        texture = private.assets.blankTexture,
+        texCoord = { 0, 1, 0, 1 },
+        color = private.assets.colors.elvTransparent,
+    },
+    borders = {
+        enabled = true,
+        left = true,
+        right = true,
+        top = true,
+        bottom = true,
+        texture = private.assets.blankTexture,
+        color = private.assets.colors.black,
+        edgeFile = false,
+        tile = true,
+        tileSize = 1,
+        edgeSize = 1,
+        insets = {
+            left = -1,
+            right = 1,
+            top = 1,
+            bottom = -1,
+        },
+    },
+}
 
-        local size = PixelUtil.GetNearestPixelSize(size, UIParent:GetEffectiveScale(), 1)
+function private:ApplyBackdrop(parent, backdrop)
+    local bg = type(backdrop) == "table" and type(backdrop.bg) == "table" and backdrop.bg
+    bg = setmetatable(bg or {}, { __index = defaultBackdrop.bg })
+    local borders = type(backdrop) == "table" and type(backdrop.borders) == "table" and backdrop.borders
+    borders = setmetatable(borders or {}, { __index = defaultBackdrop.borders })
+    borders.insets = type(backdrop) == "table" and type(backdrop.borders) == "table" and type(backdrop.borders.insets) == "table" and backdrop.borders.insets
+    borders.insets = setmetatable(borders.insets or {}, { __index = defaultBackdrop.borders.insets })
 
-        if id == "top" or id == "bottom" then
-            border:SetHeight(size)
-        elseif id == "left" or id == "right" then
-            border:SetWidth(size)
+    -- assert(parent.bg, "ApplyBackdrop: parent is missing .bg texture.")
+    -- assert(parent.borders, "ApplyBackdrop: parent is missing .borders texture.")
+    if not parent.bg or not parent.borders then
+        parent = private:CreateBackdrop(parent)
+    end
+
+    if bg.enabled then
+        if bg.atlas then
+            parent.bg:SetAtlas(bg.atlas)
+        else
+            parent.bg:SetTexture(bg.texture)
         end
+        parent.bg:SetVertexColor(bg.color:GetRGBA())
+    else
+        parent.bg:SetTexture()
+        parent.bg:SetVertexColor(1, 1, 1, 1)
+    end
 
-        border:Show()
+    parent.bg:SetTexCoord(unpack(bg.texCoord))
+
+    private:DrawBorders(parent, borders)
+end
+
+function private:CreateBackdrop(parent)
+    parent.bg = parent:CreateTexture(nil, "BACKGROUND")
+    parent.bg:SetAllPoints(parent)
+
+    parent.borders = {}
+
+    parent.borders.top = parent:CreateTexture(nil, "BORDER")
+    parent.borders.top:SetPoint("TOPLEFT")
+    parent.borders.top:SetPoint("TOPRIGHT")
+
+    parent.borders.left = parent:CreateTexture(nil, "BORDER")
+    parent.borders.left:SetPoint("TOPLEFT")
+    parent.borders.left:SetPoint("BOTTOMLEFT")
+
+    parent.borders.right = parent:CreateTexture(nil, "BORDER")
+    parent.borders.right:SetPoint("TOPRIGHT")
+    parent.borders.right:SetPoint("BOTTOMRIGHT")
+
+    parent.borders.bottom = parent:CreateTexture(nil, "BORDER")
+    parent.borders.bottom:SetPoint("BOTTOMLEFT")
+    parent.borders.bottom:SetPoint("BOTTOMRIGHT")
+
+    return parent
+end
+
+function private:ResetBorders(parent)
+    if parent.SetBackdrop then
+        parent:SetBackdropBorderColor(1, 1, 1, 1)
+        parent:ClearBackdrop()
+    end
+
+    for id, border in pairs(parent.borders) do
+        border:SetTexture()
+        border:SetVertexColor(1, 1, 1, 1)
+        border:SetHeight(0)
+        border:SetWidth(0)
+        border:ClearAllPoints()
+        border:Hide()
+    end
+end
+
+function private:DrawBorders(parent, info)
+    private:ResetBorders(parent)
+
+    if info.edgeFile and parent.SetBackdrop then
+        parent:SetBackdrop({
+            edgeFile = info.edgeFile,
+            tile = info.tile,
+            tileSize = info.tileSize,
+            edgeSize = info.edgeSize,
+            insets = info.insets,
+        })
+
+        parent:SetBackdropBorderColor(info.color:GetRGBA())
+
+        return
+    end
+
+    for id, border in pairs(parent.borders) do
+        if info.enabled and info[id] then
+            border:SetTexture(info.texture)
+            border:SetVertexColor(info.color:GetRGBA())
+
+            local size = PixelUtil.GetNearestPixelSize(info.edgeSize, private.UIParent:GetEffectiveScale(), 1)
+            local inset = info.insets[id]
+            local offset = abs(inset)
+
+            if id == "top" or id == "bottom" then
+                border:SetHeight(size)
+                border:SetPoint("LEFT", -offset, 0)
+                border:SetPoint("RIGHT", offset, 0)
+                border:SetPoint(id:upper(), 0, inset)
+            elseif id == "left" or id == "right" then
+                border:SetWidth(size)
+                border:SetPoint("TOP", 0, offset)
+                border:SetPoint("BOTTOM", 0, -offset)
+                border:SetPoint(id:upper(), inset, 0)
+            end
+
+            border:Show()
+        end
     end
 end
 
@@ -107,15 +247,6 @@ function private:ParseValue(value, ...)
         return value(...)
     else
         return value
-    end
-end
-
-function private:ResetBorders(borders)
-    for id, border in pairs(borders) do
-        border:SetTexture()
-        border:SetVertexColor(1, 1, 1, 1)
-        border:SetHeight(0)
-        border:Hide()
     end
 end
 
@@ -268,4 +399,159 @@ function private:TransformTable(tbl, op)
         table.insert(result, op(v))
     end
     return result
+end
+
+local defaultAnchors = {
+    horizontal = {
+        scrollBar = function(parent)
+            local padding = parent.padding
+            return {
+                CreateAnchor("LEFT", padding.left, 0),
+                CreateAnchor("RIGHT", parent, "RIGHT", -padding.right, 0),
+                CreateAnchor("BOTTOM", parent.statusbar, "TOP", 0, padding.bottom),
+            }
+        end,
+        with = function(parent)
+            local padding = parent.padding
+            return {
+                CreateAnchor("TOPLEFT", parent.verticalBox or parent, "TOPLEFT"),
+                CreateAnchor("BOTTOMRIGHT", parent.verticalBox or parent, "BOTTOMRIGHT"),
+            }
+        end,
+        without = function(parent)
+            local padding = parent.padding
+            return {
+                CreateAnchor("TOPLEFT", parent.verticalBox or parent, "TOPLEFT"),
+                CreateAnchor("BOTTOMRIGHT", parent.verticalBox or parent, "BOTTOMRIGHT"),
+            }
+        end,
+    },
+    vertical = {
+        scrollBar = function(parent)
+            local padding = parent.padding
+            local bottom
+            if parent.horizontalBar and parent.horizontalBar:IsShown() then
+                bottom = CreateAnchor("BOTTOM", parent.horizontalBar, "TOP", 0, padding.bottom)
+            else
+                bottom = CreateAnchor("BOTTOM", parent.statusbar, "TOP", 0, padding.bottom)
+            end
+
+            return {
+                CreateAnchor("TOP", parent.titlebar, "BOTTOM", 0, -padding.top),
+                CreateAnchor("RIGHT", -padding.right, 0),
+                bottom,
+            }
+        end,
+        with = function(parent)
+            local padding = parent.padding
+            local bottom
+            if parent.horizontalBar and parent.horizontalBar:IsShown() then
+                bottom = CreateAnchor("BOTTOM", parent.horizontalBar, "TOP", 0, padding.bottom)
+            else
+                bottom = CreateAnchor("BOTTOM", parent.statusbar, "TOP", 0, padding.bottom)
+            end
+
+            return {
+                CreateAnchor("TOPLEFT", parent.titlebar, "BOTTOMLEFT", padding.left, -padding.top),
+                CreateAnchor("RIGHT", parent.verticalBar, "LEFT", -padding.right, 0),
+                bottom,
+            }
+        end,
+        without = function(parent)
+            local padding = parent.padding
+            local bottom
+            if parent.horizontalBar and parent.horizontalBar:IsShown() then
+                bottom = CreateAnchor("BOTTOM", parent.horizontalBar, "TOP", 0, padding.bottom)
+            else
+                bottom = CreateAnchor("BOTTOM", parent.statusbar, "TOP", 0, padding.bottom)
+            end
+
+            return {
+                CreateAnchor("TOPLEFT", parent.titlebar, "BOTTOMLEFT", padding.left, -padding.top),
+                CreateAnchor("RIGHT", -padding.right, 0),
+                bottom,
+            }
+        end,
+    },
+}
+
+function private:CreateScrollFrame(parent, anchors)
+    parent.anchors = CreateFromMixins(defaultAnchors, anchors or {})
+
+    parent.verticalBar = CreateFrame("EventFrame", nil, parent, "LibInterfaceUtilsVerticalScrollBar")
+    parent.horizontalBar = CreateFrame("EventFrame", nil, parent, "LibInterfaceUtilsHorizontalScrollBar")
+
+    -- parent.verticalBar:RegisterCallback("OnScroll", function(...)
+    --     -- print(...)
+    --     parent:DoLayout()
+    -- end, parent.verticalBar)
+
+    parent.verticalBox = CreateFrame("Frame", nil, parent, "WowScrollBox")
+    parent.horizontalBox = CreateFrame("Frame", nil, parent.verticalBox, "WowScrollBox")
+    parent.horizontalBox.scrollable = true
+    parent.horizontalBox:SetScript("OnMouseWheel", nil)
+
+    parent.verticalView = CreateScrollBoxLinearView()
+    parent.verticalView:SetPanExtent(50)
+    parent.horizontalView = CreateScrollBoxLinearView()
+    parent.horizontalView:SetPanExtent(50)
+    parent.horizontalView:SetHorizontal(true)
+
+    parent.content = CreateFrame("Frame", nil, parent.horizontalBox, "ResizeLayoutFrame")
+    parent.content:SetAllPoints(parent.horizontalBox)
+    parent.content.scrollable = true
+
+    ScrollUtil.InitScrollBoxWithScrollBar(parent.verticalBox, parent.verticalBar, parent.verticalView)
+    ScrollUtil.InitScrollBoxWithScrollBar(parent.horizontalBox, parent.horizontalBar, parent.horizontalView)
+
+    function parent:EvaluateVisibility(orientation, force)
+        local scrollBox = self[orientation .. "Box"]
+        local scrollBar = self[orientation .. "Bar"]
+
+        local visible = scrollBox:HasScrollableExtent()
+
+        if force or visible ~= scrollBar:IsShown() then
+            scrollBar:SetShown(visible)
+
+            if self.anchors then
+                local barAnchors = private:ParseValue(self.anchors[orientation].scrollBar, self)
+                if self[orientation .. "BarAnchors"] ~= barAnchors then
+                    self[orientation .. "BarAnchors"] = barAnchors
+                    scrollBar:ClearAllPoints()
+                    for _, anchor in ipairs(barAnchors) do
+                        anchor:SetPoint(scrollBar, false)
+                    end
+                end
+
+                local boxAnchors = private:ParseValue(self.anchors[orientation][visible and "with" or "without"], self)
+                if self[orientation .. "BoxAnchors"] ~= boxAnchors then
+                    self[orientation .. "BoxAnchors"] = boxAnchors
+                    scrollBox:ClearAllPoints()
+                    for _, anchor in ipairs(boxAnchors) do
+                        anchor:SetPoint(scrollBox, false)
+                    end
+                end
+            end
+
+            self:TriggerEvent(self.Event.OnVisibilityChanged, orientation, visible)
+        end
+    end
+
+    parent = Mixin(parent, CallbackRegistryMixin)
+    parent:GenerateCallbackEvents({ "OnVisibilityChanged" })
+    CallbackRegistryMixin.OnLoad(parent)
+    parent:RegisterCallback("OnVisibilityChanged", function(_, orientation, visible)
+        if orientation == "horizontal" then
+            parent:EvaluateVisibility("vertical", true)
+        end
+    end, parent)
+    local onSizeChanged = function(_, orientation)
+        parent:EvaluateVisibility("vertical")
+        parent:EvaluateVisibility("horizontal")
+    end
+    parent.horizontalBox:RegisterCallback(BaseScrollBoxEvents.OnSizeChanged, onSizeChanged, parent.horizontalBar, "horizontal")
+    parent:EvaluateVisibility("horizontal", true)
+    parent:EvaluateVisibility("vertical", true)
+
+    return parent.content
 end

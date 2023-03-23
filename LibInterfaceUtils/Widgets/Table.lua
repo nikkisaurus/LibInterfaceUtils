@@ -122,10 +122,10 @@ local methods = {
         self:SetDataProvider(function(provider)
             provider:InsertTable(data)
         end)
-        -- self:SetUserData("data", data)
-        -- self:SetUserData("cols", {})
+        -- self:Set("data", data)
+        -- self:Set("cols", {})
 
-        -- local spacingH = self:GetUserData("spacingH")
+        -- local spacingH = self:Get("spacingH")
 
         -- -- ! table widget is causing fps loss just running
         -- for colID, colInfo in ipairs(data[1]) do
@@ -142,7 +142,7 @@ local methods = {
         --     col:ApplyTemplate("bordered")
 
         --     local headerRow = col:New("Group")
-        --     -- headerRow:SetUserData("xOffset", (colID == 1 and -private:GetPixel(1)) or (colID == #data[1] and private:GetPixel(1)) or 0)
+        --     -- headerRow:Set("xOffset", (colID == 1 and -private:GetPixel(1)) or (colID == #data[1] and private:GetPixel(1)) or 0)
         --     headerRow:SetSpacing(0, 0)
         --     headerRow:SetPadding(0, 0, 0, 0)
         --     headerRow:SetFullWidth(true)
@@ -155,18 +155,18 @@ local methods = {
         --     resizer:SetWidth(5)
         --     resizer:RegisterForDrag("LeftButton")
         --     resizer:SetCallback("OnDragStart", function()
-        --         col:SetUserData("left", col:GetLeft())
+        --         col:Set("left", col:GetLeft())
         --         col:StartSizing("RIGHT")
         --         col:ScheduleUpdater(function()
         --             print("running")
-        --             if col:GetLeft() < col:GetUserData("left") or col:GetWidth() < 20 then
+        --             if col:GetLeft() < col:Get("left") or col:GetWidth() < 20 then
         --                 col:SetWidth(20)
         --             end
         --         end, 0.01)
         --     end)
         --     resizer:SetCallback("OnDragStop", function()
         --         col:StopMovingOrSizing()
-        --         if col:GetLeft() < col:GetUserData("left") or col:GetWidth() < 20 then
+        --         if col:GetLeft() < col:Get("left") or col:GetWidth() < 20 then
         --             col:SetWidth(20)
         --         end
         --         col:CancelUpdater()
@@ -200,16 +200,16 @@ local methods = {
     end,
 
     SetSpacing = function(self, spacingH, spacingV)
-        self:SetUserData("spacingH", spacingH or 5)
-        self:SetUserData("spacingV", spacingV or 5)
+        self:Set("spacingH", spacingH or 5)
+        self:Set("spacingV", spacingV or 5)
     end,
 }
 
 local function creationFunc()
-    frame = lib:New("ScrollList")
+    parent = lib:New("ScrollList")
 
     local widget = {
-        object = frame,
+        object = parent,
         type = objectType,
         version = version,
     }

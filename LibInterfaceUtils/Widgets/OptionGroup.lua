@@ -19,7 +19,7 @@ local methods = {
 
     GetSelected = function(self)
         wipe(selected)
-        for id, optionButton in ipairs(self:GetUserData("options")) do
+        for id, optionButton in ipairs(self:Get("options")) do
             if optionButton:GetChecked() then
                 tinsert(selected, id)
             end
@@ -29,12 +29,12 @@ local methods = {
     end,
 
     SetInfo = function(self, info)
-        self:SetUserData("options", {})
-        local options = self:GetUserData("options")
+        self:Set("options", {})
+        local options = self:Get("options")
         if type(info) ~= "table" then
             self:ReleaseChildren()
         else
-            local isMultiSelect = self:GetUserData("multiSelect")
+            local isMultiSelect = self:Get("multiSelect")
             for id, option in ipairs(info) do
                 local checkButton = self:New("CheckButton")
                 options[id] = checkButton
@@ -67,7 +67,7 @@ local methods = {
     end,
 
     SetMultiselect = function(self, isMultiSelect)
-        self:SetUserData("multiSelect", isMultiSelect)
+        self:Set("multiSelect", isMultiSelect)
     end,
 }
 

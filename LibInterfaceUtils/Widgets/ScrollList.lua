@@ -29,7 +29,7 @@ local childScripts = {
                 frame:StartMoving()
             end
 
-            local parent = frame:GetUserData("parent")
+            local parent = frame:Get("parent")
             if parent then
                 parent:Fire("OnDragStart")
             end
@@ -41,7 +41,7 @@ local childScripts = {
                 frame:StopMovingOrSizing()
             end
 
-            local parent = frame:GetUserData("parent")
+            local parent = frame:Get("parent")
             if parent then
                 parent:Fire("OnDragStop")
             end
@@ -55,7 +55,7 @@ local childScripts = {
                 frame:StartMoving()
             end
 
-            local parent = frame:GetUserData("parent")
+            local parent = frame:Get("parent")
             if parent then
                 parent:Fire("OnDragStart")
             end
@@ -67,7 +67,7 @@ local childScripts = {
                 frame:StopMovingOrSizing()
             end
 
-            local parent = frame:GetUserData("parent")
+            local parent = frame:Get("parent")
             if parent then
                 parent:Fire("OnDragStop")
             end
@@ -105,7 +105,7 @@ local methods = {
         private:SetBackdrop(self, template.frame)
         private:SetScrollBarBackdrop(self.scrollBar, template.scrollBars and template.scrollBars.vertical)
 
-        self:SetUserData("template", template)
+        self:Set("template", template)
     end,
 
     GetVerticalScroll = function(self)

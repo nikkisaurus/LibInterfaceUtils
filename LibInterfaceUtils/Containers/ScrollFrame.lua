@@ -29,7 +29,7 @@ local childScripts = {
                 frame:StartMoving()
             end
 
-            local parent = frame:GetUserData("parent")
+            local parent = frame:Get("parent")
             if parent then
                 parent:Fire("OnDragStart")
             end
@@ -41,7 +41,7 @@ local childScripts = {
                 frame:StopMovingOrSizing()
             end
 
-            local parent = frame:GetUserData("parent")
+            local parent = frame:Get("parent")
             if parent then
                 parent:Fire("OnDragStop")
             end
@@ -55,7 +55,7 @@ local childScripts = {
                 frame:StartMoving()
             end
 
-            local parent = frame:GetUserData("parent")
+            local parent = frame:Get("parent")
             if parent then
                 parent:Fire("OnDragStart")
             end
@@ -67,7 +67,7 @@ local childScripts = {
                 frame:StopMovingOrSizing()
             end
 
-            local parent = frame:GetUserData("parent")
+            local parent = frame:Get("parent")
             if parent then
                 parent:Fire("OnDragStop")
             end
@@ -77,7 +77,7 @@ local childScripts = {
 
 local scripts = {
     -- OnSizeChanged = function(self)
-    --     self:SetUserData("scrollUpdate")
+    --     self:Set("scrollUpdate")
     --     -- self:DoLayoutDeferred()
     -- end,
 }
@@ -92,7 +92,7 @@ local methods = {
     end,
 
     -- OnLayoutFinished = function(self)
-    --     if not self:GetUserData("scrollUpdate") then
+    --     if not self:Get("scrollUpdate") then
     --         -- self:SetScrollAnchors()
     --     else
     --     end
@@ -111,7 +111,7 @@ local methods = {
         private:SetScrollBarBackdrop(self.verticalBar, template.scrollBars and template.scrollBars.vertical)
         private:SetScrollBarBackdrop(self.horizontalBar, template.scrollBars and template.scrollBars.horizontal)
 
-        self:SetUserData("template", template)
+        self:Set("template", template)
     end,
 
     GetAnchorX = function(self)
@@ -152,7 +152,7 @@ local methods = {
         -- self.horizontalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
         -- verticalBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
 
-        -- self:SetUserData("scrollUpdate", true)
+        -- self:Set("scrollUpdate", true)
 
         -- if private:round(content:GetWidth()) > private:round(verticalBox:GetWidth()) then
         --     horizontalBar:Show()
