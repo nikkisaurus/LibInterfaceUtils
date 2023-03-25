@@ -68,10 +68,21 @@ function lib:CreateFrame()
     end)
 
     for i = 1, 500 do
-        local button = frame:New("Button")
-        button:SetText("Button " .. i)
-        button:SetAutoWidth(true)
+        -- local button = frame:New("Button")
+        -- button:SetText("Button " .. i)
+        -- button:SetAutoWidth(true)
+        -- if mod(i, 10) == 0 then
+        --     button:SetDisabled(true)
+        -- end
+
+        local button = frame:New("CheckButton")
+        button:SetLabel("Button " .. i)
+        button:SetAutoWidth()
+        button:SetWidth(125)
+        button:SetStyle("radio")
+        -- button:SetAutoWidth(true)
         if mod(i, 10) == 0 then
+            button:SetChecked(true)
             button:SetDisabled(true)
         end
         -- local label = frame:New("Label")
@@ -96,7 +107,7 @@ function lib:CreateFrame()
         -- end)
     end
 
-    frame:DoLayout()
+    frame:DoLayoutDeferred()
 end
 
 -- function lib:CreateFrame()

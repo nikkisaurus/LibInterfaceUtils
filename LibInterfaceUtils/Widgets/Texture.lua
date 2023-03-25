@@ -24,7 +24,7 @@ local methods = {
 }
 
 local function creationFunc()
-    local texture = private:Mixin(UIParent:CreateTexture(private:GetObjectName(objectType), "BACKGROUND"), "UserData")
+    local texture = private:Mixin(private.UIParent:CreateTexture(private:GetObjectName(objectType), "BACKGROUND"), "UserData")
 
     local widget = {
         object = texture,

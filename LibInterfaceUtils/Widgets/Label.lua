@@ -39,7 +39,7 @@ local methods = {
     end,
 
     SetState = function(self, state)
-        self:SetUserData("state", state)
+        self:Set("state", state)
         private:SetFont(self, self:Get("template")[state])
     end,
 }

@@ -125,7 +125,7 @@ local methods = {
 }
 
 local function creationFunc()
-    local button = private:Mixin(CreateFrame("Button", private:GetObjectName(objectType), UIParent, "BackdropTemplate"), "UserData")
+    local button = private:Mixin(CreateFrame("Button", private:GetObjectName(objectType), private.UIParent, "BackdropTemplate"), "UserData")
     button.text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 
     local widget = {

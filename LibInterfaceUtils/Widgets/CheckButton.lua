@@ -7,9 +7,16 @@ if not lib or (lib.versions[objectType] or 0) >= version then
 end
 
 local defaults = {
-    label = {
+    disabled = {
         justifyH = "LEFT",
-        disabledColor = private.assets.colors.dimmedWhite,
+        color = private.assets.colors.dimmedWhite,
+    },
+    highlight = {
+        justifyH = "LEFT",
+        color = private.assets.colors.flair,
+    },
+    normal = {
+        justifyH = "LEFT",
     },
 }
 
@@ -18,6 +25,9 @@ local maps = {
         SetJustifyH = true,
         SetJustifyV = true,
         SetWordWrap = true,
+        SetFontObject = true,
+        SetFont = true,
+        SetTextColor = true,
     },
 }
 
@@ -25,6 +35,7 @@ local scripts = {
     OnClick = function(self)
         self:SetChecked(not self:Get("checked"))
     end,
+
     OnSizeChanged = function(self)
         self:SetAnchors()
     end,
@@ -34,18 +45,18 @@ local methods = {
     OnAcquire = function(self)
         self:SetSize(300, 20)
         self:ApplyTemplate()
+        self:SetPadding()
         self:SetCheckAlignment("TOPLEFT")
-        self:SetStyle()
         self:SetAutoWidth(true)
+        self:SetStyle()
         self:SetText()
         self:SetChecked()
         self:SetDisabled()
     end,
 
     ApplyTemplate = function(self, template)
-        local label = CreateFromMixins(defaults.label, template or {})
-        private:SetFont(self.label, label)
-        self:Set("label", label)
+        self:Set("template", type(template) == "table" and CreateFromMixins(defaults, template) or defaults)
+        self:SetState(self:IsDisabled() and "disabled" or "normal")
     end,
 
     GetChecked = function(self)
@@ -57,23 +68,24 @@ local methods = {
         self.label:ClearAllPoints()
 
         local checkPoint = self:Get("checkPoint")
+        local padding = self:Get("padding")
         local canWrap = self.label:CanWordWrap()
 
         self.checkBox:SetPoint(checkPoint)
-        self.label:SetPoint(checkPoint, self.checkBox, private.points[checkPoint][1], private.points[checkPoint][2] * 5, private.points[checkPoint][3] * 5)
-        self.label:SetPoint(private.points[checkPoint][1], -(private.points[checkPoint][2] * 5), -(private.points[checkPoint][3] * 5))
+        self.label:SetPoint(checkPoint, self.checkBox, private.points[checkPoint][1], private.points[checkPoint][2] * padding, private.points[checkPoint][3] * padding)
+        self.label:SetPoint(private.points[checkPoint][1], -(private.points[checkPoint][2] * padding), -(private.points[checkPoint][3] * padding))
 
         if private.points[checkPoint][3] ~= 0 then
             self.label:SetPoint("LEFT")
             self.label:SetPoint("RIGHT")
             self.label:SetWidth(self:GetWidth())
             if canWrap then
-                self:SetHeight(self.checkBox:GetHeight() + self.label:GetStringHeight() + 10)
+                self:SetHeight(self.checkBox:GetHeight() + self.label:GetStringHeight() + (padding * 2))
             else
-                self:SetHeight(self.checkBox:GetHeight() + self.label:GetHeight() + 10)
+                self:SetHeight(self.checkBox:GetHeight() + self.label:GetHeight() + (padding * 2))
             end
         else
-            self.label:SetWidth(self:GetWidth() - self.checkBox:GetWidth() - 10)
+            self.label:SetWidth(self:GetWidth() - self.checkBox:GetWidth() - (padding * 2))
             if canWrap then
                 self:SetHeight(max(self.checkBox:GetHeight(), self.label:GetStringHeight()))
             else
@@ -82,7 +94,7 @@ local methods = {
         end
 
         if self:Get("autoWidth") then
-            self:SetWidth(self.label:GetStringWidth() + 30)
+            self:SetWidth(self.checkBox:GetWidth() + self.label:GetStringWidth() + (padding * 3))
         end
 
         if not private:strcheck(self.label:GetText()) then
@@ -110,14 +122,12 @@ local methods = {
     end,
 
     SetDisabled = function(self, isDisabled)
-        local label = self:Get("label")
+        self:Set("isDisabled", isDisabled)
+        self:SetState(isDisabled and "disabled" or "normal")
+        self.checked:SetDesaturated(isDisabled)
         if isDisabled then
-            private:SetFont(self.label, CreateFromMixins(label, { color = label.disabledColor }))
-            self.checked:SetAtlas("checkmark-minimal-disabled")
             self:Disable()
         else
-            private:SetFont(self.label, label)
-            self.checked:SetAtlas("checkmark-minimal")
             self:Enable()
         end
     end,
@@ -127,27 +137,38 @@ local methods = {
         self:SetAnchors()
     end,
 
+    SetPadding = function(self, padding)
+        self:Set("padding", padding or 5)
+    end,
+
+    SetState = function(self, state)
+        self:Set("state", state)
+        private:SetFont(self, self:Get("template")[state])
+    end,
+
     SetStyle = function(self, style)
         if style == "radio" then
             self.checkBox:SetAtlas("perks-radio-background")
             self.checked:SetAtlas("perks-radio-dot")
             self.checked:ClearAllPoints()
             self.checked:SetSize(12, 12)
-            self.checked:SetPoint("CENTER", self.checkBox, "CENTER", 0, -1)
+            self.checked:SetPoint("CENTER", self.checkBox, "CENTER", 0, -PixelUtil.GetNearestPixelSize(1, private.UIParent:GetEffectiveScale(), 1))
         else
             self.checkBox:SetAtlas("perks-checkbox")
             self.checked:SetAtlas("perks-icon-checkmark")
+            self.checked:ClearAllPoints()
+            self.checked:SetAllPoints(self.checkBox)
         end
     end,
 }
 
 local function creationFunc()
-    local button = CreateFrame("CheckButton", private:GetObjectName(objectType), UIParent)
+    local button = private:Mixin(CreateFrame("CheckButton", private:GetObjectName(objectType), private.UIParent), "UserData")
 
     button.checkBox = button:CreateTexture(nil, "ARTWORK")
     button.checkBox:SetSize(12, 12)
 
-    button.checked = button:CreateTexture(nil, "ARTWORK")
+    button.checked = button:CreateTexture(nil, "OVERLAY")
     button.checked:SetAllPoints(button.checkBox)
 
     button.label = button:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
