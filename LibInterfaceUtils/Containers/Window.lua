@@ -6,121 +6,44 @@ if not lib or (lib.versions[objectType] or 0) >= version then
     return
 end
 
-local forbidden = {
-    CreateFontString = true,
-    RegisterAllEvents = true,
-    RegisterEvent = true,
-    SetBackdrop = true,
-    SetBackdropBorderColor = true,
-    SetBackdropColor = true,
-    SetScale = true,
-    UnregisterAllEvents = true,
-    UnregisterEvent = true,
-}
-
 local templates = {
     default = {
-        content = {
-            bgEnabled = false,
-            bordersEnabled = false,
-        },
-        frame = {
-            bgColor = private.assets.colors.elvBackdrop,
-        },
-        scrollBars = {
-            vertical = {
-                track = {
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.dimmedWhite,
-                },
-                background = {
-                    enabled = true,
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.darker,
-                },
-            },
-            horizontal = {
-                track = {
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.dimmedWhite,
-                },
-                background = {
-                    enabled = true,
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.darker,
-                },
-            },
-        },
-        title = {
-            font = "GameFontNormal",
-            color = private.assets.colors.flair,
-        },
-        titleBar = {
-            bgColor = private.assets.colors.elvTransparent,
+        -- frame = {}, -- Uses defaultBackdrop
+        titlebar = {
+            enabled = true,
+            texture = private.assets.blankTexture,
+            texCoord = { 0, 1, 0, 1 },
+            color = private.assets.colors.elvTransparent,
             padding = 4,
         },
-    },
-    transparent = {
-        content = {
-            bgEnabled = false,
-            bordersEnabled = false,
-        },
-        frame = {
-            bgColor = private.assets.colors.elvTransparent,
-        },
-        scrollBars = {
-            vertical = {
-                track = {
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.dimmedWhite,
-                },
-                background = {
-                    enabled = false,
-                },
-            },
-            horizontal = {
-                track = {
-                    texture = private.assets.blankTexture,
-                    color = private.assets.colors.dimmedWhite,
-                },
-                background = {
-                    enabled = false,
-                },
-            },
-        },
-        title = {
-            font = "GameFontNormal",
-            color = private.assets.colors.flair,
-        },
-        titleBar = {
-            bgColor = private.assets.colors.elvTransparent,
-            padding = 4,
+        titleborder = {
+            enabled = true,
+            texture = private.assets.blankTexture,
+            color = private.assets.colors.black,
+            edgeSize = 1,
+            inset = -1,
         },
     },
-}
-
-local templatesMetatable = {
-    __index = templates.default,
 }
 
 local childScripts = {
     close = {
         OnClick = function(self)
-            local frame = self.widget.object
+            local frame = self:GetParent()
             frame:Release()
         end,
     },
 
     resizer = {
         OnMouseDown = function(self)
-            local frame = self.widget.object
+            local frame = self:GetParent()
             if frame:IsResizable() then
                 frame:StartSizing()
             end
         end,
 
         OnMouseUp = function(self)
-            local frame = self.widget.object
+            local frame = self:GetParent()
             if frame:IsResizable() then
                 frame:StopMovingOrSizing()
             end
@@ -130,141 +53,92 @@ local childScripts = {
 
 local scripts = {
     OnDragStart = function(self)
+        if not self:IsMovable() then
+            return
+        end
         self:StartMoving()
     end,
+
     OnDragStop = function(self)
+        if not self:IsMovable() then
+            return
+        end
         self:StopMovingOrSizing()
+    end,
+
+    OnSizeChanged = function(self)
+        self:DoLayoutDeferred()
     end,
 }
 
 local methods = {
     OnAcquire = function(self, ...)
-        local w, h = GetPhysicalScreenSize()
         self:SetLayout()
         self:SetSpecialFrame()
         self:SetSize(300, 300)
-        self:EnableResize(true, 300, 300, w * 0.8, h * 0.8)
-        self:SetDraggable(true, "LeftButton")
-        self:SetClampedToScreen(true)
-        self:ApplyTemplate("default")
+        self:EnableResize(true)
+        self:EnableMovable(true, true)
+        self:ApplyTemplate()
         self:SetTitle()
-        self:SetFrameStrata("FULLSCREEN_DIALOG")
+        self:SetPadding(5, 5, 5, 5)
     end,
 
-    OnRelease = function(self)
-        self.content:ReleaseChildren()
+    ApplyTemplate = function(self, template, mixin)
+        local t = self:Set("template", type(template) == "table" and CreateFromMixins(mixin or templates.default, template) or templates[tostring(template):lower()] or templates.default)
+
+        private:ApplyBackdrop(self, t.frame)
+        self:SkinTitlebar()
     end,
 
-    AddChild = function(self, ...)
-        return self.content:AddChild(...)
+    EnableMovable = function(self, isEnabled, isClamped)
+        self:SetMovable(isEnabled or false)
+        self:SetClampedToScreen(isClamped or false)
     end,
 
-    ApplyTemplate = function(self, templateName, mixin)
-        templateName = type(templateName) == "string" and templateName:lower() or templateName
-        local template
-        if type(templateName) == "table" then
-            template = templateName
-            local info = setmetatable(template, templatesMetatable)
-        else
-            template = templates[templateName or "default"] or templates.default
-        end
-
-        private:SetBackdrop(self, template.frame)
-        private:SetBackdrop(self.titleBar, template.titleBar)
-        private:SetFont(self.titleBar.title, template.title)
-        private:SetBackdrop(self.content, template.content)
-        self.content:SetScrollBars(template.scrollBars)
-
-        self:Set("template", template)
-        self:SetAnchors()
-    end,
-
-    DoLayout = function(self, ...)
-        return self.content:DoLayout(...)
-    end,
-
-    EnableResize = function(self, enabled, minWidth, minHeight, maxWidth, maxHeight)
-        self:SetResizable(enabled or false)
-
-        if enabled then
-            assert(type(minWidth) == "number", "Invalid argument for Frame:EnableResize(enabled, minWidth, minHeight, maxWidth, maxHeight): minWidth")
-            assert(type(minHeight) == "number", "Invalid argument for Frame:EnableResize(enabled, minWidth, minHeight, maxWidth, maxHeight): minHeight")
-            assert(type(maxWidth) == "number", "Invalid argument for Frame:EnableResize(enabled, minWidth, minHeight, maxWidth, maxHeight): maxWidth")
-            assert(type(maxHeight) == "number", "Invalid argument for Frame:EnableResize(enabled, minWidth, minHeight, maxWidth, maxHeight): maxHeight")
-
-            self:SetResizeBounds(minWidth, minHeight, maxWidth, maxHeight)
+    EnableResize = function(self, isEnabled, minWidth, minHeight, ...)
+        if isEnabled then
+            self:SetResizable(true)
+            self:SetResizeBounds(minWidth or 300, minHeight or 300, ...)
             self.resizer:Show()
         else
+            self:SetResizable(false)
             self.resizer:Hide()
         end
     end,
 
-    GetAnchorX = function(self)
-        return self.content:GetAnchorX()
-    end,
-
     GetAvailableHeight = function(self)
-        return self.content:GetAvailableHeight()
+        return self.verticalBox:GetHeight()
     end,
 
     GetAvailableWidth = function(self)
-        return self.content:GetAvailableWidth()
+        return self.verticalBox:GetWidth()
     end,
 
     MarkDirty = function(self, ...)
-        self.content:MarkDirty(...)
-    end,
-
-    New = function(self, ...)
-        return self.content:New(...)
-    end,
-
-    ParentChild = function(self, ...)
-        self.content:ParentChild(...)
-    end,
-
-    ReleaseChildren = function(self)
-        self.content:ReleaseChildren()
-    end,
-
-    RemoveChild = function(self, ...)
-        self.content:RemoveChild(...)
+        self.content:SetSize(...)
+        self.horizontalBox:SetSize(...)
     end,
 
     SetAnchors = function(self)
-        self.content:SetParent(self)
-        self.content:SetPoint("TOPLEFT", self.titleBar, "BOTTOMLEFT", 5, 0)
-        self.content:SetPoint("BOTTOMRIGHT", -5, 5)
+        local t = self:Get("template")
 
-        local template = self:Get("template")
+        self.titlebar:SetHeight(max(self.title:GetStringHeight() + (t.titlebar.padding * 2), 20))
 
-        self.titleBar:SetHeight(max(self.titleBar.title:GetStringHeight() + (template.titleBar.padding * 2), 20))
+        local closeSize = self.titlebar:GetHeight() - (t.titlebar.padding / 2)
+        self.close:SetSize(closeSize, closeSize)
+        self.close:SetPoint("RIGHT", self.titlebar, "RIGHT", -t.titlebar.padding, 0)
 
-        local closeSize = self.titleBar:GetHeight() - (template.titleBar.padding / 2)
-        self.titleBar.close:SetSize(closeSize, closeSize)
-        self.titleBar.close:SetPoint("RIGHT", -template.titleBar.padding, 0)
-
-        self.titleBar.title:SetPoint("TOPLEFT", template.titleBar.padding, -template.titleBar.padding)
-        self.titleBar.title:SetPoint("RIGHT", self.titleBar.close, "LEFT", -template.titleBar.padding, 0)
-        self.titleBar.title:SetPoint("BOTTOM", 0, template.titleBar.padding)
+        self.title:SetPoint("TOPLEFT", self.titlebar, "TOPLEFT", t.titlebar.padding, -t.titlebar.padding)
+        self.title:SetPoint("RIGHT", self.close, "LEFT", -t.titlebar.padding, 0)
+        self.title:SetPoint("BOTTOM", self.titlebar, "BOTTOM", 0, t.titlebar.padding)
     end,
 
-    SetDraggable = function(self, isDraggable, ...)
-        self:EnableMouse(isDraggable or false)
-        self:SetMovable(isDraggable or false)
-        self:RegisterForDrag(...)
-    end,
-
-    SetLayout = function(self, ...)
-        self.content:SetLayout(...)
-    end,
-
-    SetPadding = function(self, ...)
-        self.content:SetPadding(...)
-    end,
-
-    SetSpacing = function(self, ...)
-        self.content:SetSpacing(...)
+    SetPadding = function(self, left, right, top, bottom)
+        self.padding.left = left or self.padding.left
+        self.padding.right = right or self.padding.right
+        self.padding.top = top or self.padding.top
+        self.padding.bottom = bottom or self.padding.bottom
+        self:SetAnchors()
     end,
 
     SetSpecialFrame = function(self, isSpecial)
@@ -276,30 +150,60 @@ local methods = {
     end,
 
     SetTitle = function(self, text)
-        self.titleBar.title:SetText(text or "")
+        self.title:SetText(text or "")
         self:SetAnchors()
+    end,
+
+    SkinTitlebar = function(self)
+        local t = self:Get("template")
+
+        self.titlebar:SetTexture()
+        self.titlebar:SetTexCoord(0, 1, 0, 1)
+        self.titlebar:SetVertexColor(1, 1, 1, 1)
+
+        if t.titlebar.enabled then
+            self.titlebar:SetTexture(t.titlebar.texture)
+            self.titlebar:SetTexCoord(unpack(t.titlebar.texCoord))
+            self.titlebar:SetVertexColor(t.titlebar.color:GetRGBA())
+        end
+
+        self.titleborder:SetTexture()
+        self.titleborder:SetVertexColor(1, 1, 1, 1)
+        self.titleborder:SetHeight(0)
+        self.titleborder:ClearAllPoints()
+        self.titleborder:Hide()
+
+        if t.titleborder.enabled then
+            self.titleborder:SetTexture(t.titleborder.texture)
+            self.titleborder:SetVertexColor(t.titleborder.color:GetRGBA())
+            self.titleborder:SetHeight(PixelUtil.GetNearestPixelSize(t.titleborder.edgeSize, private.UIParent:GetEffectiveScale(), 1))
+            self.titleborder:SetPoint("BOTTOMLEFT", self.titlebar, "BOTTOMLEFT", 0, t.titleborder.inset)
+            self.titleborder:SetPoint("BOTTOMRIGHT", self.titlebar, "BOTTOMRIGHT", 0, t.titleborder.inset)
+            self.titleborder:Show()
+        end
     end,
 }
 
 local function creationFunc()
-    local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
+    local frame = private:Mixin(CreateFrame("Frame", private:GetObjectName(objectType), private.UIParent, "BackdropTemplate"), "Container", "UserData")
     frame:SetToplevel(true)
-    frame = private:CreateTextures(frame)
+    frame:EnableMouse(true)
+    frame:RegisterForDrag("LeftButton")
+    frame:SetFrameStrata("FULLSCREEN_DIALOG")
 
-    frame.titleBar = CreateFrame("Frame", nil, frame)
-    frame.titleBar:SetPoint("TOPLEFT")
-    frame.titleBar:SetPoint("TOPRIGHT")
-    frame.titleBar = private:CreateTextures(frame.titleBar)
+    frame.titlebar = frame:CreateTexture(nil, "BACKGROUND")
+    frame.titlebar:SetPoint("TOPLEFT")
+    frame.titlebar:SetPoint("TOPRIGHT")
 
-    frame.titleBar.title = frame.titleBar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    frame.titleBar.title:SetAllPoints(frame.titleBar)
+    frame.titleborder = frame:CreateTexture(nil, "BORDER")
 
-    frame.titleBar.close = CreateFrame("Button", nil, frame.titleBar)
-    frame.titleBar.close:SetNormalAtlas("PlayerDeadBlip")
-    frame.titleBar.close:SetHighlightAtlas("PlayerDeadBlip", "ADD")
-    frame.titleBar.close:SetScript("OnClick", childScripts.close.OnClick)
+    frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    frame.title:SetAllPoints(frame.titlebar)
 
-    frame.content = lib:New("ScrollFrame")
+    frame.close = CreateFrame("Button", nil, frame)
+    frame.close:SetNormalAtlas("PlayerDeadBlip")
+    frame.close:SetHighlightAtlas("PlayerDeadBlip", "ADD")
+    frame.close:SetScript("OnClick", childScripts.close.OnClick)
 
     frame.resizer = CreateFrame("Button", nil, frame)
     frame.resizer:SetNormalTexture([[INTERFACE\CHATFRAME\UI-CHATIM-SIZEGRABBER-DOWN]])
@@ -310,15 +214,15 @@ local function creationFunc()
     frame.resizer:SetScript("OnMouseDown", childScripts.resizer.OnMouseDown)
     frame.resizer:SetScript("OnMouseUp", childScripts.resizer.OnMouseUp)
 
+    frame.content = private:CreateScrollFrame(frame)
+
     local widget = {
         object = frame,
         type = objectType,
         version = version,
         forbidden = forbidden,
+        registry = registry,
     }
-
-    frame.titleBar.close.widget = widget
-    frame.resizer.widget = widget
 
     return private:RegisterContainer(widget, methods, scripts)
 end

@@ -67,12 +67,27 @@ function lib:CreateFrame()
         frame:SetStatus(date("%x %X", time()))
     end)
 
-    for i = 1, 2000 do
-        local label = frame:New("Label")
-        label:SetText(i .. " Test a longer string that I can cut off to force a horizontal scrollbar.")
+    for i = 1, 200 do
+        -- local label = frame:New("Label")
+        -- label:SetText(i .. " Test a longer string that I can cut off to force a horizontal scrollbar.")
+        -- if i == 1 then
+        --     label:SetWidth(200)
+        --     label:SetDisabled(true)
+        -- elseif i == 2 then
+        --     label:SetWidth(200)
+        --     label:SetWordWrap(false)
+        --     label:ShowTruncatedText(true)
+        -- end
+        -- label:SetCallback("OnMouseDown", function()
+        --     print("label", i)
+        -- end)
         local tex = frame:New("Texture")
         tex:SetColorTexture(CreateColor(fastrandom(), fastrandom(), fastrandom(), 1):GetRGBA())
         tex:SetSize(100, 100)
+        tex:SetInteractible(true)
+        tex:SetCallback("OnMouseDown", function(self)
+            self:SetTexture(134400)
+        end)
     end
 
     frame:DoLayout()

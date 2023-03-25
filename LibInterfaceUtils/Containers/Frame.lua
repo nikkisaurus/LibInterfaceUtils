@@ -79,6 +79,10 @@ local scripts = {
         end
         self:StopMovingOrSizing()
     end,
+
+    OnSizeChanged = function(self)
+        self:DoLayoutDeferred()
+    end,
 }
 
 local methods = {
@@ -92,70 +96,10 @@ local methods = {
         self:SetTitle()
         self:SetStatus()
         self:SetPadding(5, 5, 5, 5)
-
-        -- local usedWidth = 0
-        -- local usedHeight = 0
-        -- for i = 1, 50 do
-        --     local frame = CreateFrame("Frame")
-        --     frame:SetSize(20, 20)
-        --     -- private:ApplyBackdrop(frame)
-        --     tinsert(self.frames, frame)
-
-        --     local test = frame:CreateTexture(nil, "BACKGROUND")
-        --     test:SetAllPoints(frame)
-        --     test:SetColorTexture(CreateColor(fastrandom(), fastrandom(), fastrandom(), 1):GetRGBA())
-
-        --     local label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-        --     label:SetText(i .. " In irure cupidatat laborum occaecat reprehenderit qui duis do officia voluptate excepteur.")
-        --     label:SetAllPoints(frame)
-        --     -- usedWidth = max(usedWidth, label:GetWidth())
-        --     -- usedHeight = usedHeight + label:GetHeight()
-        -- end
-
-        -- print(self.content.Layout, self.content.frames)
-        -- local extent = self.verticalView:Layout()
-        -- print(extent)
-
-        -- -- self.content:SetHeight(extent)
-        -- self.horizontalBox:SetHeight(extent)
-        -- self.verticalBox:Layout()
-
-        -- local layoutFunction = function(index, frame, offset)
-        --     local indent = self:GetElementIndent(frame)
-        --     local setPoint = self:IsHorizontal() and ScrollBoxViewUtil.SetHorizontalPoint or ScrollBoxViewUtil.SetVerticalPoint
-        --     return setPoint(frame, offset, indent, scrollTarget)
-        -- end
-
-        -- local frames = self.frames
-        -- local frameCount = frames and #frames or 0
-        -- if frameCount == 0 then
-        --     return 0
-        -- end
-
-        -- local spacing = 0 -- self:GetSpacing()
-        -- -- local scrollTarget = self:GetScrollTarget()
-        -- -- local frameLevelCounter = CreateFrameLevelCounter(self:GetFrameLevelPolicy(), scrollTarget:GetFrameLevel(), frameCount)
-
-        -- local total = 0
-        -- local offset = 0
-        -- for index, frame in ipairs(frames) do
-        --     local extent = layoutFunction(index, frame, offset, scrollTarget)
-        --     offset = offset + extent + spacing
-        --     total = total + extent
-
-        --     -- if frameLevelCounter then
-        --     --     frame:SetFrameLevel(frameLevelCounter())
-        --     -- end
-        -- end
-
-        -- local spacingTotal = math.max(0, frameCount - 1) * spacing
-        -- local extentTotal = total + spacingTotal
-        -- -- return extentTotal;
-        -- self:MarkDirty(usedWidth, usedHeight)
     end,
 
     ApplyTemplate = function(self, template, mixin)
-        local t = self:Set("template", type(template) == "table" and CreateFromMixins(mixin or templates.default) or templates[tostring(template):lower()] or templates.default)
+        local t = self:Set("template", type(template) == "table" and CreateFromMixins(mixin or templates.default, template) or templates[tostring(template):lower()] or templates.default)
 
         private:ApplyBackdrop(self, t.frame)
         self:SkinTitlebar()
@@ -176,6 +120,14 @@ local methods = {
             self:SetResizable(false)
             self.resizer:Hide()
         end
+    end,
+
+    GetAvailableHeight = function(self)
+        return self.verticalBox:GetHeight()
+    end,
+
+    GetAvailableWidth = function(self)
+        return self.verticalBox:GetWidth()
     end,
 
     MarkDirty = function(self, ...)
@@ -289,7 +241,7 @@ local methods = {
 
 local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), private.UIParent, "BackdropTemplate")
-    private:Mixin(frame, "Container", "UserData")
+    frame = private:Mixin(frame, "Container", "UserData")
     frame:SetToplevel(true)
     frame:EnableMouse(true)
     frame:RegisterForDrag("LeftButton")
@@ -329,7 +281,6 @@ local function creationFunc()
     frame.status:SetJustifyH("LEFT")
 
     frame.content = private:CreateScrollFrame(frame)
-    frame.scrollable = true
 
     local widget = {
         object = frame,

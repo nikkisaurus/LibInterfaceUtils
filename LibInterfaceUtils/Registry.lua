@@ -82,7 +82,6 @@ local ContainerMethods = {
 
     DoLayoutDeferred = function(self)
         if self:Get("pauseLayout") then
-            print("NO", self.widget.type)
             return
         end
 
@@ -93,7 +92,6 @@ local ContainerMethods = {
 
     DoLayout = function(self)
         if self:Get("pauseLayout") then
-            print("I SAID NO", self.widget.type)
             return
         end
 
@@ -163,9 +161,9 @@ local ContainerMethods = {
 
     SetLayout = function(self, layout, customFunc)
         layout = type(layout) == "string" and layout:lower() or layout
-        if self.content and self.content.SetLayout then
-            self.content:SetLayout(layout, customFunc)
-        end
+        -- if self.content and self.content.SetLayout then
+        --     self.content:SetLayout(layout, customFunc)
+        -- end
 
         self.layoutFunc = customFunc or private.layouts[layout or "flow"]
         self.layoutRef = customFunc and "custom" or layout or "flow"
@@ -462,6 +460,6 @@ end
 
 function private:RegisterWidgetPool(objectType, creationFunc, resetterFunc)
     lib.pool[objectType] = CreateObjectPool(creationFunc, resetterFunc or Resetter)
-    lib.pool[objectType]:SetResetDisallowedIfNew(true)
+    -- lib.pool[objectType]:SetResetDisallowedIfNew(true)
     lib.pool[objectType].GetNumObjects = GetNumObjects
 end

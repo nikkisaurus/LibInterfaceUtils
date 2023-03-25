@@ -152,6 +152,8 @@ function private:ApplyBackdrop(parent, backdrop)
     parent.bg:SetTexCoord(unpack(bg.texCoord))
 
     private:DrawBorders(parent, borders)
+
+    return parent
 end
 
 function private:CreateBackdrop(parent)
@@ -408,7 +410,7 @@ local defaultAnchors = {
             return {
                 CreateAnchor("LEFT", padding.left, 0),
                 CreateAnchor("RIGHT", parent, "RIGHT", -padding.right, 0),
-                CreateAnchor("BOTTOM", parent.statusbar, "TOP", 0, padding.bottom),
+                CreateAnchor("BOTTOM", parent.statusbar or parent, parent.statusbar and "TOP" or "BOTTOM", 0, padding.bottom),
             }
         end,
         with = function(parent)
@@ -433,11 +435,11 @@ local defaultAnchors = {
             if parent.horizontalBar and parent.horizontalBar:IsShown() then
                 bottom = CreateAnchor("BOTTOM", parent.horizontalBar, "TOP", 0, padding.bottom)
             else
-                bottom = CreateAnchor("BOTTOM", parent.statusbar, "TOP", 0, padding.bottom)
+                bottom = CreateAnchor("BOTTOM", parent.statusbar or parent, parent.statusbar and "TOP" or "BOTTOM", 0, padding.bottom)
             end
 
             return {
-                CreateAnchor("TOP", parent.titlebar, "BOTTOM", 0, -padding.top),
+                CreateAnchor("TOP", parent.titlebar or parent, parent.titlebar and "BOTTOM" or "TOP", 0, -padding.top),
                 CreateAnchor("RIGHT", -padding.right, 0),
                 bottom,
             }
@@ -448,11 +450,11 @@ local defaultAnchors = {
             if parent.horizontalBar and parent.horizontalBar:IsShown() then
                 bottom = CreateAnchor("BOTTOM", parent.horizontalBar, "TOP", 0, padding.bottom)
             else
-                bottom = CreateAnchor("BOTTOM", parent.statusbar, "TOP", 0, padding.bottom)
+                bottom = CreateAnchor("BOTTOM", parent.statusbar or parent, parent.statusbar and "TOP" or "BOTTOM", 0, padding.bottom)
             end
 
             return {
-                CreateAnchor("TOPLEFT", parent.titlebar, "BOTTOMLEFT", padding.left, -padding.top),
+                CreateAnchor("TOPLEFT", parent.titlebar or parent, parent.titlebar and "BOTTOMLEFT" or "TOPLEFT", padding.left, -padding.top),
                 CreateAnchor("RIGHT", parent.verticalBar, "LEFT", -padding.right, 0),
                 bottom,
             }
@@ -463,11 +465,11 @@ local defaultAnchors = {
             if parent.horizontalBar and parent.horizontalBar:IsShown() then
                 bottom = CreateAnchor("BOTTOM", parent.horizontalBar, "TOP", 0, padding.bottom)
             else
-                bottom = CreateAnchor("BOTTOM", parent.statusbar, "TOP", 0, padding.bottom)
+                bottom = CreateAnchor("BOTTOM", parent.statusbar or parent, parent.statusbar and "TOP" or "BOTTOM", 0, padding.bottom)
             end
 
             return {
-                CreateAnchor("TOPLEFT", parent.titlebar, "BOTTOMLEFT", padding.left, -padding.top),
+                CreateAnchor("TOPLEFT", parent.titlebar or parent, parent.titlebar and "BOTTOMLEFT" or "TOPLEFT", padding.left, -padding.top),
                 CreateAnchor("RIGHT", -padding.right, 0),
                 bottom,
             }
@@ -480,11 +482,6 @@ function private:CreateScrollFrame(parent, anchors)
 
     parent.verticalBar = CreateFrame("EventFrame", nil, parent, "LibInterfaceUtilsVerticalScrollBar")
     parent.horizontalBar = CreateFrame("EventFrame", nil, parent, "LibInterfaceUtilsHorizontalScrollBar")
-
-    -- parent.verticalBar:RegisterCallback("OnScroll", function(...)
-    --     -- print(...)
-    --     parent:DoLayout()
-    -- end, parent.verticalBar)
 
     parent.verticalBox = CreateFrame("Frame", nil, parent, "WowScrollBox")
     parent.horizontalBox = CreateFrame("Frame", nil, parent.verticalBox, "WowScrollBox")
