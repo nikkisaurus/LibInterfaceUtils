@@ -7,45 +7,40 @@ if not lib or (lib.versions[objectType] or 0) >= version then
 end
 
 local defaults = {
-    justifyH = "LEFT",
-    disabledColor = private.assets.colors.dimmedWhite,
+    disabled = {
+        justifyH = "LEFT",
+        color = private.assets.colors.dimmedWhite,
+    },
+    highlight = {
+        justifyH = "LEFT",
+    },
+    normal = {
+        justifyH = "LEFT",
+    },
 }
 
 local methods = {
     OnAcquire = function(self)
         self:ApplyTemplate()
         self:SetWordWrap(true)
-        self:SetPadding()
         self:SetText()
         self:SetDisabled()
     end,
 
     ApplyTemplate = function(self, template)
-        local t = self:Set("template", type(template) == "table" and CreateFromMixins(defaults, template) or defaults)
-        private:SetFont(self, t)
-    end,
-
-    IsDisabled = function(self)
-        return self:Get("isDisabled")
+        self:Set("template", type(template) == "table" and CreateFromMixins(defaults, template) or defaults)
+        self:SetState(self:IsDisabled() and "disabled" or "normal")
     end,
 
     SetDisabled = function(self, isDisabled)
         self:Set("isDisabled", isDisabled)
         self:EnableMouse(not isDisabled)
-        local t = self:Get("template")
-        if isDisabled then
-            private:SetFont(self, CreateFromMixins(t, { color = t.disabledColor }))
-        else
-            private:SetFont(self, t)
-        end
+        self:SetState(isDisabled and "disabled" or "normal")
     end,
 
-    SetPadding = function(self, padding)
-        self:Set("padding", padding or 20)
-    end,
-
-    ShowTruncatedText = function(self, show)
-        self:Set("showTruncatedText", show)
+    SetState = function(self, state)
+        self:SetUserData("state", state)
+        private:SetFont(self, self:Get("template")[state])
     end,
 }
 

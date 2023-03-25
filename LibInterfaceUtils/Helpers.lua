@@ -541,6 +541,9 @@ function private:CreateScrollFrame(parent, anchors)
         if orientation == "horizontal" then
             parent:EvaluateVisibility("vertical", true)
         end
+        if parent.DoLayoutDeferred then
+            parent:DoLayoutDeferred()
+        end
     end, parent)
     local onSizeChanged = function(_, orientation)
         parent:EvaluateVisibility("vertical")

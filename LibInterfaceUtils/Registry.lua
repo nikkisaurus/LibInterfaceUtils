@@ -222,6 +222,10 @@ local ObjectMethods = {
         return self:Get("relWidth")
     end,
 
+    GetState = function(self)
+        return self:Get("state")
+    end,
+
     HideTooltip = function(self)
         local truncated = self:Get("showTruncatedText")
         local tooltipInitializer = self:Get("tooltipInitializer")
@@ -233,6 +237,10 @@ local ObjectMethods = {
         local tooltip = info and info.tooltip or GameTooltip
         tooltip:ClearLines()
         tooltip:Hide()
+    end,
+
+    IsDisabled = function(self)
+        return self:Get("isDisabled")
     end,
 
     InitUserData = function(self, key, value)
@@ -334,13 +342,17 @@ local ObjectMethods = {
         local x = info and info.x or 0
         local y = info and info.y or 0
         tooltip:SetOwner(self, anchor, x, y)
-        if truncated then
+        if truncated and self.GetText then
             tooltip:AddLine(self:GetText())
         end
         if tooltipInitializer then
             tooltipInitializer(self, tooltip)
         end
         tooltip:Show()
+    end,
+
+    ShowTruncatedText = function(self, show)
+        self:Set("showTruncatedText", show)
     end,
 }
 
@@ -371,8 +383,8 @@ function private:InitializeScripts(self)
     for script, handler in pairs(widget.scripts) do
         if self:HasScript(script) then
             self:SetScript(script, function(...)
-                -- print(widget.type, script)
-                if self:Get("isDisabled") and script ~= "OnHide" and script ~= "OnShow" and script ~= "OnSizeChanged" then
+                local isDisabled = self:Get("isDisabled")
+                if isDisabled and script ~= "OnHide" and script ~= "OnShow" and script ~= "OnSizeChanged" then
                     return
                 end
 
@@ -382,10 +394,16 @@ function private:InitializeScripts(self)
 
                 if script == "OnEnter" then
                     self:ShowTooltip()
+                    if not isDisabled and self.SetState then
+                        self:SetState("highlight")
+                    end
                 end
 
                 if script == "OnLeave" then
                     self:HideTooltip()
+                    if not isDisabled and self.SetState then
+                        self:SetState("normal")
+                    end
                 end
 
                 local callback = widget.callbacks[script]
