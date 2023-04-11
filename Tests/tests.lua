@@ -67,7 +67,7 @@ function lib:CreateFrame()
         frame:SetStatus(date("%x %X", time()))
     end)
 
-    for i = 1, 500 do
+    for i = 1, 3 do
         -- local button = frame:New("Button")
         -- button:SetText("Button " .. i)
         -- button:SetAutoWidth(true)
@@ -75,29 +75,35 @@ function lib:CreateFrame()
         --     button:SetDisabled(true)
         -- end
 
-        local button = frame:New("CheckButton")
-        button:SetLabel("Button " .. i)
-        button:SetAutoWidth()
-        button:SetWidth(125)
-        button:SetStyle("radio")
-        -- button:SetAutoWidth(true)
-        if mod(i, 10) == 0 then
-            button:SetChecked(true)
-            button:SetDisabled(true)
-        end
-        -- local label = frame:New("Label")
-        -- label:SetText(i .. " Test a longer string that I can cut off to force a horizontal scrollbar.")
-        -- if i == 1 then
-        --     label:SetWidth(200)
-        --     label:SetDisabled(true)
-        -- elseif i == 2 then
-        --     label:SetWidth(200)
-        --     label:SetWordWrap(false)
-        --     label:ShowTruncatedText(true)
+        -- local button = frame:New("CheckButton")
+        -- button:SetLabel("Button " .. i)
+        -- button:SetAutoWidth()
+        -- button:SetWidth(125)
+        -- button:SetStyle("radio")
+        -- -- button:SetAutoWidth(true)
+        -- if mod(i, 10) == 0 then
+        --     button:SetChecked(true)
+        --     button:SetDisabled(true)
         -- end
-        -- label:SetCallback("OnMouseDown", function()
-        --     print("label", i)
-        -- end)
+        local label = frame:New("Label")
+        label:SetText(i .. " Test a longer string that I can cut off to force a horizontal scrollbar.")
+        -- label:SetIcon(134400)
+        if i == 1 then
+            label:SetStaticWidth(200)
+            label:SetDisabled(true)
+        elseif i == 2 then
+            label:SetStaticWidth(200)
+            -- label:SetWordWrap(false)
+            label:ShowTruncatedText(true)
+        elseif i == 3 then
+            label:SetFullWidth(true)
+            label:Set("test", "test")
+        end
+        label:SetWordWrap(false)
+        label:SetCallback("OnMouseDown", function()
+            print("label", i)
+        end)
+
         -- local tex = frame:New("Texture")
         -- tex:SetColorTexture(CreateColor(fastrandom(), fastrandom(), fastrandom(), 1):GetRGBA())
         -- tex:SetSize(100, 100)
@@ -106,6 +112,9 @@ function lib:CreateFrame()
         --     self:SetTexture(134400)
         -- end)
     end
+    -- local button = frame:New("Button")
+    -- button:SetFullWidth(true)
+    -- button:SetText("button")
 
     frame:DoLayoutDeferred()
 end

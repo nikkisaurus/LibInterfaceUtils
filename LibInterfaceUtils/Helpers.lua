@@ -548,6 +548,9 @@ function private:CreateScrollFrame(parent, anchors)
     local onSizeChanged = function(_, orientation)
         parent:EvaluateVisibility("vertical")
         parent:EvaluateVisibility("horizontal")
+        if parent.DoLayoutDeferred then
+            parent:DoLayoutDeferred()
+        end
     end
     parent.horizontalBox:RegisterCallback(BaseScrollBoxEvents.OnSizeChanged, onSizeChanged, parent.horizontalBar, "horizontal")
     parent:EvaluateVisibility("horizontal", true)

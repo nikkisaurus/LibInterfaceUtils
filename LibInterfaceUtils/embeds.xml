@@ -13,17 +13,17 @@
     <Script file="Containers/Window.lua"/>
     <Script file="Widgets/Button.lua"/>
     <Script file="Widgets/CheckButton.lua"/>
-    <Script file="Widgets/Divider.lua"/>
-    <Script file="Widgets/Dropdown.lua"/>
+    <!-- <Script file="Widgets/Divider.lua"/> -->
+    <!-- <Script file="Widgets/Dropdown.lua"/> -->
     <Script file="Widgets/EditBox.lua"/>
-    <Script file="Widgets/Header.lua"/>
+    <!-- <Script file="Widgets/Header.lua"/> -->
     <Script file="Widgets/Label.lua"/>
-    <Script file="Widgets/MultiLineEditBox.lua"/>
-    <Script file="Widgets/OptionGroup.lua"/>
+    <!-- <Script file="Widgets/MultiLineEditBox.lua"/> -->
+    <!-- <Script file="Widgets/OptionGroup.lua"/> -->
     <Include file="Widgets/Scrollbar.xml"/>
-    <Script file="Widgets/ScrollList.lua"/>
-    <Script file="Widgets/SearchBox.lua"/>
-    <Script file="Widgets/StaticPopup.lua"/>
-    <Script file="Widgets/Table.lua"/>
+    <!-- <Script file="Widgets/ScrollList.lua"/> -->
+    <!-- <Script file="Widgets/SearchBox.lua"/> -->
+    <!-- <Script file="Widgets/StaticPopup.lua"/> -->
+    <!-- <Script file="Widgets/Table.lua"/> -->
     <Script file="Widgets/Texture.lua"/>
 </Ui>

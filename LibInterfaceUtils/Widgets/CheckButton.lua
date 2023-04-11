@@ -22,6 +22,7 @@ local defaults = {
 
 local maps = {
     methods = {
+        GetText = true,
         SetJustifyH = true,
         SetJustifyV = true,
         SetWordWrap = true,
