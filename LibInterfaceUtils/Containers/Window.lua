@@ -106,6 +106,10 @@ local methods = {
         end
     end,
 
+    GetAnchorX = function(self)
+        return self.verticalBox
+    end,
+
     GetAvailableHeight = function(self)
         return self.verticalBox:GetHeight()
     end,

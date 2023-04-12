@@ -67,7 +67,7 @@ function lib:CreateFrame()
         frame:SetStatus(date("%x %X", time()))
     end)
 
-    for i = 1, 3 do
+    for i = 1, 4 do
         -- local button = frame:New("Button")
         -- button:SetText("Button " .. i)
         -- button:SetAutoWidth(true)
@@ -88,18 +88,18 @@ function lib:CreateFrame()
         local label = frame:New("Label")
         label:SetText(i .. " Test a longer string that I can cut off to force a horizontal scrollbar.")
         -- label:SetIcon(134400)
-        if i == 1 then
-            label:SetStaticWidth(200)
-            label:SetDisabled(true)
-        elseif i == 2 then
-            label:SetStaticWidth(200)
-            -- label:SetWordWrap(false)
-            label:ShowTruncatedText(true)
-        elseif i == 3 then
-            label:SetFullWidth(true)
-            label:Set("test", "test")
-        end
-        label:SetWordWrap(false)
+        -- if i == 1 then
+        --     label:SetStaticWidth(200)
+        --     label:SetDisabled(true)
+        -- elseif i == 2 then
+        --     label:SetStaticWidth(200)
+        --     -- label:SetWordWrap(false)
+        --     label:ShowTruncatedText(true)
+        -- elseif i == 3 then
+        --     label:SetFullWidth(true)
+        --     -- label:Set("test", "test")
+        -- end
+        -- label:SetWordWrap(false)
         label:SetCallback("OnMouseDown", function()
             print("label", i)
         end)
