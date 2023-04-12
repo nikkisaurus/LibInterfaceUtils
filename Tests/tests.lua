@@ -88,17 +88,20 @@ function lib:CreateFrame()
         local label = frame:New("Label")
         label:SetText(i .. " Test a longer string that I can cut off to force a horizontal scrollbar.")
         -- label:SetIcon(134400)
-        -- if i == 1 then
-        --     label:SetStaticWidth(200)
-        --     label:SetDisabled(true)
-        -- elseif i == 2 then
-        --     label:SetStaticWidth(200)
-        --     -- label:SetWordWrap(false)
-        --     label:ShowTruncatedText(true)
-        -- elseif i == 3 then
-        --     label:SetFullWidth(true)
-        --     -- label:Set("test", "test")
-        -- end
+        if i == 1 then
+            label:SetWidth(400)
+            label:SetDisabled(true)
+            --     label:SetStaticWidth(200)
+            --     label:SetDisabled(true)
+            -- elseif i == 2 then
+            --     label:SetStaticWidth(200)
+            --     -- label:SetWordWrap(false)
+            --     label:ShowTruncatedText(true)
+            -- elseif i == 3 then
+            --     -- label:Set("test", "test")
+        else
+            label:SetFullWidth(true)
+        end
         -- label:SetWordWrap(false)
         label:SetCallback("OnMouseDown", function()
             print("label", i)
@@ -112,6 +115,21 @@ function lib:CreateFrame()
         --     self:SetTexture(134400)
         -- end)
     end
+
+    local container = frame:New("Group")
+    container:SetFullWidth(true)
+    container:SetPadding(0, 0, 0, 0)
+    container:SetSpacing(0, 0)
+    -- container:SetLabel("Icon")
+
+    local icon = container:New("Texture")
+    icon:SetSize(14, 14)
+    icon:SetTexture(134400)
+
+    local label = container:New("Label")
+    label:SetFillWidth(true)
+    label:SetText("This is an icon label because I hate my life. I really wish I didn't have to do this.")
+
     -- local button = frame:New("Button")
     -- button:SetFullWidth(true)
     -- button:SetText("button")

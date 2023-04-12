@@ -15,25 +15,27 @@ local defaults = {
 
 local templates = {
     default = {
-        label = {
-            font = "GameFontNormal",
-            color = private.assets.colors.flair,
-            justifyH = "LEFT",
+        font = "GameFontNormal",
+        color = private.assets.colors.flair,
+        justifyH = "LEFT",
+        bg = {
+            enabled = false,
         },
-        content = {
-            bgEnabled = false,
-            bordersEnabled = false,
+        borders = {
+            enabled = false,
         },
     },
     bordered = {
-        label = {
-            font = "GameFontNormal",
-            color = private.assets.colors.flair,
-            justifyH = "LEFT",
-        },
-        content = {
-            bgEnabled = true,
-            bordersEnabled = true,
+        font = "GameFontNormal",
+        color = private.assets.colors.flair,
+        justifyH = "LEFT",
+        borders = {
+            insets = {
+                top = 0,
+                left = 0,
+                right = 0,
+                bottom = 0,
+            },
         },
     },
 }
@@ -73,19 +75,11 @@ local methods = {
         self:SetLabel()
     end,
 
-    ApplyTemplate = function(self, templateName, mixin)
-        templateName = type(templateName) == "string" and templateName:lower() or templateName
-        local template
-        if type(templateName) == "table" then
-            template = CreateFromMixins(templates.default, templateName)
-        else
-            template = templates[templateName or "default"] or templates.default
-        end
+    ApplyTemplate = function(self, template, mixin)
+        local t = self:Set("template", type(template) == "table" and CreateFromMixins(mixin or templates.default, template) or templates[tostring(template):lower()] or templates.default)
 
-        private:SetFont(self.label, template.label)
-        private:SetBackdrop(self.container, template.content)
-
-        self:Set("template", template)
+        private:SetFont(self.label, t)
+        private:ApplyBackdrop(self.container, t)
     end,
 
     HasLabel = function(self)
@@ -93,7 +87,7 @@ local methods = {
     end,
 
     MarkDirty = function(self, usedWidth, usedHeight)
-        self:SetHeight(usedHeight + (self:HasLabel() and (self.label:GetHeight() + 5) or 0) + (self:Get("top")) + (self:Get("bottom")))
+        self:SetHeight(usedHeight + (self:HasLabel() and (self.label:GetHeight() + 2) or 0) + self.padding.top + self.padding.bottom)
     end,
 
     SetLabel = function(self, text)
@@ -101,7 +95,7 @@ local methods = {
 
         if private:strcheck(text) then
             self.label:Show()
-            self.container:SetPoint("TOP", self.label, "BOTTOM", 0, -5)
+            self.container:SetPoint("TOP", self.label, "BOTTOM", 0, -2)
         else
             self.label:Hide()
             self.container:SetPoint("TOP")
@@ -109,17 +103,19 @@ local methods = {
     end,
 
     SetPadding = function(self, left, right, top, bottom)
-        self:Set("left", left or 5)
-        self:Set("right", right or 5)
-        self:Set("top", top or 5)
-        self:Set("bottom", bottom or 5)
-        self.content:SetPoint("TOPLEFT", left or 5, -(top or 5))
-        self.content:SetPoint("BOTTOMRIGHT", -(right or 5), -(bottom or 5))
+        self.padding.left = left or self.padding.left
+        self.padding.right = right or self.padding.right
+        self.padding.top = top or self.padding.top
+        self.padding.bottom = bottom or self.padding.bottom
+
+        self.content:SetPoint("TOPLEFT", self.padding.left or 5, -(self.padding.top or 5))
+        self.content:SetPoint("BOTTOMRIGHT", -(self.padding.right or 5), -(self.padding.bottom or 5))
     end,
 }
 
 local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), UIParent)
+    frame = private:Mixin(frame, "Container", "UserData")
 
     frame.label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     frame.label:SetPoint("TOPLEFT")
@@ -129,10 +125,10 @@ local function creationFunc()
     frame.container = CreateFrame("Frame", nil, frame)
     frame.container:SetPoint("LEFT")
     frame.container:SetPoint("BOTTOMRIGHT")
-    frame.container = private:CreateTextures(frame.container)
-    frame.container:SetScript("OnEnter", childScripts.container.OnEnter)
-    frame.container:SetScript("OnLeave", childScripts.container.OnLeave)
-    frame.container:SetScript("OnMouseDown", childScripts.container.OnMouseDown)
+    -- frame.container = private:CreateTextures(frame.container)
+    -- frame.container:SetScript("OnEnter", childScripts.container.OnEnter)
+    -- frame.container:SetScript("OnLeave", childScripts.container.OnLeave)
+    -- frame.container:SetScript("OnMouseDown", childScripts.container.OnMouseDown)
 
     frame.content = CreateFrame("Frame", nil, frame.container)
     frame.content:SetScript("OnSizeChanged", childScripts.content.OnSizeChanged)
