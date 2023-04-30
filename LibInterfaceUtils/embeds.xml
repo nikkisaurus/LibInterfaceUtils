@@ -1,11 +1,11 @@
 <Ui>
     <Script file="LibInterfaceUtils.lua"/>
-    <!-- <Script file="Helpers.lua"/> -->
+    <Script file="Helpers.lua"/>
     <!-- <Script file="Layouts.lua"/> -->
-    <!-- <Script file="Registry.lua"/> -->
+    <Script file="Registry.lua"/>
     <!-- <Script file="Containers/CollapsibleGroup.lua"/> -->
     <!-- <Script file="Containers/DropdownGroup.lua"/> -->
-    <!-- <Script file="Containers/Frame.lua"/> -->
+    <Script file="Widgets/Frame.lua"/>
     <!-- <Script file="Containers/Group.lua"/> -->
     <!-- <Script file="Containers/ScrollFrame.lua"/> -->
     <!-- <Script file="Containers/TabGroup.lua"/> -->
@@ -20,7 +20,7 @@
     <!-- <Script file="Widgets/Label.lua"/> -->
     <!-- <Script file="Widgets/MultiLineEditBox.lua"/> -->
     <!-- <Script file="Widgets/OptionGroup.lua"/> -->
-    <!-- <Include file="Widgets/Scrollbar.xml"/> -->
+    <Include file="Widgets/Scrollbar.xml"/>
     <!-- <Script file="Widgets/ScrollList.lua"/> -->
     <!-- <Script file="Widgets/SearchBox.lua"/> -->
     <!-- <Script file="Widgets/StaticPopup.lua"/> -->
