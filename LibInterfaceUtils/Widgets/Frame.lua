@@ -39,6 +39,31 @@ local templates = {
     },
 }
 
+local childScripts = {
+    close = {
+        OnClick = function(self)
+            local obj = self:GetParent()
+            obj.widget:Release()
+        end,
+    },
+
+    resizer = {
+        OnMouseDown = function(self)
+            local obj = self:GetParent()
+            if obj:IsResizable() then
+                obj:StartSizing()
+            end
+        end,
+
+        OnMouseUp = function(self)
+            local obj = self:GetParent()
+            if obj:IsResizable() then
+                obj:StopMovingOrSizing()
+            end
+        end,
+    },
+}
+
 local events = {
     OnAcquire = function(widget)
         widget:ApplyTemplate()
@@ -204,32 +229,7 @@ local methods = {
     end,
 }
 
-local childScripts = {
-    close = {
-        OnClick = function(self)
-            local obj = self:GetParent()
-            obj.widget:Release()
-        end,
-    },
-
-    resizer = {
-        OnMouseDown = function(self)
-            local obj = self:GetParent()
-            if obj:IsResizable() then
-                obj:StartSizing()
-            end
-        end,
-
-        OnMouseUp = function(self)
-            local obj = self:GetParent()
-            if obj:IsResizable() then
-                obj:StopMovingOrSizing()
-            end
-        end,
-    },
-}
-
-local function constructor()
+local function creationFunc()
     local frame = CreateFrame("Frame", private:GetObjectName(objectType), private.UIParent)
     frame:SetToplevel(true)
     frame:EnableMouse(true)
@@ -287,4 +287,4 @@ local function constructor()
     return private:RegisterContainer({ obj = frame, type = objectType, content = frame.content }, events, methods)
 end
 
-private:RegisterObjectPool(objectType, version, constructor)
+private:RegisterObjectPool(objectType, version, creationFunc)

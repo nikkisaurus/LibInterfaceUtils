@@ -33,6 +33,23 @@ function private:MixinObject(widget)
     end
 end
 
+local ContainerMixin = {
+    DoLayout = function(self) end,
+
+    New = function(self, objectType)
+        local object = lib:New(objectType)
+        tinsert(self.children, object)
+        object.obj:SetParent(self.content)
+        return object
+    end,
+}
+
+function private:MixinContainer(widget)
+    for method, func in pairs(ContainerMixin) do
+        widget[method] = func
+    end
+end
+
 local maps = {
     container = {
         Hide = true,
@@ -40,7 +57,11 @@ local maps = {
         SetSize = true,
         Show = true,
     },
-    widget = {},
+    widget = {
+        Hide = true,
+        SetSize = true,
+        Show = true,
+    },
 }
 
 function private:RegisterMaps(widget, maps, self)
@@ -88,6 +109,22 @@ end
 function private:RegisterContainer(widget, events, methods)
     widget.children = {}
 
+    widget.callbacks = {}
+    widget.userdata = {}
+
+    widget.obj.widget = widget
+
+    private:RegisterMethods(widget, methods)
+    private:InitializeEvents(widget, "OnAcquire", "OnRelease")
+    private:RegisterEventCallbacks(widget, events)
+    private:RegisterMaps(widget, maps.container)
+    private:MixinObject(widget)
+    private:MixinContainer(widget)
+
+    return widget
+end
+
+function private:RegisterWidget(widget, events, methods)
     widget.callbacks = {}
     widget.userdata = {}
 

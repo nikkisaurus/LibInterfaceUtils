@@ -17,7 +17,7 @@
     <!-- <Script file="Widgets/Dropdown.lua"/> -->
     <!-- <Script file="Widgets/EditBox.lua"/> -->
     <!-- <Script file="Widgets/Header.lua"/> -->
-    <!-- <Script file="Widgets/Label.lua"/> -->
+    <Script file="Widgets/Label.lua"/>
     <!-- <Script file="Widgets/MultiLineEditBox.lua"/> -->
     <!-- <Script file="Widgets/OptionGroup.lua"/> -->
     <Include file="Widgets/Scrollbar.xml"/>

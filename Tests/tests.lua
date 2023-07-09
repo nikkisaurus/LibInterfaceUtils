@@ -5,11 +5,18 @@ if not lib then
 end
 
 function lib:CreateFrame()
-    local frame = lib:New("Frame")
+    local frame = self:New("Frame")
     frame:SetTitle("Frame")
     frame:SetSpecialFrame(true)
     frame:SetPoint("CENTER")
     frame:SetSize(500, 500)
+
+    local label = frame:New("Label")
+    label:SetText("This is a test string.")
+    label.obj:SetPoint("TOPLEFT")
+    -- label.obj:SetPoint("TOPRIGHT")
+
+    frame:DoLayout()
 end
 
 -- local tooltipFrame = CreateFrame("GameTooltip", addonName .. "TooltipFrame", UIParent, "GameTooltipTemplate")
