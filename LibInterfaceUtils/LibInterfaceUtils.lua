@@ -18,8 +18,7 @@ end
 local widget = {
 	Fire = function(self, event, ...)
 		local callback = self.callbacks[event]
-		if not callback then return end
-		callback(...)
+		if callback then callback(...) end
 	end,
 
 	Get = function(self, key)
@@ -28,8 +27,11 @@ local widget = {
 
 	RegisterCallback = function(self, event, callback)
 		assert(type(callback) == "function", "Invalid callback function supplied to :RegisterCallback()")
-		self.callbacks[event] = callback
-		if self._frame:HasScript(event) then self._frame:SetScript(event, callback) end
+		if self._frame:HasScript(event) then
+			self._frame:SetScript(event, callback)
+		else
+			self.callbacks[event] = callback
+		end
 	end,
 
 	Release = function(self)
@@ -45,6 +47,14 @@ local widget = {
 
 	SetSize = function(self, ...)
 		self._frame:SetSize(...)
+	end,
+
+	UnregisterCallback = function(self, event)
+		if self._frame:HasScript(event) then
+			self._frame:SetScript(event, nil)
+		else
+			self.callbacks[event] = nil
+		end
 	end,
 }
 
@@ -89,6 +99,8 @@ function lib:RegisterWidget(widgetType, version, isContainer, constructor, destr
 			widget.callbacks = {}
 			widget.data = {}
 			if isContainer then widget.children = {} end
+
+			widget._frame.widget = widget
 
 			return widget
 		end, destructor or Destructor)
