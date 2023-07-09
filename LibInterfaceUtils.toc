@@ -14,5 +14,5 @@
 
 LibInterfaceUtils/embeds.xml
 #@debug@
-Tests/tests.lua
+Tests/Tests.lua
 #@end-debug@
