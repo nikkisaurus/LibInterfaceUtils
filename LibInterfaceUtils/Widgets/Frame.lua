@@ -78,10 +78,10 @@ local mt = {
 	__index = widget,
 }
 
-lib:RegisterWidget(widgetType, version, function(pool)
+lib:RegisterWidget(widgetType, version, true, function(pool)
 	local frame = setmetatable({
-		_frame = CreateFrame("Frame", pool:GetNext(), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Frame", lib:GetNextWidget(pool), UIParent, "BackdropTemplate"),
 	}, mt)
 
 	return frame
-end, true)
+end)

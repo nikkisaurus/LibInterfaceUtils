@@ -36,6 +36,7 @@ local widget = {
 		assert(type(self) == "table", "Invalid widget reference supplied to :Release()")
 		assert(self.pool, "Invalid widget reference supplied to :Release()")
 		self.pool:Release(self)
+		Fire("OnRelease", widget)
 	end,
 
 	Set = function(self, key, value)
@@ -74,14 +75,9 @@ lib.pools = {}
 local function Destructor(_, widget)
 	widget:ClearAllPoints()
 	widget:Hide()
-	Fire("OnRelease", widget)
 end
 
-local function GetNext(self)
-	return ("LIU%s%d"):format(self.widgetType, #self + 1)
-end
-
-function lib:RegisterWidget(widgetType, version, constructor, isContainer)
+function lib:RegisterWidget(widgetType, version, isContainer, constructor, destructor)
 	assert(type(widgetType) == "string", ("Invalid widget type: '%s' must be a string value."):format(widgetType))
 	assert(type(version) == "number", ("Invalid version number for widget type '%s'."):format(widgetType))
 	assert(type(constructor) == "function", ("Invalid constructor function for widget type '%s'."):format(widgetType))
@@ -89,12 +85,16 @@ function lib:RegisterWidget(widgetType, version, constructor, isContainer)
 	local pool = lib.pools[widgetType]
 	if not (pool and pool.version >= version) then
 		pool = CreateObjectPool(function(...)
-			return Mixin(constructor(...), isContainer and container or widget)
-		end, Destructor)
+			local widget = Mixin(constructor(...), isContainer and container or widget)
+			widget.callbacks = {}
+			widget.data = {}
+			if isContainer then widget.children = {} end
+
+			return widget
+		end, destructor or Destructor)
 		pool:SetResetDisallowedIfNew(true)
 		pool.widgetType = widgetType
 		pool.version = version
-		pool.GetNext = GetNext
 		lib.pools[widgetType] = pool
 	end
 end
@@ -108,8 +108,6 @@ function lib:New(widgetType)
 	assert(pool, ("Widget type '%s' does not exist."):format(widgetType))
 
 	local widget = pool:Acquire()
-	widget.callbacks = {}
-	widget.data = {}
 	widget.pool = pool
 	Fire("OnAcquire", widget)
 
@@ -118,4 +116,13 @@ end
 
 function lib:Release(widget)
 	widget:Release()
+end
+
+-- *******************************
+-- *** Helpers ***
+-- *******************************
+
+function lib:GetNextWidget(pool)
+	assert(pool and pool.widgetType and lib.pools[pool.widgetType], "Invalid widget pool supplied to :GetNextWidget()")
+	return ("LIU%s%d"):format(pool.widgetType, #pool + 1)
 end
