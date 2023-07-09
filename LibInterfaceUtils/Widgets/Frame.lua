@@ -83,5 +83,15 @@ lib:RegisterWidget(widgetType, version, true, function(pool)
 		_frame = CreateFrame("Frame", lib:GetNextWidget(pool), UIParent, "BackdropTemplate"),
 	}, mt)
 
+	frame.content = CreateFrame("Frame", nil, frame._frame, "BackdropTemplate")
+	frame.content:SetAllPoints(frame._frame)
+	-- frame.content:SetBackdrop({
+	-- 	bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
+	-- 	edgeFile = [[INTERFACE/BUTTONS/WHITE8X8]],
+	-- 	edgeSize = 1,
+	-- })
+	-- frame.content:SetBackdropColor(1, 0, 0, 0.75)
+	-- frame.content:SetBackdropBorderColor(1, 0, 0, 1)
+
 	return frame
 end)

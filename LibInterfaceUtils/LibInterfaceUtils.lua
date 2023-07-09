@@ -98,7 +98,13 @@ function lib:RegisterWidget(widgetType, version, isContainer, constructor, destr
 			local widget = Mixin(constructor(...), isContainer and container or widget)
 			widget.callbacks = {}
 			widget.data = {}
-			if isContainer then widget.children = {} end
+			if isContainer then
+				assert(
+					type(widget.content) == "table",
+					("Widgets of type '%s' must provide a content frame."):format(widgetType)
+				)
+				widget.children = {}
+			end
 
 			widget._frame.widget = widget
 
