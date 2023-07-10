@@ -9,7 +9,6 @@ lib.layouts = {
 		local rowHeight = 0
 		local availableWidth = frame:GetWidth() - padding.left - padding.right
 		local rowWidth = 0
-		local currentRowFullWidth = false
 
 		for i, child in ipairs(children) do
 			-- Save the original size if not already saved
@@ -21,19 +20,23 @@ lib.layouts = {
 			end
 
 			-- Start a new row if fullWidth is true or availableWidth is zero
-			if child.state.fullWidth or availableWidth == 0 or currentRowFullWidth then
+			if child.state.fullWidth or availableWidth == 0 then
 				xOffset = padding.left
 				yOffset = yOffset - rowHeight - spacing.y
 				rowHeight = 0
 				rowWidth = 0
-				currentRowFullWidth = false
 			end
 
 			-- Calculate the remaining width for fillWidth child
 			local remainingWidth = availableWidth - rowWidth
-			if (child.state.fillWidth or child.state.fullWidth) and remainingWidth > 0 then
-				child:SetSize(remainingWidth, child:GetHeight())
+			if child.state.fullWidth and remainingWidth > 0 then
+				-- Set the child width to the availableWidth
+				child:SetSize(availableWidth, child:GetHeight())
 				rowWidth = availableWidth
+			elseif child.state.fillWidth and remainingWidth > 0 then
+				-- Set the child width to the remainingWidth
+				child:SetSize(remainingWidth, child:GetHeight())
+				rowWidth = rowWidth + remainingWidth + spacing.x
 			else
 				-- Set the child width based on the original size and available width
 				local childWidth = math.min(child.state.originalSize.width, availableWidth)
@@ -57,12 +60,10 @@ lib.layouts = {
 			-- Update xOffset, rowHeight, and adjust rowWidth
 			xOffset = xOffset + child:GetWidth() + spacing.x
 			rowHeight = math.max(rowHeight, child:GetHeight())
-			rowWidth = rowWidth + spacing.x
-
-			if child.state.fullWidth then currentRowFullWidth = true end
 		end
 
 		-- Adjust the frame height based on the children's layout
 		frame:SetHeight(math.abs(yOffset) + rowHeight + padding.top + padding.bottom)
 	end,
+	list = function(self, frame, children) end,
 }
