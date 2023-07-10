@@ -34,8 +34,8 @@ local widgetType, version = "Frame", 1
 local widget = {
 	OnAcquire = function(self)
 		self:SetBackdrop(lib.defaultBackdrop)
-		self:SetBackdropColor(unpack(lib.colors.elvBackdrop))
-		self:SetBackdropBorderColor(0, 0, 0, 1)
+		self:SetBackdropColor(unpack(lib.colors.elvTransparent))
+		self:SetBackdropBorderColor(unpack(lib.colors.black))
 		self:SetMovable(true)
 		self:EnableResize(true, 100, 100)
 		self:SetPoint("CENTER")
@@ -137,7 +137,7 @@ lib:RegisterWidget(widgetType, version, true, function(pool)
 		edgeSize = 1,
 	})
 	frame.content:SetBackdropColor(unpack(lib.colors.elvTransparent))
-	frame.content:SetBackdropBorderColor(0, 0, 0, 1)
+	frame.content:SetBackdropBorderColor(unpack(lib.colors.black))
 
 	return frame
 end)

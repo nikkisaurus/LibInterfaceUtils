@@ -48,7 +48,7 @@ local TEXTURES = {
 		},
 		texture = {
 			texture = lib.defaultTexture,
-			color = lib.colors.elvTransparent,
+			color = lib.colors.elvBackdrop,
 		},
 	},
 	Pushed = {
@@ -63,7 +63,7 @@ local TEXTURES = {
 		},
 		texture = {
 			texture = lib.defaultTexture,
-			color = lib.colors.elvTransparent,
+			color = lib.colors.elvBackdrop,
 		},
 	},
 }

@@ -17,9 +17,10 @@ local widget = {
 		self:SetJustifyV()
 		self:SetTitle()
 		self:SetBackdrop(lib.defaultBackdrop)
-		self:SetBackdropColor(1, 0, 0, 1)
-		self:SetBackdropBorderColor(0, 0, 0, 1)
+		self:SetBackdropColor(unpack(lib.colors.elvTransparent))
+		self:SetBackdropBorderColor(unpack(lib.colors.black))
 		self:SetAutoHeight(true)
+		self:SetCollapsible(true)
 		self:Show()
 	end,
 
@@ -69,6 +70,10 @@ local widget = {
 
 	SetBackdropColor = function(self, ...)
 		self.content:SetBackdropColor(...)
+	end,
+
+	SetCollapsible = function(self, collapsible)
+		self.state.collapsible = collapsible
 	end,
 
 	SetFont = function(self, font)
