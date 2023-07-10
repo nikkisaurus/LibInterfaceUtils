@@ -69,6 +69,10 @@ local widget = {
 		self.state.fillWidth = fillWidth
 	end,
 
+	SetFullHeight = function(self, fullHeight)
+		self.state.fullHeight = fullHeight
+	end,
+
 	SetFullWidth = function(self, fullWidth)
 		self.state.fullWidth = fullWidth
 	end,
@@ -178,6 +182,8 @@ function lib:RegisterWidget(widgetType, version, isContainer, constructor, destr
 					("Widgets of type '%s' must provide a content frame."):format(widgetType)
 				)
 				widget.children = {}
+				widget.layout = lib.layouts.flow
+				-- widget.layout = lib.layouts.list
 				widget._frame:SetScript("OnSizeChanged", function()
 					widget:DoLayout()
 				end)

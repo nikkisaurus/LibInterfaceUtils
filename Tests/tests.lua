@@ -22,6 +22,8 @@ local function TestFrame()
 
 	local button3 = frame:New("Button")
 	button3:SetText("Click Me!")
+	button3:SetFullHeight(true)
+	button3:SetFullWidth(true)
 
 	local button4 = frame:New("Button")
 	button4:SetText("Click Me!")

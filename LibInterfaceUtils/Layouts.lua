@@ -15,6 +15,7 @@ lib.layouts = {
 			firstChild:SetPoint("TOPLEFT", frame, "TOPLEFT", padding.left, -padding.top)
 		end
 	end,
+
 	flow = function(self, frame, children)
 		local padding = self.state.padding
 		local spacing = self.state.spacing
@@ -22,6 +23,7 @@ lib.layouts = {
 		local rowHeight = 0
 		local availableWidth = frame:GetWidth() - padding.left - padding.right
 		local rowWidth = 0
+		local availableHeight = frame:GetHeight() - padding.top - padding.bottom
 
 		for i, child in ipairs(children) do
 			-- Save the original size if not already saved
@@ -67,22 +69,34 @@ lib.layouts = {
 				end
 			end
 
+			-- Check if child has fullHeight property
+			if child.state.fullHeight then
+				-- Set the child height to the remaining height of the frame
+				local childHeight =
+					math.max(child.state.originalSize.height, availableHeight - math.abs(yOffset) - spacing.y)
+				child:SetSize(child:GetWidth(), childHeight)
+			end
+
 			-- Position the child on the current row
 			child:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
 
 			-- Update xOffset, rowHeight, and adjust rowWidth
 			xOffset = xOffset + child:GetWidth() + spacing.x
 			rowHeight = math.max(rowHeight, child:GetHeight())
+
+			if child.state.fullHeight then break end
 		end
 
 		-- Adjust the frame height based on the children's layout
 		frame:SetHeight(math.abs(yOffset) + rowHeight + padding.top + padding.bottom)
 	end,
+
 	list = function(self, frame, children)
 		local padding = self.state.padding
 		local spacing = self.state.spacing
 		local yOffset = -padding.top
 		local availableWidth = frame:GetWidth() - padding.left - padding.right
+		local availableHeight = frame:GetHeight() - padding.top - padding.bottom
 
 		for i, child in ipairs(children) do
 			-- Save the original size if not already saved
@@ -104,11 +118,21 @@ lib.layouts = {
 				child:SetSize(maxWidth, child:GetHeight())
 			end
 
+			-- Check if child has fullHeight property
+			if child.state.fullHeight then
+				-- Set the child height to the remaining height of the frame
+				local childHeight =
+					math.max(child.state.originalSize.height, availableHeight - math.abs(yOffset) - spacing.y)
+				child:SetSize(child:GetWidth(), childHeight)
+			end
+
 			-- Position the child on the current row
 			child:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
 
 			-- Update the y-offset for the next row
 			yOffset = yOffset - child:GetHeight() - spacing.y
+
+			if child.state.fullHeight then break end
 		end
 
 		-- Adjust the frame height based on the children's layout
