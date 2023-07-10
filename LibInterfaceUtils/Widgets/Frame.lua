@@ -40,6 +40,15 @@ local widget = {
 		})
 		self:SetBackdropColor(unpack(lib.colors.elvBackdrop))
 		self:SetBackdropBorderColor(0, 0, 0, 1)
+
+		self.content:SetBackdrop({
+			bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
+			edgeFile = [[INTERFACE/BUTTONS/WHITE8X8]],
+			edgeSize = 1,
+		})
+		self.content:SetBackdropColor(unpack(lib.colors.elvTransparent))
+		self.content:SetBackdropBorderColor(0, 0, 0, 1)
+
 		self:SetMovable(true)
 		self:EnableResize(true, 100, 100)
 		self:SetPoint("CENTER")
@@ -134,14 +143,6 @@ lib:RegisterWidget(widgetType, version, true, function(pool)
 	frame.content:SetPoint("TOP", title, "BOTTOM", 0, -4)
 	frame.content:SetPoint("LEFT")
 	frame.content:SetPoint("BOTTOMRIGHT")
-
-	frame.content:SetBackdrop({
-		bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
-		edgeFile = [[INTERFACE/BUTTONS/WHITE8X8]],
-		edgeSize = 1,
-	})
-	frame.content:SetBackdropColor(unpack(lib.colors.elvTransparent))
-	frame.content:SetBackdropBorderColor(0, 0, 0, 1)
 
 	return frame
 end)
