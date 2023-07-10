@@ -15,7 +15,7 @@ local function TestFrame()
 
 	-- local group = nestMe:New("Group")
 	local group = frame:New("Group")
-	group:SetLayout("fill")
+	group:SetLayout("list")
 	group:SetFullWidth(true)
 	group:SetTitle("Nest Container")
 	-- group:RegisterCallback("OnSizeChanged", function()
@@ -26,6 +26,9 @@ local function TestFrame()
 	nestedGroup:SetLayout("flow")
 	nestedGroup:SetTitle("Test Buttons")
 	-- group:SetFullHeight(true)
+
+	local l = group:New("Label")
+	l:SetText("Testing")
 
 	local button = nestedGroup:New("Button")
 	button:SetText("Click Me!")
