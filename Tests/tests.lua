@@ -9,7 +9,7 @@ local function TestFrame()
 
 	local label = frame:New("Label")
 	label:SetIcon(134400)
-	label:SetText("Testing string size and whatnot TOPLEFT")
+	label:SetText("Testing string size and whatnot TOPLEFT blah blah need this to be a little longer")
 	label:SetFullWidth(true)
 
 	local label2 = frame:New("Label")

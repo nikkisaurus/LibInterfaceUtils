@@ -209,6 +209,10 @@ lib:RegisterWidget(widgetType, version, false, function(pool)
 		_frame = CreateFrame("Frame", lib:GetNextWidget(pool), UIParent, "BackdropTemplate"),
 	}, mt)
 
+	frame._frame:SetScript("OnSizeChanged", function()
+		frame:SetAnchors()
+	end)
+
 	frame._frame.icon = frame._frame:CreateTexture(nil, "ARTWORK")
 	frame._frame.text = frame._frame:CreateFontString(nil, "OVERLAY")
 

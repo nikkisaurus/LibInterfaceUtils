@@ -41,7 +41,7 @@ local widget = {
 		self:SetBackdropColor(0, 0, 0, 0.75)
 		self:SetBackdropBorderColor(0, 0, 0, 1)
 		self:SetMovable(true)
-		self:EnableResize(true, 300, 300)
+		self:EnableResize(true, 100, 100)
 		self:SetPoint("CENTER")
 		self:SetSize(700, 500)
 		self:Show()
