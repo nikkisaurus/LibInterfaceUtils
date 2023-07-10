@@ -33,11 +33,7 @@ local widgetType, version = "Frame", 1
 
 local widget = {
 	OnAcquire = function(self)
-		self:SetBackdrop({
-			bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
-			edgeFile = [[INTERFACE/BUTTONS/WHITE8X8]],
-			edgeSize = 1,
-		})
+		self:SetBackdrop(lib.defaultBackdrop)
 		self:SetBackdropColor(unpack(lib.colors.elvBackdrop))
 		self:SetBackdropBorderColor(0, 0, 0, 1)
 		self:SetMovable(true)
@@ -136,8 +132,8 @@ lib:RegisterWidget(widgetType, version, true, function(pool)
 	frame.content:SetPoint("BOTTOMRIGHT")
 
 	frame.content:SetBackdrop({
-		bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
-		edgeFile = [[INTERFACE/BUTTONS/WHITE8X8]],
+		bgFile = lib.defaultTexture,
+		edgeFile = lib.defaultTexture,
 		edgeSize = 1,
 	})
 	frame.content:SetBackdropColor(unpack(lib.colors.elvTransparent))

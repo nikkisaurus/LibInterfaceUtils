@@ -10,14 +10,14 @@ local TEXTURES = {
 		border = {
 			enabled = true,
 			size = 1,
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
+			texture = lib.defaultTexture,
 			color = { 1, 1, 1, 0.25 },
 		},
 		text = {
 			fontObject = GameFontDisable,
 		},
 		texture = {
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
+			texture = lib.defaultTexture,
 			color = { 0, 0, 0, 0.25 },
 		},
 	},
@@ -25,29 +25,29 @@ local TEXTURES = {
 		border = {
 			enabled = true,
 			size = 1,
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
-			color = { 1, 1, 1, 1 },
+			texture = lib.defaultTexture,
+			color = lib.colors.white,
 		},
 		text = {
 			fontObject = GameFontHighlight,
 		},
 		texture = {
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
-			color = { 0, 0, 0, 1 },
+			texture = lib.defaultTexture,
+			color = lib.colors.black,
 		},
 	},
 	Normal = {
 		border = {
 			enabled = true,
 			size = 1,
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
-			color = { 0, 0, 0, 1 },
+			texture = lib.defaultTexture,
+			color = lib.colors.black,
 		},
 		text = {
 			fontObject = GameFontNormal,
 		},
 		texture = {
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
+			texture = lib.defaultTexture,
 			color = lib.colors.elvTransparent,
 		},
 	},
@@ -55,14 +55,14 @@ local TEXTURES = {
 		border = {
 			enabled = true,
 			size = 1,
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
+			texture = lib.defaultTexture,
 			color = lib.colors.gold,
 		},
 		text = {
 			fontObject = GameFontNormal,
 		},
 		texture = {
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
+			texture = lib.defaultTexture,
 			color = lib.colors.elvTransparent,
 		},
 	},

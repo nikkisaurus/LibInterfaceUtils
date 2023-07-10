@@ -13,7 +13,12 @@ lib.layouts = {
 				frame:GetHeight() - padding.top - padding.bottom
 			)
 			firstChild:SetPoint("TOPLEFT", frame, "TOPLEFT", padding.left, -padding.top)
+
+			-- Do child layout
+			lib:safecall(firstChild.DoLayout, firstChild)
 		end
+
+		return frame:GetSize()
 	end,
 
 	flow = function(self, frame, children)
@@ -81,13 +86,20 @@ lib.layouts = {
 			-- Position the child on the current row
 			child:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
 
+			-- Do child layout
+			-- self:PauseLayout()
+			if child.DoLayout then child:DoLayout() end
+			-- lib:safecall(child.DoLayout, child)
+			-- self:ResumeLayout()
+
 			-- Update xOffset, rowHeight, and adjust rowWidth
 			xOffset = xOffset + child:GetWidth() + spacing.x
 			rowHeight = math.max(rowHeight, child:GetHeight())
 		end
 
 		-- Adjust the frame height based on the children's layout
-		frame:SetHeight(math.abs(yOffset) + rowHeight + padding.top + padding.bottom)
+		local contentHeight = math.abs(yOffset) + rowHeight + padding.top + padding.bottom
+		return frame:GetWidth(), contentHeight
 	end,
 
 	list = function(self, frame, children)
@@ -130,6 +142,9 @@ lib.layouts = {
 			-- Position the child on the current row
 			child:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
 
+			-- Do child layout
+			lib:safecall(child.DoLayout, child)
+
 			-- Update the y-offset for the next row
 			yOffset = yOffset - child:GetHeight() - spacing.y
 
@@ -138,6 +153,6 @@ lib.layouts = {
 
 		-- Adjust the frame height based on the children's layout
 		local contentHeight = math.abs(yOffset) + padding.top + padding.bottom
-		frame:SetHeight(contentHeight)
+		return frame:GetWidth(), contentHeight
 	end,
 }

@@ -186,13 +186,11 @@ local widget = {
 	end,
 
 	SetText = function(self, text)
-		self.state.text = text
 		self._frame.text:SetText(text or "")
 		self:SetAnchors()
 	end,
 
 	SetWordWrap = function(self, canWrap)
-		self.state.canWrap = canWrap or false
 		self._frame.text:SetWordWrap(canWrap or false)
 	end,
 }
@@ -214,7 +212,7 @@ lib:RegisterWidget(widgetType, version, false, function(pool)
 	frame._frame.text = frame._frame:CreateFontString(nil, "OVERLAY")
 
 	-- frame._frame:SetBackdrop({
-	-- 	bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
+	-- 	bgFile = lib.defaultTexture,
 	-- })
 	-- frame._frame:SetBackdropColor(0, 1, 0, 0.75)
 

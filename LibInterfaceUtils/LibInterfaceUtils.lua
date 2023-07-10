@@ -2,6 +2,13 @@ local lib = LibStub:NewLibrary("LibInterfaceUtils-1.0", 1)
 if not lib then return end
 
 -- *******************************
+-- *** Throttler ***
+-- *******************************
+
+local frame = CreateFrame("Frame")
+frame:Hide()
+
+-- *******************************
 -- *** Events ***
 -- *******************************
 
@@ -118,8 +125,17 @@ local container = Mixin({
 		tinsert(self.children, widget)
 	end,
 
+	DoLayoutDeferred = function(self)
+		C_Timer.NewTicker(0.1, function()
+			self:DoLayout()
+		end, 1)
+	end,
+
 	DoLayout = function(self)
-		self:layout(self.content, self.children)
+		if self.state.paused then return end
+		local width, height = self:layout(self.content, self.children)
+		Fire("OnLayoutFinished", self, width, height)
+		return width, height
 	end,
 
 	New = function(self, widgetType)
@@ -127,6 +143,10 @@ local container = Mixin({
 		widget._frame:SetParent(self.content)
 		tinsert(self.children, widget)
 		return widget
+	end,
+
+	PauseLayout = function(self)
+		self.state.paused = true
 	end,
 
 	ReleaseChild = function(self, widget)
@@ -137,7 +157,7 @@ local container = Mixin({
 			end
 		end
 		widget:Release()
-		self:DoLayout()
+		self:DoLayoutDeferred()
 	end,
 
 	ReleaseChildren = function(self)
@@ -145,7 +165,11 @@ local container = Mixin({
 			child:Release()
 		end
 		self.children = {}
-		self:DoLayout()
+		self:DoLayoutDeferred()
+	end,
+
+	ResumeLayout = function(self)
+		self.state.paused = nil
 	end,
 
 	SetLayout = function(self, layout)
@@ -182,10 +206,9 @@ function lib:RegisterWidget(widgetType, version, isContainer, constructor, destr
 					("Widgets of type '%s' must provide a content frame."):format(widgetType)
 				)
 				widget.children = {}
-				-- widget.layout = lib.layouts.flow
-				widget.layout = lib.layouts.list
+				widget.layout = lib.layouts.flow
 				widget._frame:SetScript("OnSizeChanged", function()
-					widget:DoLayout()
+					widget:DoLayoutDeferred()
 				end)
 			end
 

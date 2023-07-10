@@ -6,26 +6,33 @@ local function TestFrame()
 	frame:RegisterCallback("OnRelease", function()
 		print("Bye")
 	end)
+	-- frame:SetLayout("fill")
 
-	local button = frame:New("Button")
+	local group = frame:New("Group")
+	group:SetLayout("flow")
+	group:SetFullWidth(true)
+	group:SetTitle("Test Buttons")
+	-- group:SetFullHeight(true)
+
+	local button = group:New("Button")
 	button:SetText("Click Me!")
 	button:Disable()
 	button:SetFullWidth(true)
 
-	local button1 = frame:New("Button")
+	local button1 = group:New("Button")
 	button1:SetText("Click Me!")
 	button1:Disable()
 
-	local button2 = frame:New("Button")
+	local button2 = group:New("Button")
 	button2:SetText("Click Me!")
 	button2:SetFillWidth(true)
 
-	local button3 = frame:New("Button")
+	local button3 = group:New("Button")
 	button3:SetText("Click Me!")
 	-- button3:SetFullHeight(true)
 	button3:SetFullWidth(true)
 
-	local button4 = frame:New("Button")
+	local button4 = group:New("Button")
 	button4:SetText("Click Me!")
 	button4:SetFullWidth(true)
 	-- button:SetText("Click Me! You'll never guess what I do.")
@@ -36,8 +43,6 @@ local function TestFrame()
 	button1:RegisterCallback("OnEnter", function()
 		print("Hijacking")
 	end)
-
-	-- if true then return end
 
 	-- button:UnregisterCallback("OnEnter")
 
