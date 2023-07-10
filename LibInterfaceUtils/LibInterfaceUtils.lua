@@ -44,7 +44,10 @@ local widget = {
 	RegisterCallback = function(self, event, callback)
 		assert(type(callback) == "function", "Invalid callback function supplied to :RegisterCallback()")
 		if self._frame:HasScript(event) then
-			self._frame:SetScript(event, callback)
+			self._frame:SetScript(event, function(frame, ...)
+				if frame.widget[event] then frame.widget[event](frame.widget, ...) end
+				callback(...)
+			end)
 		else
 			self.callbacks[event] = callback
 		end
@@ -88,7 +91,9 @@ local widget = {
 
 	UnregisterCallback = function(self, event)
 		if self._frame:HasScript(event) then
-			self._frame:SetScript(event, nil)
+			self._frame:SetScript(event, self[event] and function(frame, ...)
+				if frame.widget[event] then frame.widget[event](frame.widget, ...) end
+			end or nil)
 		else
 			self.callbacks[event] = nil
 		end
@@ -176,6 +181,14 @@ function lib:RegisterWidget(widgetType, version, isContainer, constructor, destr
 			end
 
 			widget._frame.widget = widget
+
+			for event, callback in pairs(widget) do
+				if widget._frame:HasScript(event) then
+					widget._frame:SetScript(event, function(frame, ...)
+						if frame.widget[event] then frame.widget[event](frame.widget, ...) end
+					end)
+				end
+			end
 
 			return widget
 		end, destructor or Destructor)

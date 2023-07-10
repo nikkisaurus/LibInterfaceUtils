@@ -38,12 +38,14 @@ local widget = {
 			edgeFile = [[INTERFACE/BUTTONS/WHITE8X8]],
 			edgeSize = 1,
 		})
-		self:SetBackdropColor(0, 0, 0, 0.75)
+		self:SetBackdropColor(unpack(lib.colors.elvBackdrop))
 		self:SetBackdropBorderColor(0, 0, 0, 1)
 		self:SetMovable(true)
 		self:EnableResize(true, 100, 100)
 		self:SetPoint("CENTER")
 		self:SetSize(700, 500)
+		self:SetPadding(5, 5, 5, 5)
+		self:SetSpacing(5, 5)
 		self:Show()
 	end,
 
@@ -81,20 +83,32 @@ local widget = {
 		frame:SetScript("OnDragStart", movable and OnDragStart or nil)
 		frame:SetScript("OnDragStop", movable and OnDragStop or nil)
 	end,
+
+	SetPadding = function(self, left, right, top, bottom)
+		self.state.padding = {
+			left = left or 0,
+			right = right or 0,
+			top = top or 0,
+			bottom = bottom or 0,
+		}
+	end,
+
+	SetSpacing = function(self, x, y)
+		self.state.spacing = {
+			x = x or 0,
+			y = y or 0,
+		}
+	end,
 }
 
 -- *******************************
 -- *** Registration ***
 -- *******************************
 
-local mt = {
-	__index = widget,
-}
-
 lib:RegisterWidget(widgetType, version, true, function(pool)
-	local frame = setmetatable({
+	local frame = CreateFromMixins({
 		_frame = CreateFrame("Frame", lib:GetNextWidget(pool), UIParent, "BackdropTemplate"),
-	}, mt)
+	}, widget)
 
 	frame._frame.resizer = CreateFrame("Button", nil, frame._frame)
 	frame._frame.resizer:SetNormalTexture(386862)
@@ -117,13 +131,17 @@ lib:RegisterWidget(widgetType, version, true, function(pool)
 	title:SetText("Frame")
 
 	frame.content = CreateFrame("Frame", nil, frame._frame, "BackdropTemplate")
-	frame.content:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -4)
-	frame.content:SetPoint("BOTTOMRIGHT", -4, 4)
+	frame.content:SetPoint("TOP", title, "BOTTOM", 0, -4)
+	frame.content:SetPoint("LEFT")
+	frame.content:SetPoint("BOTTOMRIGHT")
 
-	-- frame.content:SetBackdrop({
-	-- 	bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
-	-- })
-	-- frame.content:SetBackdropColor(1, 0, 0, 0.75)
+	frame.content:SetBackdrop({
+		bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
+		edgeFile = [[INTERFACE/BUTTONS/WHITE8X8]],
+		edgeSize = 1,
+	})
+	frame.content:SetBackdropColor(unpack(lib.colors.elvTransparent))
+	frame.content:SetBackdropBorderColor(0, 0, 0, 1)
 
 	return frame
 end)

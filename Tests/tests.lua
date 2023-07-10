@@ -8,10 +8,22 @@ local function TestFrame()
 	end)
 
 	local button = frame:New("Button")
-	button:SetText("Click Me! You'll never guess what I do.")
-	button:RegisterCallback("OnClick", function()
-		print("I pressed a button!")
+	button:SetText("Click Me!")
+	button:Disable()
+	local button2 = frame:New("Button")
+	button2:SetText("Click Me!")
+	-- button:SetText("Click Me! You'll never guess what I do.")
+	-- button:RegisterCallback("OnClick", function()
+	-- 	print("I pressed a button!")
+	-- end)
+
+	button:RegisterCallback("OnEnter", function()
+		print("Hijacking")
 	end)
+
+	if true then return end
+
+	-- button:UnregisterCallback("OnEnter")
 
 	local label = frame:New("Label")
 	label:SetIcon(134400)

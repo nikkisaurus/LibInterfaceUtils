@@ -201,14 +201,10 @@ local widget = {
 -- *** Registration ***
 -- *******************************
 
-local mt = {
-	__index = widget,
-}
-
 lib:RegisterWidget(widgetType, version, false, function(pool)
-	local frame = setmetatable({
+	local frame = CreateFromMixins({
 		_frame = CreateFrame("Frame", lib:GetNextWidget(pool), UIParent, "BackdropTemplate"),
-	}, mt)
+	}, widget)
 
 	frame._frame:SetScript("OnSizeChanged", function()
 		frame:SetAnchors()
