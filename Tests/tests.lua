@@ -8,7 +8,12 @@ local function TestFrame()
 	end)
 	-- frame:SetLayout("fill")
 
-	local group = frame:New("Group")
+	local nestMe = frame:New("Group")
+	nestMe:SetFullWidth(true)
+	nestMe:SetAutoHeight(false)
+	nestMe:SetBackdrop()
+
+	local group = nestMe:New("Group")
 	group:SetLayout("flow")
 	group:SetFullWidth(true)
 	group:SetTitle("Test Buttons")
