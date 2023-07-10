@@ -99,7 +99,7 @@ local widget = {
 		self:SetWordWrap(true)
 		self:SetIcon()
 		self:SetText()
-		self:SetAutoWidth()
+		self:SetAutoWidth(true)
 		self:Show()
 	end,
 
@@ -122,7 +122,7 @@ local widget = {
 			icon:SetPoint(unpack(points.icon))
 			text:SetPoint(unpack(points.text[1]))
 
-			if self.state.autoWidth and not self.state.fillWidth then
+			if self.state.autoWidth and not self.state.fullWidth then
 				text:SetWidth(text:GetStringWidth())
 				self:SetWidth((points.iconWidth and size or 0) + text:GetWidth())
 			else
@@ -137,7 +137,7 @@ local widget = {
 		else
 			text:SetPoint("TOPLEFT")
 
-			if self.state.autoWidth and not self.state.fillWidth then
+			if self.state.autoWidth and not self.state.fullWidth then
 				text:SetWidth(text:GetStringWidth())
 				self:SetWidth(text:GetWidth())
 			else
