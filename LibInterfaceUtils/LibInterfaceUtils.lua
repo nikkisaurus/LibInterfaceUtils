@@ -184,7 +184,9 @@ local container = Mixin({
 	end,
 
 	SetLayout = function(self, layout)
-		self.layout = lib.layouts[layout:lower()] or layout
+		layout = layout:lower()
+		self.state.layout = layout
+		self.layout = lib.layouts[layout] or layout
 	end,
 }, widget)
 

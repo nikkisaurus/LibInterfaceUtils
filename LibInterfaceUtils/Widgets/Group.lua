@@ -49,6 +49,8 @@ local widget = {
 
 	OnLayoutFinished = function(self, _, height)
 		if self.state.autoHeight then
+			local parent = self.state.parent
+			if parent and parent.state.layout == "fill" then return end
 			local padding = self.state.titlePadding
 			local titleHeight = self._frame.titlebar.title:GetHeight()
 			local pendingHeight = height + titleHeight + padding.top + padding.bottom - padding.content

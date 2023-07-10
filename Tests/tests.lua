@@ -15,7 +15,7 @@ local function TestFrame()
 
 	-- local group = nestMe:New("Group")
 	local group = frame:New("Group")
-	-- group:SetLayout("fill")
+	group:SetLayout("fill")
 	group:SetFullWidth(true)
 	group:SetTitle("Nest Container")
 	-- group:RegisterCallback("OnSizeChanged", function()
