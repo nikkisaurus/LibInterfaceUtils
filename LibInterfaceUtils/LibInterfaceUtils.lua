@@ -29,7 +29,10 @@ local widget = {
 
 	DoParentLayout = function(self)
 		local parent = self.state.parent
-		if parent then parent:DoLayout(self) end
+		while parent do
+			parent:DoLayout()
+			parent = parent.state.parent
+		end
 	end,
 
 	Fire = function(self, event, ...)

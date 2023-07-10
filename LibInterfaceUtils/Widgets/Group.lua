@@ -19,7 +19,6 @@ local function OnMouseDown(title)
 	end
 
 	widget:UpdateIconState()
-	widget:DoParentLayout()
 end
 
 -- *******************************
@@ -63,6 +62,7 @@ local widget = {
 		local title = titlebar.title
 		local padding = self.state.titlePadding
 		titlebar:SetHeight(title:GetHeight() + padding.top + padding.bottom)
+		self:DoParentLayout()
 	end,
 
 	SetAnchors = function(self)

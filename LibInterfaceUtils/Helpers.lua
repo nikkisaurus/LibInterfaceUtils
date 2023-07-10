@@ -22,7 +22,7 @@ function lib:IsStringValid(str)
 end
 
 function lib:safecall(func, ...)
-	if type(func) == "function" then func(...) end
+	if type(func) == "function" then return func(...) end
 end
 
 function lib:SetFont(fontString, font)
