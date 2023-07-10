@@ -4,7 +4,7 @@ if not lib then return end
 lib.layouts = {
 	flow = function(self, frame, children)
 		local spacing = 10
-		local xOffset, yOffset = 0, 10
+		local xOffset, yOffset = 0, 0
 		local rowHeight = 0
 
 		for i, child in ipairs(children) do

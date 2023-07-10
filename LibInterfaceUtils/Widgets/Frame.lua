@@ -120,10 +120,10 @@ lib:RegisterWidget(widgetType, version, true, function(pool)
 	frame.content:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -4)
 	frame.content:SetPoint("BOTTOMRIGHT", -4, 4)
 
-	frame.content:SetBackdrop({
-		bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
-	})
-	frame.content:SetBackdropColor(1, 0, 0, 0.75)
+	-- frame.content:SetBackdrop({
+	-- 	bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
+	-- })
+	-- frame.content:SetBackdropColor(1, 0, 0, 0.75)
 
 	return frame
 end)

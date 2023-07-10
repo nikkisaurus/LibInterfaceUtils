@@ -7,6 +7,12 @@ local function TestFrame()
 		print("Bye")
 	end)
 
+	local button = frame:New("Button")
+	button:SetText("Click Me! You'll never guess what I do.")
+	button:RegisterCallback("OnClick", function()
+		print("I pressed a button!")
+	end)
+
 	local label = frame:New("Label")
 	label:SetIcon(134400)
 	label:SetText("Testing string size and whatnot TOPLEFT blah blah need this to be a little longer")

@@ -150,11 +150,6 @@ local widget = {
 		end
 	end,
 
-	SetAutoHeight = function(self, autoHeight)
-		self.state.autoHeight = autoHeight
-		self:SetAnchors()
-	end,
-
 	SetAutoWidth = function(self, autoWidth)
 		self.state.autoWidth = autoWidth
 		self:SetAnchors()
