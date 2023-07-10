@@ -7,8 +7,8 @@ if not lib then return end
 
 local function Fire(event, widget, ...)
 	local callback = widget[event]
-	if not callback or type(callback) ~= "function" then return end
-	callback(widget, ...)
+	if type(callback) == "function" then callback(widget, ...) end
+	widget:Fire(event, ...)
 end
 
 -- *******************************
@@ -16,6 +16,10 @@ end
 -- *******************************
 
 local widget = {
+	ClearAllPoints = function(self)
+		self._frame:ClearAllPoints()
+	end,
+
 	Fire = function(self, event, ...)
 		local callback = self.callbacks[event]
 		if callback then callback(...) end
@@ -23,6 +27,18 @@ local widget = {
 
 	Get = function(self, key)
 		return self.data[key]
+	end,
+
+	GetWidth = function(self)
+		return self._frame:GetWidth()
+	end,
+
+	GetHeight = function(self)
+		return self._frame:GetHeight()
+	end,
+
+	Hide = function(self)
+		self._frame:Hide()
 	end,
 
 	RegisterCallback = function(self, event, callback)
@@ -38,15 +54,31 @@ local widget = {
 		assert(type(self) == "table", "Invalid widget reference supplied to :Release()")
 		assert(self.pool, "Invalid widget reference supplied to :Release()")
 		self.pool:Release(self)
-		Fire("OnRelease", widget)
+		Fire("OnRelease", self)
 	end,
 
 	Set = function(self, key, value)
 		self.data[key] = value
 	end,
 
+	SetPoint = function(self, ...)
+		self._frame:SetPoint(...)
+	end,
+
 	SetSize = function(self, ...)
 		self._frame:SetSize(...)
+	end,
+
+	SetHeight = function(self, ...)
+		self._frame:SetHeight(...)
+	end,
+
+	SetWidth = function(self, ...)
+		self._frame:SetWidth(...)
+	end,
+
+	Show = function(self)
+		self._frame:Show()
 	end,
 
 	UnregisterCallback = function(self, event)
@@ -63,16 +95,24 @@ local widget = {
 -- *******************************
 
 local container = Mixin({
-	ClearAllPoints = function(self)
-		self._frame:ClearAllPoints()
+	AddChild = function(self, widget)
+		widget._frame:SetParent(self.content)
+		tinsert(self.children, widget)
 	end,
 
-	Hide = function(self)
-		self._frame:Hide()
+	DoLayout = function(self)
+		self:layout(self.content, self.children)
 	end,
 
-	Show = function(self)
-		self._frame:Show()
+	New = function(self, widgetType)
+		local widget = lib:New(widgetType)
+		widget._frame:SetParent(self.content)
+		tinsert(self.children, widget)
+		return widget
+	end,
+
+	SetLayout = function(self, layout)
+		self.layout = lib.layouts[layout:lower()] or layout
 	end,
 }, widget)
 
@@ -98,12 +138,14 @@ function lib:RegisterWidget(widgetType, version, isContainer, constructor, destr
 			local widget = Mixin(constructor(...), isContainer and container or widget)
 			widget.callbacks = {}
 			widget.data = {}
+			widget.state = {}
 			if isContainer then
 				assert(
 					type(widget.content) == "table",
 					("Widgets of type '%s' must provide a content frame."):format(widgetType)
 				)
 				widget.children = {}
+				widget.layout = lib.layouts.flow
 			end
 
 			widget._frame.widget = widget

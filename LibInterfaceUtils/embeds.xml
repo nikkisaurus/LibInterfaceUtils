@@ -1,4 +1,6 @@
 <Ui>
   <Include file="LibInterfaceUtils.lua" />
+  <Include file="Layouts.lua" />
   <Include file="Widgets/Frame.lua" />
+  <Include file="Widgets/Label.lua" />
 </Ui>
