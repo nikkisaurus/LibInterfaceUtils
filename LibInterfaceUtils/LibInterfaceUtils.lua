@@ -65,6 +65,10 @@ local widget = {
 		self.data[key] = value
 	end,
 
+	SetFillWidth = function(self, fillWidth)
+		self.state.fillWidth = fillWidth
+	end,
+
 	SetFullWidth = function(self, fullWidth)
 		self.state.fullWidth = fullWidth
 	end,

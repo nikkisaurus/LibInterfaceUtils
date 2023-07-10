@@ -10,14 +10,28 @@ local function TestFrame()
 	local button = frame:New("Button")
 	button:SetText("Click Me!")
 	button:Disable()
+	button:SetFullWidth(true)
+
+	local button1 = frame:New("Button")
+	button1:SetText("Click Me!")
+	button1:Disable()
+
 	local button2 = frame:New("Button")
 	button2:SetText("Click Me!")
+	button2:SetFillWidth(true)
+
+	local button3 = frame:New("Button")
+	button3:SetText("Click Me!")
+
+	local button4 = frame:New("Button")
+	button4:SetText("Click Me!")
+	button4:SetFullWidth(true)
 	-- button:SetText("Click Me! You'll never guess what I do.")
 	-- button:RegisterCallback("OnClick", function()
 	-- 	print("I pressed a button!")
 	-- end)
 
-	button:RegisterCallback("OnEnter", function()
+	button1:RegisterCallback("OnEnter", function()
 		print("Hijacking")
 	end)
 

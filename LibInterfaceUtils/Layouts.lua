@@ -5,48 +5,64 @@ lib.layouts = {
 	flow = function(self, frame, children)
 		local padding = self.state.padding
 		local spacing = self.state.spacing
-		local xOffset, yOffset = padding.left or 0, -(padding.top or 0)
+		local xOffset, yOffset = padding.left, -padding.top
 		local rowHeight = 0
-		local availableWidth = frame:GetWidth() - (padding.left or 0) - (padding.right or 0)
+		local availableWidth = frame:GetWidth() - padding.left - padding.right
+		local rowWidth = 0
+		local currentRowFullWidth = false
 
 		for i, child in ipairs(children) do
-			local childWidth = child:GetWidth()
-
-			if child.state.fullWidth or xOffset + childWidth > availableWidth then
-				xOffset = padding.left or 0
-				yOffset = yOffset - rowHeight - spacing.y
-				rowHeight = 0
-			end
-
 			-- Save the original size if not already saved
-			child.state.originalSize = child.state.originalSize
-				or {
+			if not child.state.originalSize then
+				child.state.originalSize = {
 					width = child:GetWidth(),
 					height = child:GetHeight(),
 				}
-
-			if child.state.fullWidth or childWidth > availableWidth then
-				child:SetSize(availableWidth, child:GetHeight())
-				childWidth = availableWidth
-			elseif child.state.originalSize.width <= availableWidth then
-				child:SetSize(child.state.originalSize.width, child:GetHeight())
-				childWidth = child.state.originalSize.width
 			end
 
-			if childWidth < child.state.originalSize.width and child.state.originalSize.width <= availableWidth then
-				-- Fill the rest of the available width if the child is smaller than its original size
-				local remainingWidth = availableWidth - childWidth
-				child:SetWidth(childWidth + remainingWidth)
-				childWidth = childWidth + remainingWidth
+			-- Start a new row if fullWidth is true or availableWidth is zero
+			if child.state.fullWidth or availableWidth == 0 or currentRowFullWidth then
+				xOffset = padding.left
+				yOffset = yOffset - rowHeight - spacing.y
+				rowHeight = 0
+				rowWidth = 0
+				currentRowFullWidth = false
 			end
 
+			-- Calculate the remaining width for fillWidth child
+			local remainingWidth = availableWidth - rowWidth
+			if (child.state.fillWidth or child.state.fullWidth) and remainingWidth > 0 then
+				child:SetSize(remainingWidth, child:GetHeight())
+				rowWidth = availableWidth
+			else
+				-- Set the child width based on the original size and available width
+				local childWidth = math.min(child.state.originalSize.width, availableWidth)
+				child:SetSize(childWidth, child:GetHeight())
+
+				-- Update row width
+				rowWidth = rowWidth + childWidth + spacing.x
+
+				-- Start a new row if child width exceeds available width
+				if rowWidth > availableWidth then
+					xOffset = padding.left
+					yOffset = yOffset - rowHeight - spacing.y
+					rowHeight = 0
+					rowWidth = childWidth + spacing.x
+				end
+			end
+
+			-- Position the child on the current row
 			child:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
 
-			xOffset = xOffset + childWidth + spacing.x
+			-- Update xOffset, rowHeight, and adjust rowWidth
+			xOffset = xOffset + child:GetWidth() + spacing.x
 			rowHeight = math.max(rowHeight, child:GetHeight())
+			rowWidth = rowWidth + spacing.x
+
+			if child.state.fullWidth then currentRowFullWidth = true end
 		end
 
 		-- Adjust the frame height based on the children's layout
-		frame:SetHeight(math.abs(yOffset) + rowHeight + (padding.top or 0) + (padding.bottom or 0))
+		frame:SetHeight(math.abs(yOffset) + rowHeight + padding.top + padding.bottom)
 	end,
 }
