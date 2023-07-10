@@ -100,6 +100,7 @@ local widget = {
 		self:SetIcon()
 		self:SetText()
 		self:SetAutoWidth(true)
+		self:SetInteractive()
 		self:Show()
 	end,
 
@@ -163,6 +164,11 @@ local widget = {
 		self._frame.text:SetFontObject(...)
 	end,
 
+	SetInteractive = function(self, isInteractive, callback)
+		self._frame:EnableMouse(isInteractive)
+		self._frame:SetScript("OnMouseDown", isInteractive and callback or nil)
+	end,
+
 	SetJustifyH = function(self, ...)
 		self._frame.text:SetJustifyH(...)
 	end,
@@ -216,10 +222,10 @@ lib:RegisterWidget(widgetType, version, false, function(pool)
 	frame._frame.icon = frame._frame:CreateTexture(nil, "ARTWORK")
 	frame._frame.text = frame._frame:CreateFontString(nil, "OVERLAY")
 
-	frame._frame:SetBackdrop({
-		bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
-	})
-	frame._frame:SetBackdropColor(0, 1, 0, 0.75)
+	-- frame._frame:SetBackdrop({
+	-- 	bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
+	-- })
+	-- frame._frame:SetBackdropColor(0, 1, 0, 0.75)
 
 	return frame
 end)
