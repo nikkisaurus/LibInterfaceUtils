@@ -2,6 +2,19 @@ local lib = LibStub:GetLibrary("LibInterfaceUtils-1.0")
 if not lib then return end
 
 lib.layouts = {
+	fill = function(self, frame, children)
+		local padding = self.state.padding
+		local firstChild = children[1]
+
+		if firstChild then
+			-- Set the first child's size to fill the entire frame
+			firstChild:SetSize(
+				frame:GetWidth() - padding.left - padding.right,
+				frame:GetHeight() - padding.top - padding.bottom
+			)
+			firstChild:SetPoint("TOPLEFT", frame, "TOPLEFT", padding.left, -padding.top)
+		end
+	end,
 	flow = function(self, frame, children)
 		local padding = self.state.padding
 		local spacing = self.state.spacing
@@ -65,5 +78,41 @@ lib.layouts = {
 		-- Adjust the frame height based on the children's layout
 		frame:SetHeight(math.abs(yOffset) + rowHeight + padding.top + padding.bottom)
 	end,
-	list = function(self, frame, children) end,
+	list = function(self, frame, children)
+		local padding = self.state.padding
+		local spacing = self.state.spacing
+		local yOffset = -padding.top
+		local availableWidth = frame:GetWidth() - padding.left - padding.right
+
+		for i, child in ipairs(children) do
+			-- Save the original size if not already saved
+			if not child.state.originalSize then
+				child.state.originalSize = {
+					width = child:GetWidth(),
+					height = child:GetHeight(),
+				}
+			end
+
+			-- Start a new row for each child
+			local xOffset = padding.left
+
+			-- Set the child size based on the specified conditions
+			if child.state.fullWidth or child.state.fillWidth then
+				child:SetSize(availableWidth, child:GetHeight())
+			elseif child:GetWidth() > availableWidth then
+				local maxWidth = math.min(availableWidth, child.state.originalSize.width)
+				child:SetSize(maxWidth, child:GetHeight())
+			end
+
+			-- Position the child on the current row
+			child:SetPoint("TOPLEFT", frame, "TOPLEFT", xOffset, yOffset)
+
+			-- Update the y-offset for the next row
+			yOffset = yOffset - child:GetHeight() - spacing.y
+		end
+
+		-- Adjust the frame height based on the children's layout
+		local contentHeight = math.abs(yOffset) + padding.top + padding.bottom
+		frame:SetHeight(contentHeight)
+	end,
 }
