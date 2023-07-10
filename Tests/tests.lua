@@ -17,7 +17,7 @@ local function TestFrame()
 	label2:SetIcon(134400, nil, "TOPRIGHT")
 	label2:SetText("Testing string size and whatnot TOPRIGHT")
 	label2:SetInteractive(true, function()
-		print("clicked 2")
+		frame:ReleaseChild(label2)
 	end)
 
 	local label3 = frame:New("Label")

@@ -53,6 +53,7 @@ local widget = {
 	Release = function(self)
 		assert(type(self) == "table", "Invalid widget reference supplied to :Release()")
 		assert(self.pool, "Invalid widget reference supplied to :Release()")
+		self._frame:SetParent(UIParent)
 		self.pool:Release(self)
 		Fire("OnRelease", self)
 	end,
@@ -113,6 +114,25 @@ local container = Mixin({
 		widget._frame:SetParent(self.content)
 		tinsert(self.children, widget)
 		return widget
+	end,
+
+	ReleaseChild = function(self, widget)
+		for i, child in ipairs(self.children) do
+			if child == widget then
+				tremove(self.children, i)
+				break
+			end
+		end
+		widget:Release()
+		self:DoLayout()
+	end,
+
+	ReleaseChildren = function(self)
+		for _, child in ipairs(self.children) do
+			child:Release()
+		end
+		self.children = {}
+		self:DoLayout()
 	end,
 
 	SetLayout = function(self, layout)
