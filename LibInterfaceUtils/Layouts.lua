@@ -55,6 +55,7 @@ lib.layouts = {
 			else
 				-- Set the child width based on the original size and available width
 				local childWidth = math.min(child.state.originalSize.width, availableWidth)
+				if childWidth == availableWidth then child.state.availableWidth = true end
 				child:SetSize(childWidth, child:GetHeight())
 
 				-- Update row width
@@ -83,8 +84,6 @@ lib.layouts = {
 			-- Update xOffset, rowHeight, and adjust rowWidth
 			xOffset = xOffset + child:GetWidth() + spacing.x
 			rowHeight = math.max(rowHeight, child:GetHeight())
-
-			if child.state.fullHeight then break end
 		end
 
 		-- Adjust the frame height based on the children's layout
@@ -111,9 +110,11 @@ lib.layouts = {
 			local xOffset = padding.left
 
 			-- Set the child size based on the specified conditions
-			if child.state.fullWidth or child.state.fillWidth then
+			if child.state.fullWidth or child.state.fillWidth or child:GetWidth() > availableWidth then
+				child.state.availableWidth = true
 				child:SetSize(availableWidth, child:GetHeight())
-			elseif child:GetWidth() > availableWidth then
+			else
+				child.state.availableWidth = false
 				local maxWidth = math.min(availableWidth, child.state.originalSize.width)
 				child:SetSize(maxWidth, child:GetHeight())
 			end

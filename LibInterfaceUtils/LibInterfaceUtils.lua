@@ -182,8 +182,8 @@ function lib:RegisterWidget(widgetType, version, isContainer, constructor, destr
 					("Widgets of type '%s' must provide a content frame."):format(widgetType)
 				)
 				widget.children = {}
-				widget.layout = lib.layouts.flow
-				-- widget.layout = lib.layouts.list
+				-- widget.layout = lib.layouts.flow
+				widget.layout = lib.layouts.list
 				widget._frame:SetScript("OnSizeChanged", function()
 					widget:DoLayout()
 				end)

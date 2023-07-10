@@ -92,7 +92,7 @@ local widgetType, version = "Label", 1
 
 local widget = {
 	OnAcquire = function(self)
-		self:SetSize(100, 0)
+		self:SetSize(200, 0)
 		self:SetFontObject(GameFontHighlight)
 		self:SetJustifyH("LEFT")
 		self:SetJustifyV("MIDDLE")
@@ -123,7 +123,7 @@ local widget = {
 			icon:SetPoint(unpack(points.icon))
 			text:SetPoint(unpack(points.text[1]))
 
-			if self.state.autoWidth and not self.state.fullWidth then
+			if self.state.autoWidth and not self.state.fullWidth and not self.state.availableWidth then
 				text:SetWidth(text:GetStringWidth())
 				self:SetWidth((points.iconWidth and size or 0) + text:GetWidth())
 			else
