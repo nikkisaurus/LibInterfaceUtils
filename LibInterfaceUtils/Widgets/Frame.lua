@@ -36,6 +36,9 @@ local widget = {
 		self:SetBackdrop(lib.defaultBackdrop)
 		self:SetBackdropColor(unpack(lib.colors.elvTransparent))
 		self:SetBackdropBorderColor(unpack(lib.colors.black))
+		self:SetContentBackdrop(lib.defaultBackdrop)
+		self:SetContentBackdropColor(unpack(lib.colors.elvTransparent))
+		self:SetContentBackdropBorderColor(unpack(lib.colors.black))
 		self:SetMovable(true)
 		self:EnableResize(true, 100, 100)
 		self:SetPoint("CENTER")
@@ -63,6 +66,18 @@ local widget = {
 
 	SetBackdropColor = function(self, ...)
 		self._frame:SetBackdropColor(...)
+	end,
+
+	SetContentBackdrop = function(self, ...)
+		self.content:SetBackdrop(...)
+	end,
+
+	SetContentBackdropBorderColor = function(self, ...)
+		self.content:SetBackdropBorderColor(...)
+	end,
+
+	SetContentBackdropColor = function(self, ...)
+		self.content:SetBackdropColor(...)
 	end,
 
 	SetMovable = function(self, movable, ...)
@@ -124,20 +139,11 @@ lib:RegisterWidget(widgetType, version, true, function(pool)
 	local title = frame._frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	title:SetPoint("TOPLEFT", 4, -4)
 	title:SetPoint("BOTTOMRIGHT", close, "BOTTOMLEFT", -4, 0)
-	title:SetText("Frame")
 
 	frame.content = CreateFrame("Frame", nil, frame._frame, "BackdropTemplate")
 	frame.content:SetPoint("TOP", title, "BOTTOM", 0, -4)
 	frame.content:SetPoint("LEFT")
 	frame.content:SetPoint("BOTTOMRIGHT")
-
-	frame.content:SetBackdrop({
-		bgFile = lib.defaultTexture,
-		edgeFile = lib.defaultTexture,
-		edgeSize = 1,
-	})
-	frame.content:SetBackdropColor(unpack(lib.colors.elvTransparent))
-	frame.content:SetBackdropBorderColor(unpack(lib.colors.black))
 
 	return frame
 end)
