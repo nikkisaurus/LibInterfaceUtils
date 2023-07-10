@@ -27,6 +27,11 @@ local widget = {
 		self._frame:ClearAllPoints()
 	end,
 
+	DoParentLayout = function(self)
+		local parent = self.state.parent
+		if parent then parent:DoLayout(self) end
+	end,
+
 	Fire = function(self, event, ...)
 		local callback = self.callbacks[event]
 		if callback then callback(...) end
@@ -64,6 +69,7 @@ local widget = {
 		assert(type(self) == "table", "Invalid widget reference supplied to :Release()")
 		assert(self.pool, "Invalid widget reference supplied to :Release()")
 		self._frame:SetParent(UIParent)
+		self.state.parent = nil
 		self.pool:Release(self)
 		Fire("OnRelease", self)
 	end,
@@ -122,6 +128,7 @@ local widget = {
 local container = Mixin({
 	AddChild = function(self, widget)
 		widget._frame:SetParent(self.content)
+		widget.state.parent = self
 		tinsert(self.children, widget)
 	end,
 
@@ -131,7 +138,7 @@ local container = Mixin({
 		end, 1)
 	end,
 
-	DoLayout = function(self)
+	DoLayout = function(self, child)
 		if self.state.paused then return end
 		local width, height = self:layout(self.content, self.children)
 		Fire("OnLayoutFinished", self, width, height)
@@ -141,6 +148,7 @@ local container = Mixin({
 	New = function(self, widgetType)
 		local widget = lib:New(widgetType)
 		widget._frame:SetParent(self.content)
+		widget.state.parent = self
 		tinsert(self.children, widget)
 		return widget
 	end,
@@ -206,7 +214,7 @@ function lib:RegisterWidget(widgetType, version, isContainer, constructor, destr
 					("Widgets of type '%s' must provide a content frame."):format(widgetType)
 				)
 				widget.children = {}
-				widget.layout = lib.layouts.flow
+				widget.layout = lib.layouts.list
 				widget._frame:SetScript("OnSizeChanged", function()
 					widget:DoLayoutDeferred()
 				end)
