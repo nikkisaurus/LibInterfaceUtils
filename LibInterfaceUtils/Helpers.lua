@@ -29,9 +29,24 @@ function lib:SetFont(fontString, font)
 	if font.font then fontString:SetFont(unpack(font.font)) end
 
 	if font.fontObject then
-		fontString:SetFont(font.fontObject:GetFont())
-		fontString:SetFontObject(font.fontObject)
+		local fontObject = _G[font.fontObject] or font.fontObject
+		fontString:SetFont(fontObject:GetFont())
+		fontString:SetFontObject(fontObject)
 	end
 
 	if font.color then fontString:SetTextColor(unpack(font.color)) end
+end
+
+function lib:Mixin(target, ...)
+	for _, mixin in ipairs({ ... }) do
+		for key, value in pairs(mixin) do
+			if type(value) == "table" and type(target[key]) == "table" then
+				self:Mixin(target[key], value) -- Recursively override nested tables
+			else
+				target[key] = value -- Override non-table values
+			end
+		end
+	end
+
+	return target
 end
