@@ -9,7 +9,7 @@ local function TestFrame()
 	end)
 
 	local scrollFrame = frame:New("ScrollFrame")
-	-- frame:SetLayout("fill")
+	-- scrollFrame:SetLayout("list")
 
 	-- local nestMe = frame:New("Group")
 	-- nestMe:SetFullWidth(true)

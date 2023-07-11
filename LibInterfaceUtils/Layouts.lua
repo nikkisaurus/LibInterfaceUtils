@@ -2,7 +2,8 @@ local lib = LibStub:GetLibrary("LibInterfaceUtils-1.0")
 if not lib then return end
 
 lib.layouts = {
-	fill = function(self, frame, children)
+	fill = function(self, frame, children, scrollBox)
+		frame = scrollBox or frame
 		local padding = self.state.padding
 		local firstChild = children[1]
 
@@ -21,12 +22,12 @@ lib.layouts = {
 		return frame:GetSize()
 	end,
 
-	flow = function(self, frame, children)
+	flow = function(self, frame, children, scrollBox)
 		local padding = self.state.padding
 		local spacing = self.state.spacing
 		local xOffset, yOffset = padding.left, -padding.top
 		local rowHeight = 0
-		local availableWidth = frame:GetWidth() - padding.left - padding.right
+		local availableWidth = (scrollBox or frame):GetWidth() - padding.left - padding.right
 		local rowWidth = 0
 		local availableHeight = frame:GetHeight() - padding.top - padding.bottom
 
@@ -100,14 +101,14 @@ lib.layouts = {
 		-- Calculate the total content height based on the positioned child widgets
 		local contentHeight = math.abs(yOffset) + rowHeight + padding.top + padding.bottom
 
-		return frame:GetWidth(), contentHeight
+		return (scrollBox or frame):GetWidth(), contentHeight
 	end,
 
-	list = function(self, frame, children)
+	list = function(self, frame, children, scrollBox)
 		local padding = self.state.padding
 		local spacing = self.state.spacing
 		local yOffset = -padding.top
-		local availableWidth = frame:GetWidth() - padding.left - padding.right
+		local availableWidth = (scrollBox or frame):GetWidth() - padding.left - padding.right
 		local availableHeight = frame:GetHeight() - padding.top - padding.bottom
 
 		for i, child in ipairs(children) do
@@ -154,6 +155,6 @@ lib.layouts = {
 
 		-- Adjust the frame height based on the children's layout
 		local contentHeight = math.abs(yOffset) + padding.top + padding.bottom
-		return frame:GetWidth(), contentHeight
+		return (scrollBox or frame):GetWidth(), contentHeight
 	end,
 }

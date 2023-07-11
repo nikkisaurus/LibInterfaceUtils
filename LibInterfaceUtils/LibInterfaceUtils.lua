@@ -143,7 +143,7 @@ local container = Mixin({
 
 	DoLayout = function(self, child)
 		if self.state.paused then return end
-		local width, height = self:layout(self.content, self.children)
+		local width, height = self:layout(self.content, self.children, self._frame.scrollBox)
 		Fire("OnLayoutFinished", self, width, height)
 		return width, height
 	end,

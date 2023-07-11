@@ -9,28 +9,15 @@ local widgetType, version = "ScrollFrame", 1
 
 local Widget = {
 	OnAcquire = function(self)
-		self:SetBackdrop(lib.defaultBackdrop)
-		self:SetBackdropColor(1, 0, 0, 1)
-		-- self:SetBackdropColor(unpack(lib.colors.elvTransparent))
-		self:SetBackdropBorderColor(unpack(lib.colors.black))
-		-- self:SetContentBackdrop(lib.defaultBackdrop)
-		-- self:SetContentBackdropColor(unpack(lib.colors.elvTransparent))
-		-- self:SetContentBackdropBorderColor(unpack(lib.colors.black))
-		-- self:SetMovable(true)
-		-- self:EnableResize(true, 100, 100)
-		-- self:SetPoint("CENTER")
 		self:SetPadding(5, 5, 5, 5)
 		self:SetSpacing(5, 5)
 		self:Show()
 	end,
 
-	-- EnableResize = function(self, enable, ...)
-	-- 	local frame = self._frame
-	-- 	frame:SetResizable(enable)
-	-- 	frame:SetResizeBounds(...)
-	-- 	frame.resizer:SetEnabled(enable)
-	-- 	frame.resizer[enable and "Show" or "Hide"](frame.resizer)
-	-- end,
+	OnLayoutFinished = function(self, ...)
+		self.content:SetSize(...)
+		self._frame.scrollBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
+	end,
 
 	SetBackdrop = function(self, ...)
 		self._frame:SetBackdrop(...)
@@ -44,32 +31,17 @@ local Widget = {
 		self._frame:SetBackdropColor(...)
 	end,
 
-	-- SetContentBackdrop = function(self, ...)
-	-- 	self.content:SetBackdrop(...)
-	-- end,
+	SetContentBackdrop = function(self, ...)
+		self.content:SetBackdrop(...)
+	end,
 
-	-- SetContentBackdropBorderColor = function(self, ...)
-	-- 	self.content:SetBackdropBorderColor(...)
-	-- end,
+	SetContentBackdropBorderColor = function(self, ...)
+		self.content:SetBackdropBorderColor(...)
+	end,
 
-	-- SetContentBackdropColor = function(self, ...)
-	-- 	self.content:SetBackdropColor(...)
-	-- end,
-
-	-- SetMovable = function(self, movable, ...)
-	-- 	local frame = self._frame
-
-	-- 	frame:EnableMouse(movable)
-	-- 	frame:SetMovable(movable)
-	-- 	if movable then
-	-- 		frame:RegisterForDrag((...) or "LeftButton", ...)
-	-- 	else
-	-- 		frame:RegisterForDrag()
-	-- 	end
-
-	-- 	frame:SetScript("OnDragStart", movable and OnDragStart or nil)
-	-- 	frame:SetScript("OnDragStop", movable and OnDragStop or nil)
-	-- end,
+	SetContentBackdropColor = function(self, ...)
+		self.content:SetBackdropColor(...)
+	end,
 
 	SetPadding = function(self, left, right, top, bottom)
 		self.state.padding = {
@@ -93,12 +65,37 @@ local Widget = {
 -- *******************************
 
 lib:RegisterWidget(widgetType, version, true, function(pool)
+	local frame = CreateFrame("Frame", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate")
 	local widget = CreateFromMixins({
-		_frame = CreateFrame("Frame", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate"),
+		_frame = frame,
 	}, Widget)
 
-	widget.content = CreateFrame("Frame", nil, widget._frame, "BackdropTemplate")
-	widget.content:SetAllPoints(widget._frame)
+	frame.scrollBar = CreateFrame("EventFrame", nil, frame, "MinimalScrollBar")
+	frame.scrollBar:SetPoint("TOPRIGHT", -2, 0)
+	frame.scrollBar:SetPoint("BOTTOMRIGHT", -2, 0)
+
+	frame.scrollBox = CreateFrame("Frame", nil, frame, "WowScrollBox")
+
+	widget.content = CreateFrame("Frame", nil, frame.scrollBox, "ResizeLayoutFrame, BackdropTemplate")
+	widget.content.scrollable = true
+	widget.content:SetAllPoints(frame.scrollBox)
+
+	frame.scrollView = CreateScrollBoxLinearView()
+	frame.scrollView:SetPanExtent(50)
+
+	local anchors = {
+		with = {
+			CreateAnchor("TOPLEFT", frame, "TOPLEFT", 0, 0),
+			CreateAnchor("BOTTOMRIGHT", frame.scrollBar, "BOTTOMLEFT", -7, 0),
+		},
+		without = {
+			CreateAnchor("TOPLEFT", frame, "TOPLEFT", 0, 0),
+			CreateAnchor("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 0),
+		},
+	}
+
+	ScrollUtil.AddManagedScrollBarVisibilityBehavior(frame.scrollBox, frame.scrollBar, anchors.with, anchors.without)
+	ScrollUtil.InitScrollBoxWithScrollBar(frame.scrollBox, frame.scrollBar, frame.scrollView)
 
 	return widget
 end)
