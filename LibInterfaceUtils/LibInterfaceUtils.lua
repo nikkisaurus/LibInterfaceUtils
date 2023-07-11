@@ -2,6 +2,13 @@ local lib = LibStub:NewLibrary("LibInterfaceUtils-1.0", 1)
 if not lib then return end
 
 -- *******************************
+-- *** Throttler ***
+-- *******************************
+
+local frame = CreateFrame("Frame")
+frame:Hide()
+
+-- *******************************
 -- *** Events ***
 -- *******************************
 
@@ -18,6 +25,14 @@ end
 local widget = {
 	ClearAllPoints = function(self)
 		self._frame:ClearAllPoints()
+	end,
+
+	DoParentLayout = function(self)
+		local parent = self.state.parent
+		while parent do
+			parent:DoLayout()
+			parent = parent.state.parent
+		end
 	end,
 
 	Fire = function(self, event, ...)
@@ -57,6 +72,7 @@ local widget = {
 		assert(type(self) == "table", "Invalid widget reference supplied to :Release()")
 		assert(self.pool, "Invalid widget reference supplied to :Release()")
 		self._frame:SetParent(UIParent)
+		self.state.parent = nil
 		self.pool:Release(self)
 		Fire("OnRelease", self)
 	end,
@@ -115,18 +131,33 @@ local widget = {
 local container = Mixin({
 	AddChild = function(self, widget)
 		widget._frame:SetParent(self.content)
+		widget.state.parent = self
 		tinsert(self.children, widget)
 	end,
 
-	DoLayout = function(self)
-		self:layout(self.content, self.children)
+	DoLayoutDeferred = function(self)
+		C_Timer.NewTicker(0.1, function()
+			self:DoLayout()
+		end, 1)
+	end,
+
+	DoLayout = function(self, child)
+		if self.state.paused then return end
+		local width, height = self:layout(self.content, self.children, self._frame.scrollBox)
+		Fire("OnLayoutFinished", self, width, height)
+		return width, height
 	end,
 
 	New = function(self, widgetType)
 		local widget = lib:New(widgetType)
 		widget._frame:SetParent(self.content)
+		widget.state.parent = self
 		tinsert(self.children, widget)
 		return widget
+	end,
+
+	PauseLayout = function(self)
+		self.state.paused = true
 	end,
 
 	ReleaseChild = function(self, widget)
@@ -137,7 +168,7 @@ local container = Mixin({
 			end
 		end
 		widget:Release()
-		self:DoLayout()
+		self:DoLayoutDeferred()
 	end,
 
 	ReleaseChildren = function(self)
@@ -145,11 +176,17 @@ local container = Mixin({
 			child:Release()
 		end
 		self.children = {}
-		self:DoLayout()
+		self:DoLayoutDeferred()
+	end,
+
+	ResumeLayout = function(self)
+		self.state.paused = nil
 	end,
 
 	SetLayout = function(self, layout)
-		self.layout = lib.layouts[layout:lower()] or layout
+		layout = layout:lower()
+		self.state.layout = layout
+		self.layout = lib.layouts[layout] or layout
 	end,
 }, widget)
 
@@ -182,9 +219,9 @@ function lib:RegisterWidget(widgetType, version, isContainer, constructor, destr
 					("Widgets of type '%s' must provide a content frame."):format(widgetType)
 				)
 				widget.children = {}
-				widget.layout = lib.layouts.flow
+				widget:SetLayout("flow")
 				widget._frame:SetScript("OnSizeChanged", function()
-					widget:DoLayout()
+					widget:DoLayoutDeferred()
 				end)
 			end
 
@@ -230,7 +267,17 @@ end
 -- *** Helpers ***
 -- *******************************
 
-function lib:GetNextWidget(pool)
-	assert(pool and pool.widgetType and lib.pools[pool.widgetType], "Invalid widget pool supplied to :GetNextWidget()")
-	return ("LIU%s%d"):format(pool.widgetType, #pool + 1)
+function lib:GetNextWidget(widgetType)
+	local pool = lib.pools[widgetType]
+	local count = 0
+
+	for _, _ in pool:EnumerateActive() do
+		count = count + 1
+	end
+
+	for _, _ in pool:EnumerateInactive() do
+		count = count + 1
+	end
+
+	return ("LIU%s%d"):format(widgetType, count + 1)
 end

@@ -138,14 +138,10 @@ local widget = {
 		else
 			text:SetPoint("TOPLEFT")
 
-			if self.state.autoWidth and not self.state.fullWidth then
-				text:SetWidth(text:GetStringWidth())
-				self:SetWidth(text:GetWidth())
-			else
-				text:SetWidth(self:GetWidth())
-			end
+			if self.state.autoWidth and not self.state.fullWidth then text:SetWidth(text:GetStringWidth()) end
 
 			text:SetPoint("TOPRIGHT")
+			self:SetWidth(text:GetWidth())
 			self:SetHeight(text:GetStringHeight())
 		end
 	end,
@@ -186,13 +182,11 @@ local widget = {
 	end,
 
 	SetText = function(self, text)
-		self.state.text = text
 		self._frame.text:SetText(text or "")
 		self:SetAnchors()
 	end,
 
 	SetWordWrap = function(self, canWrap)
-		self.state.canWrap = canWrap or false
 		self._frame.text:SetWordWrap(canWrap or false)
 	end,
 }
@@ -203,7 +197,7 @@ local widget = {
 
 lib:RegisterWidget(widgetType, version, false, function(pool)
 	local frame = CreateFromMixins({
-		_frame = CreateFrame("Frame", lib:GetNextWidget(pool), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Frame", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate"),
 	}, widget)
 
 	frame._frame:SetScript("OnSizeChanged", function()
@@ -214,7 +208,7 @@ lib:RegisterWidget(widgetType, version, false, function(pool)
 	frame._frame.text = frame._frame:CreateFontString(nil, "OVERLAY")
 
 	-- frame._frame:SetBackdrop({
-	-- 	bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
+	-- 	bgFile = lib.defaultTexture,
 	-- })
 	-- frame._frame:SetBackdropColor(0, 1, 0, 0.75)
 

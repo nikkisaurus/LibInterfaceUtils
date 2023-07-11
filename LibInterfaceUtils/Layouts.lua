@@ -2,7 +2,8 @@ local lib = LibStub:GetLibrary("LibInterfaceUtils-1.0")
 if not lib then return end
 
 lib.layouts = {
-	fill = function(self, frame, children)
+	fill = function(self, frame, children, scrollBox)
+		frame = scrollBox or frame
 		local padding = self.state.padding
 		local firstChild = children[1]
 
@@ -13,18 +14,24 @@ lib.layouts = {
 				frame:GetHeight() - padding.top - padding.bottom
 			)
 			firstChild:SetPoint("TOPLEFT", frame, "TOPLEFT", padding.left, -padding.top)
+
+			-- Perform child layout
+			lib:safecall(firstChild.DoLayout, firstChild)
 		end
+
+		return frame:GetSize()
 	end,
 
-	flow = function(self, frame, children)
+	flow = function(self, frame, children, scrollBox)
 		local padding = self.state.padding
 		local spacing = self.state.spacing
 		local xOffset, yOffset = padding.left, -padding.top
 		local rowHeight = 0
-		local availableWidth = frame:GetWidth() - padding.left - padding.right
+		local availableWidth = (scrollBox or frame):GetWidth() - padding.left - padding.right
 		local rowWidth = 0
 		local availableHeight = frame:GetHeight() - padding.top - padding.bottom
 
+		-- Position child widgets and calculate row heights
 		for i, child in ipairs(children) do
 			-- Save the original size if not already saved
 			if not child.state.originalSize then
@@ -86,15 +93,22 @@ lib.layouts = {
 			rowHeight = math.max(rowHeight, child:GetHeight())
 		end
 
-		-- Adjust the frame height based on the children's layout
-		frame:SetHeight(math.abs(yOffset) + rowHeight + padding.top + padding.bottom)
+		-- Perform child layout after positioning
+		for _, child in ipairs(children) do
+			lib:safecall(child.DoLayout, child)
+		end
+
+		-- Calculate the total content height based on the positioned child widgets
+		local contentHeight = math.abs(yOffset) + rowHeight + padding.top + padding.bottom
+
+		return (scrollBox or frame):GetWidth(), contentHeight
 	end,
 
-	list = function(self, frame, children)
+	list = function(self, frame, children, scrollBox)
 		local padding = self.state.padding
 		local spacing = self.state.spacing
 		local yOffset = -padding.top
-		local availableWidth = frame:GetWidth() - padding.left - padding.right
+		local availableWidth = (scrollBox or frame):GetWidth() - padding.left - padding.right
 		local availableHeight = frame:GetHeight() - padding.top - padding.bottom
 
 		for i, child in ipairs(children) do
@@ -133,11 +147,14 @@ lib.layouts = {
 			-- Update the y-offset for the next row
 			yOffset = yOffset - child:GetHeight() - spacing.y
 
+			-- Perform child layout after positioning
+			lib:safecall(child.DoLayout, child)
+
 			if child.state.fullHeight then break end
 		end
 
 		-- Adjust the frame height based on the children's layout
 		local contentHeight = math.abs(yOffset) + padding.top + padding.bottom
-		frame:SetHeight(contentHeight)
+		return (scrollBox or frame):GetWidth(), contentHeight
 	end,
 }

@@ -2,81 +2,38 @@ local lib = LibStub:GetLibrary("LibInterfaceUtils-1.0")
 if not lib then return end
 
 local function TestFrame()
-	local frame = lib:New("Frame")
-	frame:RegisterCallback("OnRelease", function()
-		print("Bye")
-	end)
+	local frame, scrollFrame = lib:GetScrollableFrame()
+	frame:SetTitle("Test Frame")
 
-	local button = frame:New("Button")
-	button:SetText("Click Me!")
-	button:Disable()
-	button:SetFullWidth(true)
+	local widgets = scrollFrame:New("Group")
+	widgets:SetFullWidth(true)
+	widgets:SetTitle("Widgets")
 
-	local button1 = frame:New("Button")
-	button1:SetText("Click Me!")
-	button1:Disable()
+	local labels = widgets:New("Group")
+	labels:SetFullWidth(true)
+	labels:SetTitle("Labels")
 
-	local button2 = frame:New("Button")
-	button2:SetText("Click Me!")
-	button2:SetFillWidth(true)
+	for i = 1, 10 do
+		local label = labels:New("Label")
+		label:SetFullWidth(true)
+		label:SetIcon(134400)
+		label:SetText("This is a header label " .. i)
 
-	local button3 = frame:New("Button")
-	button3:SetText("Click Me!")
-	-- button3:SetFullHeight(true)
-	button3:SetFullWidth(true)
+		local lorem = labels:New("Label")
+		lorem:SetFullWidth(true)
+		lorem:SetText(
+			"Veniam anim veniam sint enim. Exercitation nulla enim mollit sit non veniam nulla amet ad laborum ullamco excepteur voluptate cupidatat. Id anim labore minim dolor quis ad deserunt nulla in. Id minim minim minim eiusmod in ullamco eu veniam amet est est."
+		)
+	end
 
-	local button4 = frame:New("Button")
-	button4:SetText("Click Me!")
-	button4:SetFullWidth(true)
-	-- button:SetText("Click Me! You'll never guess what I do.")
-	-- button:RegisterCallback("OnClick", function()
-	-- 	print("I pressed a button!")
-	-- end)
+	local buttons = widgets:New("Group")
+	buttons:SetFullWidth(true)
+	buttons:SetTitle("Buttons")
 
-	button1:RegisterCallback("OnEnter", function()
-		print("Hijacking")
-	end)
-
-	-- if true then return end
-
-	-- button:UnregisterCallback("OnEnter")
-
-	local label = frame:New("Label")
-	label:SetIcon(134400)
-	label:SetText("Testing string size and whatnot TOPLEFT blah blah need this to be a little longer")
-	label:SetFullWidth(true)
-	label:SetInteractive(true)
-
-	local label2 = frame:New("Label")
-	label2:SetIcon(134400, nil, "TOPRIGHT")
-	label2:SetText("Testing string size and whatnot TOPRIGHT")
-	label2:SetInteractive(true, function()
-		frame:ReleaseChild(label2)
-	end)
-
-	local label3 = frame:New("Label")
-	label3:SetIcon(134400, nil, "BOTTOMLEFT")
-	label3:SetText("Testing string size and whatnot BOTTOMLEFT")
-
-	local label4 = frame:New("Label")
-	label4:SetIcon(134400, nil, "BOTTOMRIGHT")
-	label4:SetText("Testing string size and whatnot BOTTOMRIGHT")
-
-	local label5 = frame:New("Label")
-	label5:SetIcon(134400, nil, "LEFT")
-	label5:SetText("Testing string size and whatnot LEFT")
-
-	local label6 = frame:New("Label")
-	label6:SetIcon(134400, nil, "RIGHT")
-	label6:SetText("Testing string size and whatnot RIGHT")
-
-	local label7 = frame:New("Label")
-	label7:SetIcon(134400, nil, "TOP")
-	label7:SetText("Testing string size and whatnot TOP")
-
-	local label8 = frame:New("Label")
-	label8:SetIcon(134400, nil, "BOTTOM")
-	label8:SetText("Testing string size and whatnot BOTTOM")
+	for i = 1, 10 do
+		local button = buttons:New("Button")
+		button:SetText("Button " .. i)
+	end
 
 	frame:DoLayout()
 end

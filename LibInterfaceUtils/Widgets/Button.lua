@@ -10,14 +10,14 @@ local TEXTURES = {
 		border = {
 			enabled = true,
 			size = 1,
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
+			texture = lib.defaultTexture,
 			color = { 1, 1, 1, 0.25 },
 		},
 		text = {
-			fontObject = GameFontDisable,
+			fontObject = "GameFontDisable",
 		},
 		texture = {
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
+			texture = lib.defaultTexture,
 			color = { 0, 0, 0, 0.25 },
 		},
 	},
@@ -25,45 +25,45 @@ local TEXTURES = {
 		border = {
 			enabled = true,
 			size = 1,
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
-			color = { 1, 1, 1, 1 },
+			texture = lib.defaultTexture,
+			color = lib.colors.white,
 		},
 		text = {
-			fontObject = GameFontHighlight,
+			fontObject = "GameFontHighlight",
 		},
 		texture = {
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
-			color = { 0, 0, 0, 1 },
+			texture = lib.defaultTexture,
+			color = lib.colors.black,
 		},
 	},
 	Normal = {
 		border = {
 			enabled = true,
 			size = 1,
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
-			color = { 0, 0, 0, 1 },
+			texture = lib.defaultTexture,
+			color = lib.colors.black,
 		},
 		text = {
-			fontObject = GameFontNormal,
+			fontObject = "GameFontNormal",
 		},
 		texture = {
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
-			color = lib.colors.elvTransparent,
+			texture = lib.defaultTexture,
+			color = lib.colors.elvBackdrop,
 		},
 	},
 	Pushed = {
 		border = {
 			enabled = true,
 			size = 1,
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
+			texture = lib.defaultTexture,
 			color = lib.colors.gold,
 		},
 		text = {
-			fontObject = GameFontNormal,
+			fontObject = "GameFontNormal",
 		},
 		texture = {
-			texture = [[INTERFACE/BUTTONS/WHITE8X8]],
-			color = lib.colors.elvTransparent,
+			texture = lib.defaultTexture,
+			color = lib.colors.elvBackdrop,
 		},
 	},
 }
@@ -74,6 +74,7 @@ local TEXTURES = {
 
 local widgetType, version = "Button", 1
 
+local tex
 local widget = {
 	OnAcquire = function(self)
 		self:SetSize(150, 25)
@@ -86,6 +87,8 @@ local widget = {
 		self:Enable()
 		self:Show()
 	end,
+
+	OnClick = function(self) end,
 
 	OnEnter = function(self)
 		self.state.highlight = true
@@ -122,18 +125,6 @@ local widget = {
 	-- 	self:SetAnchors()
 	-- end,
 
-	SetFont = function(self, font)
-		local text = self._frame.text
-
-		if font.font then text:SetFont(unpack(font.font)) end
-		if font.fontObject then
-			text:SetFont(font.fontObject:GetFont())
-			text:SetFontObject(font.fontObject)
-		end
-
-		if font.color then text:SetTextColor(unpack(font.color)) end
-	end,
-
 	SetJustifyH = function(self, ...)
 		self._frame.text:SetJustifyH(...)
 	end,
@@ -152,25 +143,8 @@ local widget = {
 	end,
 
 	SetTextures = function(self, textures)
-		local textures = Mixin(textures or {}, TEXTURES)
-		textures.Disabled = Mixin(textures.Disabled or {}, TEXTURES.Disabled)
-		textures.Disabled.border = Mixin(textures.Disabled.border or {}, TEXTURES.Disabled.border)
-		textures.Disabled.text = Mixin(textures.Disabled.text or {}, TEXTURES.Disabled.text)
-		textures.Disabled.texture = Mixin(textures.Disabled.texture or {}, TEXTURES.Disabled.texture)
-		textures.Highlight = Mixin(textures.Highlight or {}, TEXTURES.Highlight)
-		textures.Highlight.border = Mixin(textures.Highlight.border or {}, TEXTURES.Highlight.border)
-		textures.Highlight.text = Mixin(textures.Highlight.text or {}, TEXTURES.Highlight.text)
-		textures.Highlight.texture = Mixin(textures.Highlight.texture or {}, TEXTURES.Highlight.texture)
-		textures.Normal = Mixin(textures.Normal or {}, TEXTURES.Normal)
-		textures.Normal.border = Mixin(textures.Normal.border or {}, TEXTURES.Normal.border)
-		textures.Normal.text = Mixin(textures.Normal.text or {}, TEXTURES.Normal.text)
-		textures.Normal.texture = Mixin(textures.Normal.texture or {}, TEXTURES.Normal.texture)
-		textures.Pushed = Mixin(textures.Pushed or {}, TEXTURES.Pushed)
-		textures.Pushed.border = Mixin(textures.Pushed.border or {}, TEXTURES.Pushed.border)
-		textures.Pushed.text = Mixin(textures.Pushed.text or {}, TEXTURES.Pushed.text)
-		textures.Pushed.texture = Mixin(textures.Pushed.texture or {}, TEXTURES.Pushed.texture)
-		self.state.textures = textures
-
+		self.state.textures = textures or {}
+		lib:SetMetatables(self.state.textures, TEXTURES)
 		self:UpdateState()
 	end,
 
@@ -181,8 +155,8 @@ local widget = {
 
 	UpdateState = function(self)
 		local state = not self._frame:IsEnabled() and "Disabled"
-			or self.state.pushed and "Pushed"
-			or self.state.highlight and "Highlight"
+			or (self.state.pushed and "Pushed")
+			or (self.state.highlight and "Highlight")
 			or "Normal"
 		local template = self.state.textures[state]
 
@@ -208,7 +182,7 @@ local widget = {
 		local get = self._frame[("Get%sTexture"):format(state)]
 		get(self._frame):SetVertexColor(unpack(template.texture.color))
 
-		self:SetFont(template.text)
+		lib:SetFont(self._frame.text, template.text)
 	end,
 }
 
@@ -218,7 +192,7 @@ local widget = {
 
 lib:RegisterWidget(widgetType, version, false, function(pool)
 	local frame = CreateFromMixins({
-		_frame = CreateFrame("Button", lib:GetNextWidget(pool), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Button", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate"),
 	}, widget)
 
 	frame.borders = {

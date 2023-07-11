@@ -33,28 +33,19 @@ local widgetType, version = "Frame", 1
 
 local widget = {
 	OnAcquire = function(self)
-		self:SetBackdrop({
-			bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
-			edgeFile = [[INTERFACE/BUTTONS/WHITE8X8]],
-			edgeSize = 1,
-		})
-		self:SetBackdropColor(unpack(lib.colors.elvBackdrop))
-		self:SetBackdropBorderColor(0, 0, 0, 1)
-
-		self.content:SetBackdrop({
-			bgFile = [[INTERFACE/BUTTONS/WHITE8X8]],
-			edgeFile = [[INTERFACE/BUTTONS/WHITE8X8]],
-			edgeSize = 1,
-		})
-		self.content:SetBackdropColor(unpack(lib.colors.elvTransparent))
-		self.content:SetBackdropBorderColor(0, 0, 0, 1)
-
+		self:SetBackdrop(lib.defaultBackdrop)
+		self:SetBackdropColor(unpack(lib.colors.elvTransparent))
+		self:SetBackdropBorderColor(unpack(lib.colors.black))
+		self:SetContentBackdrop(lib.defaultBackdrop)
+		self:SetContentBackdropColor(unpack(lib.colors.elvTransparent))
+		self:SetContentBackdropBorderColor(unpack(lib.colors.black))
 		self:SetMovable(true)
 		self:EnableResize(true, 100, 100)
 		self:SetPoint("CENTER")
 		self:SetSize(700, 500)
 		self:SetPadding(5, 5, 5, 5)
 		self:SetSpacing(5, 5)
+		self:SetTitle()
 		self:Show()
 	end,
 
@@ -76,6 +67,18 @@ local widget = {
 
 	SetBackdropColor = function(self, ...)
 		self._frame:SetBackdropColor(...)
+	end,
+
+	SetContentBackdrop = function(self, ...)
+		self.content:SetBackdrop(...)
+	end,
+
+	SetContentBackdropBorderColor = function(self, ...)
+		self.content:SetBackdropBorderColor(...)
+	end,
+
+	SetContentBackdropColor = function(self, ...)
+		self.content:SetBackdropColor(...)
 	end,
 
 	SetMovable = function(self, movable, ...)
@@ -108,6 +111,10 @@ local widget = {
 			y = y or 0,
 		}
 	end,
+
+	SetTitle = function(self, text)
+		self._frame.title:SetText(text or "")
+	end,
 }
 
 -- *******************************
@@ -116,7 +123,7 @@ local widget = {
 
 lib:RegisterWidget(widgetType, version, true, function(pool)
 	local frame = CreateFromMixins({
-		_frame = CreateFrame("Frame", lib:GetNextWidget(pool), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Frame", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate"),
 	}, widget)
 
 	frame._frame.resizer = CreateFrame("Button", nil, frame._frame)
@@ -134,13 +141,12 @@ lib:RegisterWidget(widgetType, version, true, function(pool)
 	close:SetSize(12, 12)
 	close:SetScript("OnClick", OnClick)
 
-	local title = frame._frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	title:SetPoint("TOPLEFT", 4, -4)
-	title:SetPoint("BOTTOMRIGHT", close, "BOTTOMLEFT", -4, 0)
-	title:SetText("Frame")
+	frame._frame.title = frame._frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame._frame.title:SetPoint("TOPLEFT", 4, -4)
+	frame._frame.title:SetPoint("BOTTOMRIGHT", close, "BOTTOMLEFT", -4, 0)
 
 	frame.content = CreateFrame("Frame", nil, frame._frame, "BackdropTemplate")
-	frame.content:SetPoint("TOP", title, "BOTTOM", 0, -4)
+	frame.content:SetPoint("TOP", frame._frame.title, "BOTTOM", 0, -4)
 	frame.content:SetPoint("LEFT")
 	frame.content:SetPoint("BOTTOMRIGHT")
 
