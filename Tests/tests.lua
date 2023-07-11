@@ -1,5 +1,7 @@
 local lib = LibStub:GetLibrary("LibInterfaceUtils-1.0")
-if not lib then return end
+if not lib then
+	return
+end
 
 local function TestFrame()
 	local frame, scrollFrame = lib:GetScrollableFrame()

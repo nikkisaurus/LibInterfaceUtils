@@ -79,39 +79,41 @@ local widgetType, version = "Button", 1
 
 local tex
 local widget = {
-	OnAcquire = function(self)
-		self:SetSize(150, 25)
-		self:SetJustifyH("CENTER")
-		self:SetJustifyV("MIDDLE")
-		self:SetWordWrap()
-		self:SetPushedTextOffset(1, -1)
-		self:SetTextures()
-		self:SetText()
-		self:Enable()
-		self:Show()
-	end,
+	_events = {
+		OnAcquire = function(self)
+			self:SetSize(150, 25)
+			self:SetJustifyH("CENTER")
+			self:SetJustifyV("MIDDLE")
+			self:SetWordWrap()
+			self:SetPushedTextOffset(1, -1)
+			self:SetTextures()
+			self:SetText()
+			self:Enable()
+			self:Show()
+		end,
 
-	OnClick = function(self) end,
+		OnClick = function(self) end,
 
-	OnEnter = function(self)
-		self.state.highlight = true
-		self:UpdateState()
-	end,
+		OnEnter = function(self)
+			self._state.highlight = true
+			self:UpdateState()
+		end,
 
-	OnLeave = function(self)
-		self.state.highlight = false
-		self:UpdateState()
-	end,
+		OnLeave = function(self)
+			self._state.highlight = false
+			self:UpdateState()
+		end,
 
-	OnMouseDown = function(self)
-		self.state.pushed = true
-		self:UpdateState()
-	end,
+		OnMouseDown = function(self)
+			self._state.pushed = true
+			self:UpdateState()
+		end,
 
-	OnMouseUp = function(self)
-		self.state.pushed = false
-		self:UpdateState()
-	end,
+		OnMouseUp = function(self)
+			self._state.pushed = false
+			self:UpdateState()
+		end,
+	},
 
 	Disable = function(self)
 		self._frame:Disable()
@@ -124,7 +126,7 @@ local widget = {
 	end,
 
 	-- SetAutoHeight = function(self, autoHeight)
-	-- 	self.state.autoHeight = autoHeight
+	-- 	self._state.autoHeight = autoHeight
 	-- 	self:SetAnchors()
 	-- end,
 
@@ -141,27 +143,27 @@ local widget = {
 	end,
 
 	SetText = function(self, text)
-		self.state.text = text
+		self._state.text = text
 		self._frame.text:SetText(text or "")
 	end,
 
 	SetTextures = function(self, textures)
-		self.state.textures = textures or {}
-		addon.setNestedMetatables(self.state.textures, TEXTURES)
+		self._state.textures = textures or {}
+		addon.setNestedMetatables(self._state.textures, TEXTURES)
 		self:UpdateState()
 	end,
 
 	SetWordWrap = function(self, canWrap)
-		self.state.canWrap = canWrap or false
+		self._state.canWrap = canWrap or false
 		self._frame.text:SetWordWrap(canWrap or false)
 	end,
 
 	UpdateState = function(self)
 		local state = not self._frame:IsEnabled() and "Disabled"
-			or (self.state.pushed and "Pushed")
-			or (self.state.highlight and "Highlight")
+			or (self._state.pushed and "Pushed")
+			or (self._state.highlight and "Highlight")
 			or "Normal"
-		local template = self.state.textures[state]
+		local template = self._state.textures[state]
 
 		for id, border in pairs(self.borders) do
 			local borderTemplate = template.border
@@ -219,7 +221,7 @@ lib:RegisterWidget(widgetType, version, false, function(pool)
 	frame._frame:SetFontString(frame._frame.text)
 
 	-- frame._frame:SetScript("OnEnter", function()
-	-- 	local borders = frame.state.textures.border
+	-- 	local borders = frame._state.textures.border
 	-- 	if borders then
 	-- 		for _, border in pairs(frame.borders) do
 	-- 			border:SetVertexColor(unpack(borders[4]))
@@ -228,7 +230,7 @@ lib:RegisterWidget(widgetType, version, false, function(pool)
 	-- end)
 
 	-- frame._frame:SetScript("OnLeave", function()
-	-- 	local borders = frame.state.textures.border
+	-- 	local borders = frame._state.textures.border
 	-- 	if borders then
 	-- 		for _, border in pairs(frame.borders) do
 	-- 			border:SetVertexColor(unpack(borders[1]))
@@ -237,7 +239,7 @@ lib:RegisterWidget(widgetType, version, false, function(pool)
 	-- end)
 
 	-- frame._frame:SetScript("OnMouseDown", function()
-	-- 	local borders = frame.state.textures.border
+	-- 	local borders = frame._state.textures.border
 	-- 	if borders then
 	-- 		for _, border in pairs(frame.borders) do
 	-- 			border:SetVertexColor(unpack(borders[5]))
@@ -246,7 +248,7 @@ lib:RegisterWidget(widgetType, version, false, function(pool)
 	-- end)
 
 	-- frame._frame:SetScript("OnMouseUp", function()
-	-- 	local borders = frame.state.textures.border
+	-- 	local borders = frame._state.textures.border
 	-- 	if borders then
 	-- 		for _, border in pairs(frame.borders) do
 	-- 			border:SetVertexColor(unpack(borders[GetMouseFocus() == frame.frame and 4 or 1]))

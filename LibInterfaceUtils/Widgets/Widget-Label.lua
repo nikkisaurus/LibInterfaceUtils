@@ -94,24 +94,26 @@ end
 local widgetType, version = "Label", 1
 
 local widget = {
-	OnAcquire = function(self)
-		self:SetSize(200, 0)
-		self:SetFontObject(GameFontHighlight)
-		self:SetJustifyH("LEFT")
-		self:SetJustifyV("MIDDLE")
-		self:SetWordWrap(true)
-		self:SetIcon()
-		self:SetText()
-		self:SetAutoWidth(true)
-		self:SetInteractive()
-		self:Show()
-	end,
+	_events = {
+		OnAcquire = function(self)
+			self:SetSize(200, 0)
+			self:SetFontObject(GameFontHighlight)
+			self:SetJustifyH("LEFT")
+			self:SetJustifyV("MIDDLE")
+			self:SetWordWrap(true)
+			self:SetIcon()
+			self:SetText()
+			self:SetAutoWidth(true)
+			self:SetInteractive()
+			self:Show()
+		end,
+	},
 
 	SetAnchors = function(self)
 		local point, size
-		if self.state.icon.texture then
-			point = self.state.icon.point
-			size = self.state.icon.size
+		if self._state.icon.texture then
+			point = self._state.icon.point
+			size = self._state.icon.size
 		end
 
 		local icon = self._frame.icon
@@ -126,7 +128,7 @@ local widget = {
 			icon:SetPoint(unpack(points.icon))
 			text:SetPoint(unpack(points.text[1]))
 
-			if self.state.autoWidth and not self.state.fullWidth and not self.state.availableWidth then
+			if self._state.autoWidth and not self._state.fullWidth and not self._state.availableWidth then
 				text:SetWidth(text:GetStringWidth())
 				self:SetWidth((points.iconWidth and size or 0) + text:GetWidth())
 			else
@@ -143,7 +145,7 @@ local widget = {
 		else
 			text:SetPoint("TOPLEFT")
 
-			if self.state.autoWidth and not self.state.fullWidth then
+			if self._state.autoWidth and not self._state.fullWidth then
 				text:SetWidth(text:GetStringWidth())
 			end
 
@@ -154,7 +156,7 @@ local widget = {
 	end,
 
 	SetAutoWidth = function(self, autoWidth)
-		self.state.autoWidth = autoWidth
+		self._state.autoWidth = autoWidth
 		self:SetAnchors()
 	end,
 
@@ -176,7 +178,7 @@ local widget = {
 	end,
 
 	SetIcon = function(self, texture, size, point)
-		self.state.icon = {
+		self._state.icon = {
 			texture = texture ~= "" and texture,
 			size = size or 14,
 			point = point or "TOPLEFT",

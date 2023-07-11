@@ -5,7 +5,7 @@ if not lib then
 end
 
 function lib:GetScrollableFrame()
-	local frame = lib:New("Frame")
+	local frame = self:New("Frame")
 	frame:SetLayout("fill")
 	local scrollFrame = frame:New("ScrollFrame")
 
@@ -13,7 +13,7 @@ function lib:GetScrollableFrame()
 end
 
 function lib:GetSimpleGroup(parent)
-	local group = (parent or lib):New("Group")
+	local group = (parent or self):New("Group")
 	group:SetBackdrop()
 	group:SetCollapsible()
 

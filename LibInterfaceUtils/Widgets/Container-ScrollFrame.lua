@@ -11,16 +11,18 @@ end
 local widgetType, version = "ScrollFrame", 1
 
 local Widget = {
-	OnAcquire = function(self)
-		self:SetPadding(5, 5, 5, 5)
-		self:SetSpacing(5, 5)
-		self:Show()
-	end,
+	_events = {
+		OnAcquire = function(self)
+			self:SetPadding(5, 5, 5, 5)
+			self:SetSpacing(5, 5)
+			self:Show()
+		end,
 
-	OnLayoutFinished = function(self, ...)
-		self._frame.content:SetSize(...)
-		self._frame.scrollBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
-	end,
+		OnLayoutFinished = function(self, ...)
+			self._frame.content:SetSize(...)
+			self._frame.scrollBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
+		end,
+	},
 
 	SetBackdrop = function(self, ...)
 		self._frame:SetBackdrop(...)
@@ -47,7 +49,7 @@ local Widget = {
 	end,
 
 	SetPadding = function(self, left, right, top, bottom)
-		self.state.padding = {
+		self._state.padding = {
 			left = left or 0,
 			right = right or 0,
 			top = top or 0,
@@ -56,7 +58,7 @@ local Widget = {
 	end,
 
 	SetSpacing = function(self, x, y)
-		self.state.spacing = {
+		self._state.spacing = {
 			x = x or 0,
 			y = y or 0,
 		}

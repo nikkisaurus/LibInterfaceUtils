@@ -5,7 +5,7 @@ if not lib then
 end
 
 local widgetType, version, isContainer = "Frame", 1, true
-local Widget = {}
+local Widget = { _events = {} }
 
 local function OnClick(closeButton)
 	local frame = closeButton:GetParent()
@@ -30,7 +30,7 @@ local function OnMouseUp(resizer)
 	frame:StopMovingOrSizing()
 end
 
-function Widget:OnAcquire()
+function Widget._events:OnAcquire()
 	self:SetContainerBackdrop(addon.defaultBackdrop)
 	self:SetContainerBackdropBorderColor(addon.colors.black)
 	self:SetContainerBackdropColor(addon.colors.elvTransparent)
@@ -97,7 +97,7 @@ function Widget:SetMovable(movable, ...)
 end
 
 function Widget:SetPadding(left, right, top, bottom)
-	self.state.padding = {
+	self._state.padding = {
 		left = left or 0,
 		right = right or 0,
 		top = top or 0,
@@ -106,7 +106,7 @@ function Widget:SetPadding(left, right, top, bottom)
 end
 
 function Widget:SetSpacing(x, y)
-	self.state.spacing = {
+	self._state.spacing = {
 		x = x or 0,
 		y = y or 0,
 	}

@@ -1,13 +1,15 @@
 <Ui>
   <Include file="LibInterfaceUtils.lua" />
-  <Include file="Themes.lua" />
-  <Include file="Factories.lua" />
-  <Include file="Registry.lua" />
-  <Include file="Utils.lua" />
-  <Include file="Layouts.lua" />
-  <Include file="Widgets/Button.lua" />
-  <Include file="Widgets/Frame.lua" />
-  <Include file="Widgets/Group.lua" />
-  <Include file="Widgets/Label.lua" />
-  <Include file="Widgets/ScrollFrame.lua" />
+  <Include file="Mixins/Container.lua" />
+  <Include file="Mixins/Widget.lua" />
+  <Include file="Core/Factories.lua" />
+  <Include file="Core/Layouts.lua" />
+  <Include file="Core/Registry.lua" />
+  <Include file="Core/Themes.lua" />
+  <Include file="Core/Utils.lua" />
+  <Include file="Widgets/Container-Frame.lua" />
+  <Include file="Widgets/Container-Group.lua" />
+  <Include file="Widgets/Container-ScrollFrame.lua" />
+  <Include file="Widgets/Widget-Button.lua" />
+  <Include file="Widgets/Widget-Label.lua" />
 </Ui>
