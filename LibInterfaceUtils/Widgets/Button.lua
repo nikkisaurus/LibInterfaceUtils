@@ -74,6 +74,7 @@ local TEXTURES = {
 
 local widgetType, version = "Button", 1
 
+local tex
 local widget = {
 	OnAcquire = function(self)
 		self:SetSize(150, 25)
@@ -86,6 +87,8 @@ local widget = {
 		self:Enable()
 		self:Show()
 	end,
+
+	OnClick = function(self) end,
 
 	OnEnter = function(self)
 		self.state.highlight = true
@@ -140,7 +143,8 @@ local widget = {
 	end,
 
 	SetTextures = function(self, textures)
-		self.state.textures = lib:Mixin({}, TEXTURES, textures)
+		self.state.textures = textures or {}
+		lib:SetMetatables(self.state.textures, TEXTURES)
 		self:UpdateState()
 	end,
 

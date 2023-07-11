@@ -37,16 +37,9 @@ function lib:SetFont(fontString, font)
 	if font.color then fontString:SetTextColor(unpack(font.color)) end
 end
 
-function lib:Mixin(target, ...)
-	for _, mixin in ipairs({ ... }) do
-		for key, value in pairs(mixin) do
-			if type(value) == "table" and type(target[key]) == "table" then
-				self:Mixin(target[key], value) -- Recursively override nested tables
-			else
-				target[key] = value -- Override non-table values
-			end
-		end
+function lib:SetMetatables(target, source)
+	setmetatable(target, { __index = source })
+	for key, value in pairs(target) do
+		if type(value) == "table" and type(source[key]) == "table" then lib:SetMetatables(value, source[key]) end
 	end
-
-	return target
 end
