@@ -43,3 +43,19 @@ function lib:SetMetatables(target, source)
 		if type(value) == "table" and type(source[key]) == "table" then lib:SetMetatables(value, source[key]) end
 	end
 end
+
+function lib:GetScrollableFrame()
+	local frame = lib:New("Frame")
+	frame:SetLayout("fill")
+	local scrollFrame = frame:New("ScrollFrame")
+
+	return frame, scrollFrame
+end
+
+function lib:GetSimpleGroup(parent)
+	local group = (parent or lib):New("Group")
+	group:SetBackdrop()
+	group:SetCollapsible()
+
+	return group
+end

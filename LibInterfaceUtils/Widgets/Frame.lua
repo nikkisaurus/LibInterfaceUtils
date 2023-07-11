@@ -45,6 +45,7 @@ local widget = {
 		self:SetSize(700, 500)
 		self:SetPadding(5, 5, 5, 5)
 		self:SetSpacing(5, 5)
+		self:SetTitle()
 		self:Show()
 	end,
 
@@ -110,6 +111,10 @@ local widget = {
 			y = y or 0,
 		}
 	end,
+
+	SetTitle = function(self, text)
+		self._frame.title:SetText(text or "")
+	end,
 }
 
 -- *******************************
@@ -136,12 +141,12 @@ lib:RegisterWidget(widgetType, version, true, function(pool)
 	close:SetSize(12, 12)
 	close:SetScript("OnClick", OnClick)
 
-	local title = frame._frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	title:SetPoint("TOPLEFT", 4, -4)
-	title:SetPoint("BOTTOMRIGHT", close, "BOTTOMLEFT", -4, 0)
+	frame._frame.title = frame._frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame._frame.title:SetPoint("TOPLEFT", 4, -4)
+	frame._frame.title:SetPoint("BOTTOMRIGHT", close, "BOTTOMLEFT", -4, 0)
 
 	frame.content = CreateFrame("Frame", nil, frame._frame, "BackdropTemplate")
-	frame.content:SetPoint("TOP", title, "BOTTOM", 0, -4)
+	frame.content:SetPoint("TOP", frame._frame.title, "BOTTOM", 0, -4)
 	frame.content:SetPoint("LEFT")
 	frame.content:SetPoint("BOTTOMRIGHT")
 

@@ -138,14 +138,10 @@ local widget = {
 		else
 			text:SetPoint("TOPLEFT")
 
-			if self.state.autoWidth and not self.state.fullWidth then
-				text:SetWidth(text:GetStringWidth())
-				self:SetWidth(text:GetWidth())
-			else
-				text:SetWidth(self:GetWidth())
-			end
+			if self.state.autoWidth and not self.state.fullWidth then text:SetWidth(text:GetStringWidth()) end
 
 			text:SetPoint("TOPRIGHT")
+			self:SetWidth(text:GetWidth())
 			self:SetHeight(text:GetStringHeight())
 		end
 	end,
