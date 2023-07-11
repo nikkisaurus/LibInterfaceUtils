@@ -3,9 +3,12 @@ if not lib then return end
 
 local function TestFrame()
 	local frame = lib:New("Frame")
+	frame:SetLayout("fill")
 	frame:RegisterCallback("OnRelease", function()
 		print("Bye")
 	end)
+
+	local scrollFrame = frame:New("ScrollFrame")
 	-- frame:SetLayout("fill")
 
 	-- local nestMe = frame:New("Group")
@@ -14,7 +17,7 @@ local function TestFrame()
 	-- nestMe:SetBackdrop()
 
 	-- local group = nestMe:New("Group")
-	local group = frame:New("Group")
+	local group = scrollFrame:New("Group")
 	group:SetFullWidth(true)
 	group:SetTitle("Nest Container")
 	-- group:RegisterCallback("OnSizeChanged", function()
@@ -60,44 +63,44 @@ local function TestFrame()
 
 	-- button:UnregisterCallback("OnEnter")
 
-	local label = frame:New("Label")
+	local label = scrollFrame:New("Label")
 	label:SetIcon(134400)
 	label:SetText("Testing string size and whatnot TOPLEFT blah blah need this to be a little longer")
 	label:SetFullWidth(true)
 	label:SetInteractive(true)
 
-	local label2 = frame:New("Label")
+	local label2 = scrollFrame:New("Label")
 	label2:SetIcon(134400, nil, "TOPRIGHT")
 	label2:SetText("Testing string size and whatnot TOPRIGHT")
 	label2:SetInteractive(true, function()
-		frame:ReleaseChild(label2)
+		scrollFrame:ReleaseChild(label2)
 	end)
 
-	local label3 = frame:New("Label")
+	local label3 = scrollFrame:New("Label")
 	label3:SetIcon(134400, nil, "BOTTOMLEFT")
 	label3:SetText("Testing string size and whatnot BOTTOMLEFT")
 
-	local label4 = frame:New("Label")
+	local label4 = scrollFrame:New("Label")
 	label4:SetIcon(134400, nil, "BOTTOMRIGHT")
 	label4:SetText("Testing string size and whatnot BOTTOMRIGHT")
 
-	local label5 = frame:New("Label")
+	local label5 = scrollFrame:New("Label")
 	label5:SetIcon(134400, nil, "LEFT")
 	label5:SetText("Testing string size and whatnot LEFT")
 
-	local label6 = frame:New("Label")
+	local label6 = scrollFrame:New("Label")
 	label6:SetIcon(134400, nil, "RIGHT")
 	label6:SetText("Testing string size and whatnot RIGHT")
 
-	local label7 = frame:New("Label")
+	local label7 = scrollFrame:New("Label")
 	label7:SetIcon(134400, nil, "TOP")
 	label7:SetText("Testing string size and whatnot TOP")
 
-	local label8 = frame:New("Label")
+	local label8 = scrollFrame:New("Label")
 	label8:SetIcon(134400, nil, "BOTTOM")
 	label8:SetText("Testing string size and whatnot BOTTOM")
 
-	frame:DoLayout()
+	scrollFrame:DoLayout()
 end
 
 local frame = CreateFrame("Frame")

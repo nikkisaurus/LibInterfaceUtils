@@ -7,18 +7,7 @@ if not lib then return end
 
 local function OnMouseDown(title)
 	local widget = title:GetParent().widget
-
-	if not widget.state.collapsed then
-		widget.state.collapsed = widget:GetHeight()
-		widget.content:Hide()
-		widget:SetHeight(widget.state.collapsed - widget.content:GetHeight() + widget.state.titlePadding.content)
-	else
-		widget.content:Show()
-		widget:SetHeight(widget.state.collapsed)
-		widget.state.collapsed = nil
-	end
-
-	widget:UpdateIconState()
+	widget:SetCollapsed(not widget.state.collapsed, widget.state.collapsed)
 end
 
 -- *******************************
@@ -44,6 +33,7 @@ local widget = {
 		self:SetBackdropBorderColor(unpack(lib.colors.black))
 		self:SetAutoHeight(true)
 		self:SetCollapsible(true)
+		self:SetCollapsed(true)
 		self:Show()
 	end,
 
@@ -64,7 +54,6 @@ local widget = {
 		local title = titlebar.title
 		local padding = self.state.titlePadding
 		titlebar:SetHeight(title:GetHeight() + padding.top + padding.bottom)
-		self:DoParentLayout()
 	end,
 
 	SetAnchors = function(self)
@@ -123,6 +112,21 @@ local widget = {
 
 	SetBackdropColor = function(self, ...)
 		self.content:SetBackdropColor(...)
+	end,
+
+	SetCollapsed = function(self, collapsed, restore)
+		self.state.collapsed = collapsed and self:GetHeight()
+
+		if collapsed then
+			self.content:Hide()
+			self:SetHeight(self.state.collapsed - self.content:GetHeight() + self.state.titlePadding.content)
+		else
+			self.content:Show()
+			if restore then self:SetHeight(restore) end
+		end
+
+		self:UpdateIconState()
+		self:DoParentLayout()
 	end,
 
 	SetCollapsible = function(self, collapsible)

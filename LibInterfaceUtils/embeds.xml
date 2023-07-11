@@ -6,4 +6,5 @@
   <Include file="Widgets/Frame.lua" />
   <Include file="Widgets/Group.lua" />
   <Include file="Widgets/Label.lua" />
+  <Include file="Widgets/ScrollFrame.lua" />
 </Ui>
