@@ -267,7 +267,17 @@ end
 -- *** Helpers ***
 -- *******************************
 
-function lib:GetNextWidget(pool)
-	assert(pool and pool.widgetType and lib.pools[pool.widgetType], "Invalid widget pool supplied to :GetNextWidget()")
-	return ("LIU%s%d"):format(pool.widgetType, #pool + 1)
+function lib:GetNextWidget(widgetType)
+	local pool = lib.pools[widgetType]
+	local count = 0
+
+	for _, _ in pool:EnumerateActive() do
+		count = count + 1
+	end
+
+	for _, _ in pool:EnumerateInactive() do
+		count = count + 1
+	end
+
+	return ("LIU%s%d"):format(widgetType, count + 1)
 end

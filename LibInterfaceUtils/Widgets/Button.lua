@@ -188,7 +188,7 @@ local widget = {
 
 lib:RegisterWidget(widgetType, version, false, function(pool)
 	local frame = CreateFromMixins({
-		_frame = CreateFrame("Button", lib:GetNextWidget(pool), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Button", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate"),
 	}, widget)
 
 	frame.borders = {

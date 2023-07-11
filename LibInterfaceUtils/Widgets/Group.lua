@@ -200,7 +200,7 @@ local widget = {
 
 lib:RegisterWidget(widgetType, version, true, function(pool)
 	local frame = CreateFromMixins({
-		_frame = CreateFrame("Frame", lib:GetNextWidget(pool), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Frame", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate"),
 	}, widget)
 
 	frame._frame.titlebar = CreateFrame("Frame", nil, frame._frame, "BackdropTemplate")

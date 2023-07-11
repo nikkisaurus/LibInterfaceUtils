@@ -118,7 +118,7 @@ local widget = {
 
 lib:RegisterWidget(widgetType, version, true, function(pool)
 	local frame = CreateFromMixins({
-		_frame = CreateFrame("Frame", lib:GetNextWidget(pool), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Frame", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate"),
 	}, widget)
 
 	frame._frame.resizer = CreateFrame("Button", nil, frame._frame)
