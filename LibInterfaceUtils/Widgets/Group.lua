@@ -1,5 +1,8 @@
-local lib = LibStub:GetLibrary("LibInterfaceUtils-1.0")
-if not lib then return end
+local addonName, addon = ...
+local lib = LibStub:GetLibrary(addonName .. "-1.0")
+if not lib then
+	return
+end
 
 -- *******************************
 -- *** Scripts ***
@@ -22,15 +25,15 @@ local widget = {
 		self:SetPadding(5, 5, 5, 5)
 		self:SetSpacing(5, 5)
 		self:SetTitle()
-		self:SetTitlebarBackdrop(lib.defaultBackdrop)
-		self:SetTitlebarBackdropColor(unpack(lib.colors.elvTransparent))
-		self:SetTitlebarBackdropBorderColor(unpack(lib.colors.black))
+		self:SetTitlebarBackdrop(addon.defaultBackdrop)
+		self:SetTitlebarBackdropColor(unpack(addon.colors.elvTransparent))
+		self:SetTitlebarBackdropBorderColor(unpack(addon.colors.black))
 		self:SetFont()
 		self:SetJustifyH()
 		self:SetJustifyV()
-		self:SetBackdrop(lib.defaultBackdrop)
-		self:SetBackdropColor(unpack(lib.colors.elvTransparent))
-		self:SetBackdropBorderColor(unpack(lib.colors.black))
+		self:SetBackdrop(addon.defaultBackdrop)
+		self:SetBackdropColor(unpack(addon.colors.elvTransparent))
+		self:SetBackdropBorderColor(unpack(addon.colors.black))
 		self:SetAutoHeight(true)
 		self:SetCollapsible(true)
 		self:SetCollapsed(true)
@@ -40,12 +43,18 @@ local widget = {
 	OnLayoutFinished = function(self, _, height)
 		if self.state.autoHeight then
 			local parent = self.state.parent
-			if parent and parent.state.layout == "fill" then return end
+			if parent and parent.state.layout == "fill" then
+				return
+			end
 			local padding = self.state.titlePadding
 			local titleHeight = self._frame.titlebar.title:GetHeight()
 			local pendingHeight = height + titleHeight + padding.top + padding.bottom - padding.content
-			if self.state.collapsed then pendingHeight = titleHeight + padding.top + padding.bottom end
-			if self:GetHeight() ~= pendingHeight then self:SetHeight(pendingHeight) end
+			if self.state.collapsed then
+				pendingHeight = titleHeight + padding.top + padding.bottom
+			end
+			if self:GetHeight() ~= pendingHeight then
+				self:SetHeight(pendingHeight)
+			end
 		end
 	end,
 
@@ -59,9 +68,9 @@ local widget = {
 	SetAnchors = function(self)
 		local titlebar = self._frame.titlebar
 		local title = titlebar.title
-		local titleText = lib:IsStringValid(title:GetText())
+		local titleText = addon.isValidString(title:GetText())
 		local icon = titlebar.icon
-		local content = self.content
+		local content = self._frame.content
 
 		titlebar:ClearAllPoints()
 		title:ClearAllPoints()
@@ -87,7 +96,9 @@ local widget = {
 					+ padding.top
 					+ padding.bottom
 					- padding.content
-				if self:GetHeight() ~= pendingHeight then self:SetHeight(pendingHeight) end
+				if self:GetHeight() ~= pendingHeight then
+					self:SetHeight(pendingHeight)
+				end
 			end
 		else
 			content:SetPoint("TOP")
@@ -103,26 +114,28 @@ local widget = {
 	end,
 
 	SetBackdrop = function(self, ...)
-		self.content:SetBackdrop(...)
+		self._frame.content:SetBackdrop(...)
 	end,
 
 	SetBackdropBorderColor = function(self, ...)
-		self.content:SetBackdropBorderColor(...)
+		self._frame.content:SetBackdropBorderColor(...)
 	end,
 
 	SetBackdropColor = function(self, ...)
-		self.content:SetBackdropColor(...)
+		self._frame.content:SetBackdropColor(...)
 	end,
 
 	SetCollapsed = function(self, collapsed, restore)
 		self.state.collapsed = collapsed and self:GetHeight()
 
 		if collapsed then
-			self.content:Hide()
-			self:SetHeight(self.state.collapsed - self.content:GetHeight() + self.state.titlePadding.content)
+			self._frame.content:Hide()
+			self:SetHeight(self.state.collapsed - self._frame.content:GetHeight() + self.state.titlePadding.content)
 		else
-			self.content:Show()
-			if restore then self:SetHeight(restore) end
+			self._frame.content:Show()
+			if restore then
+				self:SetHeight(restore)
+			end
 		end
 
 		self:UpdateIconState()
@@ -140,7 +153,7 @@ local widget = {
 	SetFont = function(self, font)
 		lib:SetFont(
 			self._frame.titlebar.title,
-			Mixin(font or {}, { fontObject = GameFontNormalLarge, color = lib.colors.gold })
+			Mixin(font or {}, { fontObject = GameFontNormalLarge, color = addon.colors.gold })
 		)
 	end,
 
@@ -204,15 +217,15 @@ local widget = {
 
 lib:RegisterWidget(widgetType, version, true, function(pool)
 	local frame = CreateFromMixins({
-		_frame = CreateFrame("Frame", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Frame", addon.GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
 	}, widget)
 
 	frame._frame.titlebar = CreateFrame("Frame", nil, frame._frame, "BackdropTemplate")
-	frame._frame.titlebar:SetBackdrop(lib.defaultBackdrop)
+	frame._frame.titlebar:SetBackdrop(addon.defaultBackdrop)
 	frame._frame.titlebar.title = frame._frame.titlebar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame._frame.titlebar.icon = frame._frame.titlebar:CreateTexture(nil, "OVERLAY")
 	frame._frame.titlebar.icon:SetSize(16, 16)
-	frame.content = CreateFrame("Frame", nil, frame._frame, "BackdropTemplate")
+	frame._frame.content = CreateFrame("Frame", nil, frame._frame, "BackdropTemplate")
 
 	return frame
 end)

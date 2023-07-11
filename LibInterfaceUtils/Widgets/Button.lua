@@ -1,5 +1,8 @@
-local lib = LibStub:GetLibrary("LibInterfaceUtils-1.0")
-if not lib then return end
+local addonName, addon = ...
+local lib = LibStub:GetLibrary(addonName .. "-1.0")
+if not lib then
+	return
+end
 
 -- *******************************
 -- *** Constants ***
@@ -10,14 +13,14 @@ local TEXTURES = {
 		border = {
 			enabled = true,
 			size = 1,
-			texture = lib.defaultTexture,
+			texture = addon.defaultTexture,
 			color = { 1, 1, 1, 0.25 },
 		},
 		text = {
 			fontObject = "GameFontDisable",
 		},
 		texture = {
-			texture = lib.defaultTexture,
+			texture = addon.defaultTexture,
 			color = { 0, 0, 0, 0.25 },
 		},
 	},
@@ -25,45 +28,45 @@ local TEXTURES = {
 		border = {
 			enabled = true,
 			size = 1,
-			texture = lib.defaultTexture,
-			color = lib.colors.white,
+			texture = addon.defaultTexture,
+			color = addon.colors.white,
 		},
 		text = {
 			fontObject = "GameFontHighlight",
 		},
 		texture = {
-			texture = lib.defaultTexture,
-			color = lib.colors.black,
+			texture = addon.defaultTexture,
+			color = addon.colors.black,
 		},
 	},
 	Normal = {
 		border = {
 			enabled = true,
 			size = 1,
-			texture = lib.defaultTexture,
-			color = lib.colors.black,
+			texture = addon.defaultTexture,
+			color = addon.colors.black,
 		},
 		text = {
 			fontObject = "GameFontNormal",
 		},
 		texture = {
-			texture = lib.defaultTexture,
-			color = lib.colors.elvBackdrop,
+			texture = addon.defaultTexture,
+			color = addon.colors.elvBackdrop,
 		},
 	},
 	Pushed = {
 		border = {
 			enabled = true,
 			size = 1,
-			texture = lib.defaultTexture,
-			color = lib.colors.gold,
+			texture = addon.defaultTexture,
+			color = addon.colors.gold,
 		},
 		text = {
 			fontObject = "GameFontNormal",
 		},
 		texture = {
-			texture = lib.defaultTexture,
-			color = lib.colors.elvBackdrop,
+			texture = addon.defaultTexture,
+			color = addon.colors.elvBackdrop,
 		},
 	},
 }
@@ -144,7 +147,7 @@ local widget = {
 
 	SetTextures = function(self, textures)
 		self.state.textures = textures or {}
-		lib:SetMetatables(self.state.textures, TEXTURES)
+		addon.setNestedMetatables(self.state.textures, TEXTURES)
 		self:UpdateState()
 	end,
 
@@ -192,7 +195,7 @@ local widget = {
 
 lib:RegisterWidget(widgetType, version, false, function(pool)
 	local frame = CreateFromMixins({
-		_frame = CreateFrame("Button", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Button", addon.GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
 	}, widget)
 
 	frame.borders = {

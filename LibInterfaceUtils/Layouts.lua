@@ -1,5 +1,8 @@
-local lib = LibStub:GetLibrary("LibInterfaceUtils-1.0")
-if not lib then return end
+local addonName, addon = ...
+local lib = LibStub:GetLibrary(addonName .. "-1.0")
+if not lib then
+	return
+end
 
 lib.layouts = {
 	fill = function(self, frame, children, scrollBox)
@@ -16,7 +19,7 @@ lib.layouts = {
 			firstChild:SetPoint("TOPLEFT", frame, "TOPLEFT", padding.left, -padding.top)
 
 			-- Perform child layout
-			lib:safecall(firstChild.DoLayout, firstChild)
+			addon.safecall(firstChild.DoLayout, firstChild)
 		end
 
 		return frame:GetSize()
@@ -62,7 +65,9 @@ lib.layouts = {
 			else
 				-- Set the child width based on the original size and available width
 				local childWidth = math.min(child.state.originalSize.width, availableWidth)
-				if childWidth == availableWidth then child.state.availableWidth = true end
+				if childWidth == availableWidth then
+					child.state.availableWidth = true
+				end
 				child:SetSize(childWidth, child:GetHeight())
 
 				-- Update row width
@@ -95,7 +100,7 @@ lib.layouts = {
 
 		-- Perform child layout after positioning
 		for _, child in ipairs(children) do
-			lib:safecall(child.DoLayout, child)
+			addon.safecall(child.DoLayout, child)
 		end
 
 		-- Calculate the total content height based on the positioned child widgets
@@ -148,9 +153,11 @@ lib.layouts = {
 			yOffset = yOffset - child:GetHeight() - spacing.y
 
 			-- Perform child layout after positioning
-			lib:safecall(child.DoLayout, child)
+			addon.safecall(child.DoLayout, child)
 
-			if child.state.fullHeight then break end
+			if child.state.fullHeight then
+				break
+			end
 		end
 
 		-- Adjust the frame height based on the children's layout

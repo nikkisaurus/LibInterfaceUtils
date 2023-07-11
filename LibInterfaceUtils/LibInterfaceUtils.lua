@@ -1,5 +1,8 @@
-local lib = LibStub:NewLibrary("LibInterfaceUtils-1.0", 1)
-if not lib then return end
+local addonName, addon = ...
+local lib = LibStub:NewLibrary(addonName .. "-1.0", 1)
+if not lib then
+	return
+end
 
 -- *******************************
 -- *** Throttler ***
@@ -14,7 +17,9 @@ frame:Hide()
 
 local function Fire(event, widget, ...)
 	local callback = widget[event]
-	if type(callback) == "function" then callback(widget, ...) end
+	if type(callback) == "function" then
+		callback(widget, ...)
+	end
 	widget:Fire(event, ...)
 end
 
@@ -37,7 +42,9 @@ local widget = {
 
 	Fire = function(self, event, ...)
 		local callback = self.callbacks[event]
-		if callback then callback(...) end
+		if callback then
+			callback(...)
+		end
 	end,
 
 	Get = function(self, key)
@@ -60,7 +67,9 @@ local widget = {
 		assert(type(callback) == "function", "Invalid callback function supplied to :RegisterCallback()")
 		if self._frame:HasScript(event) then
 			self._frame:SetScript(event, function(frame, ...)
-				if frame.widget[event] then frame.widget[event](frame.widget, ...) end
+				if frame.widget[event] then
+					frame.widget[event](frame.widget, ...)
+				end
 				callback(...)
 			end)
 		else
@@ -116,7 +125,9 @@ local widget = {
 	UnregisterCallback = function(self, event)
 		if self._frame:HasScript(event) then
 			self._frame:SetScript(event, self[event] and function(frame, ...)
-				if frame.widget[event] then frame.widget[event](frame.widget, ...) end
+				if frame.widget[event] then
+					frame.widget[event](frame.widget, ...)
+				end
 			end or nil)
 		else
 			self.callbacks[event] = nil
@@ -130,7 +141,7 @@ local widget = {
 
 local container = Mixin({
 	AddChild = function(self, widget)
-		widget._frame:SetParent(self.content)
+		widget._frame:SetParent(self._frame.content)
 		widget.state.parent = self
 		tinsert(self.children, widget)
 	end,
@@ -142,15 +153,17 @@ local container = Mixin({
 	end,
 
 	DoLayout = function(self, child)
-		if self.state.paused then return end
-		local width, height = self:layout(self.content, self.children, self._frame.scrollBox)
+		if self.state.paused then
+			return
+		end
+		local width, height = self:layout(self._frame.content, self.children, self._frame.scrollBox)
 		Fire("OnLayoutFinished", self, width, height)
 		return width, height
 	end,
 
 	New = function(self, widgetType)
 		local widget = lib:New(widgetType)
-		widget._frame:SetParent(self.content)
+		widget._frame:SetParent(self._frame.content)
 		widget.state.parent = self
 		tinsert(self.children, widget)
 		return widget
@@ -215,7 +228,7 @@ function lib:RegisterWidget(widgetType, version, isContainer, constructor, destr
 			widget.state = {}
 			if isContainer then
 				assert(
-					type(widget.content) == "table",
+					type(widget._frame.content) == "table",
 					("Widgets of type '%s' must provide a content frame."):format(widgetType)
 				)
 				widget.children = {}
@@ -230,7 +243,9 @@ function lib:RegisterWidget(widgetType, version, isContainer, constructor, destr
 			for event, callback in pairs(widget) do
 				if widget._frame:HasScript(event) then
 					widget._frame:SetScript(event, function(frame, ...)
-						if frame.widget[event] then frame.widget[event](frame.widget, ...) end
+						if frame.widget[event] then
+							frame.widget[event](frame.widget, ...)
+						end
 					end)
 				end
 			end
@@ -266,18 +281,3 @@ end
 -- *******************************
 -- *** Helpers ***
 -- *******************************
-
-function lib:GetNextWidget(widgetType)
-	local pool = lib.pools[widgetType]
-	local count = 0
-
-	for _, _ in pool:EnumerateActive() do
-		count = count + 1
-	end
-
-	for _, _ in pool:EnumerateInactive() do
-		count = count + 1
-	end
-
-	return ("LIU%s%d"):format(widgetType, count + 1)
-end

@@ -1,5 +1,8 @@
-local lib = LibStub:GetLibrary("LibInterfaceUtils-1.0")
-if not lib then return end
+local addonName, addon = ...
+local lib = LibStub:GetLibrary(addonName .. "-1.0")
+if not lib then
+	return
+end
 
 -- *******************************
 -- *** Widget ***
@@ -15,7 +18,7 @@ local Widget = {
 	end,
 
 	OnLayoutFinished = function(self, ...)
-		self.content:SetSize(...)
+		self._frame.content:SetSize(...)
 		self._frame.scrollBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
 	end,
 
@@ -32,15 +35,15 @@ local Widget = {
 	end,
 
 	SetContentBackdrop = function(self, ...)
-		self.content:SetBackdrop(...)
+		self._frame.content:SetBackdrop(...)
 	end,
 
 	SetContentBackdropBorderColor = function(self, ...)
-		self.content:SetBackdropBorderColor(...)
+		self._frame.content:SetBackdropBorderColor(...)
 	end,
 
 	SetContentBackdropColor = function(self, ...)
-		self.content:SetBackdropColor(...)
+		self._frame.content:SetBackdropColor(...)
 	end,
 
 	SetPadding = function(self, left, right, top, bottom)
@@ -65,7 +68,7 @@ local Widget = {
 -- *******************************
 
 lib:RegisterWidget(widgetType, version, true, function(pool)
-	local frame = CreateFrame("Frame", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate")
+	local frame = CreateFrame("Frame", addon.GenerateWidgetName(widgetType), UIParent, "BackdropTemplate")
 	local widget = CreateFromMixins({
 		_frame = frame,
 	}, Widget)
@@ -76,9 +79,9 @@ lib:RegisterWidget(widgetType, version, true, function(pool)
 
 	frame.scrollBox = CreateFrame("Frame", nil, frame, "WowScrollBox")
 
-	widget.content = CreateFrame("Frame", nil, frame.scrollBox, "ResizeLayoutFrame, BackdropTemplate")
-	widget.content.scrollable = true
-	widget.content:SetAllPoints(frame.scrollBox)
+	frame.content = CreateFrame("Frame", nil, frame.scrollBox, "ResizeLayoutFrame, BackdropTemplate")
+	frame.content.scrollable = true
+	frame.content:SetAllPoints(frame.scrollBox)
 
 	frame.scrollView = CreateScrollBoxLinearView()
 	frame.scrollView:SetPanExtent(50)

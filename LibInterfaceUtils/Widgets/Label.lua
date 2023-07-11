@@ -1,5 +1,8 @@
-local lib = LibStub:GetLibrary("LibInterfaceUtils-1.0")
-if not lib then return end
+local addonName, addon = ...
+local lib = LibStub:GetLibrary(addonName .. "-1.0")
+if not lib then
+	return
+end
 
 -- *******************************
 -- *** Constants ***
@@ -131,14 +134,18 @@ local widget = {
 			end
 
 			text:SetPoint(unpack(points.text[2]))
-			if points.text[3] then text:SetPoint(unpack(points.text[3])) end
+			if points.text[3] then
+				text:SetPoint(unpack(points.text[3]))
+			end
 			self:SetHeight(max(size, (points.iconHeight and size or 0) + text:GetStringHeight()))
 
 			icon:Show()
 		else
 			text:SetPoint("TOPLEFT")
 
-			if self.state.autoWidth and not self.state.fullWidth then text:SetWidth(text:GetStringWidth()) end
+			if self.state.autoWidth and not self.state.fullWidth then
+				text:SetWidth(text:GetStringWidth())
+			end
 
 			text:SetPoint("TOPRIGHT")
 			self:SetWidth(text:GetWidth())
@@ -197,7 +204,7 @@ local widget = {
 
 lib:RegisterWidget(widgetType, version, false, function(pool)
 	local frame = CreateFromMixins({
-		_frame = CreateFrame("Frame", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Frame", addon.GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
 	}, widget)
 
 	frame._frame:SetScript("OnSizeChanged", function()
@@ -208,7 +215,7 @@ lib:RegisterWidget(widgetType, version, false, function(pool)
 	frame._frame.text = frame._frame:CreateFontString(nil, "OVERLAY")
 
 	-- frame._frame:SetBackdrop({
-	-- 	bgFile = lib.defaultTexture,
+	-- 	bgFile = addon.defaultTexture,
 	-- })
 	-- frame._frame:SetBackdropColor(0, 1, 0, 0.75)
 

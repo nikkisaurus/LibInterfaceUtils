@@ -1,12 +1,15 @@
-local lib = LibStub:GetLibrary("LibInterfaceUtils-1.0")
-if not lib then return end
+local addonName, addon = ...
+local lib = LibStub:GetLibrary(addonName .. "-1.0")
+if not lib then
+	return
+end
 
--- *******************************
--- *** Scripts ***
--- *******************************
+local widgetType, version, isContainer = "Frame", 1, true
+local Widget = {}
 
-local function OnClick(close)
-	close:GetParent().widget:Release()
+local function OnClick(closeButton)
+	local frame = closeButton:GetParent()
+	frame.widget:Release()
 end
 
 local function OnDragStart(frame)
@@ -18,137 +21,134 @@ local function OnDragStop(frame)
 end
 
 local function OnMouseDown(resizer)
-	resizer:GetParent():StartSizing()
+	local frame = resizer:GetParent()
+	frame:StartSizing()
 end
 
 local function OnMouseUp(resizer)
-	resizer:GetParent():StopMovingOrSizing()
+	local frame = resizer:GetParent()
+	frame:StopMovingOrSizing()
 end
 
--- *******************************
--- *** Widget ***
--- *******************************
+function Widget:OnAcquire()
+	self:SetContainerBackdrop(addon.defaultBackdrop)
+	self:SetContainerBackdropBorderColor(addon.colors.black)
+	self:SetContainerBackdropColor(addon.colors.elvTransparent)
+	self:SetContentBackdrop(addon.defaultBackdrop)
+	self:SetContentBackdropBorderColor(addon.colors.black)
+	self:SetContentBackdropColor(addon.colors.elvTransparent)
+	self:SetMovable(true)
+	self:EnableResize(true, 100, 100)
+	self:SetPoint("CENTER")
+	self:SetSize(700, 500)
+	self:SetPadding(5, 5, 5, 5)
+	self:SetSpacing(5, 5)
+	self:SetTitle()
+	self:Show()
+end
 
-local widgetType, version = "Frame", 1
+function Widget:EnableResize(isEnabled, ...)
+	local frame = self._frame
+	local resizer = frame.resizer
 
-local widget = {
-	OnAcquire = function(self)
-		self:SetBackdrop(lib.defaultBackdrop)
-		self:SetBackdropColor(unpack(lib.colors.elvTransparent))
-		self:SetBackdropBorderColor(unpack(lib.colors.black))
-		self:SetContentBackdrop(lib.defaultBackdrop)
-		self:SetContentBackdropColor(unpack(lib.colors.elvTransparent))
-		self:SetContentBackdropBorderColor(unpack(lib.colors.black))
-		self:SetMovable(true)
-		self:EnableResize(true, 100, 100)
-		self:SetPoint("CENTER")
-		self:SetSize(700, 500)
-		self:SetPadding(5, 5, 5, 5)
-		self:SetSpacing(5, 5)
-		self:SetTitle()
-		self:Show()
-	end,
+	frame:SetResizable(isEnabled)
+	frame:SetResizeBounds(...)
+	resizer:SetEnabled(isEnabled)
+	resizer[isEnabled and "Show" or "Hide"](resizer)
+end
 
-	EnableResize = function(self, enable, ...)
-		local frame = self._frame
-		frame:SetResizable(enable)
-		frame:SetResizeBounds(...)
-		frame.resizer:SetEnabled(enable)
-		frame.resizer[enable and "Show" or "Hide"](frame.resizer)
-	end,
+function Widget:SetContainerBackdrop(...)
+	self._frame:SetBackdrop(...)
+end
 
-	SetBackdrop = function(self, ...)
-		self._frame:SetBackdrop(...)
-	end,
+function Widget:SetContainerBackdropBorderColor(...)
+	self._frame:SetBackdropBorderColor(addon.unpack(...))
+end
 
-	SetBackdropBorderColor = function(self, ...)
-		self._frame:SetBackdropBorderColor(...)
-	end,
+function Widget:SetContainerBackdropColor(...)
+	self._frame:SetBackdropColor(addon.unpack(...))
+end
 
-	SetBackdropColor = function(self, ...)
-		self._frame:SetBackdropColor(...)
-	end,
+function Widget:SetContentBackdrop(...)
+	self._frame.content:SetBackdrop(...)
+end
 
-	SetContentBackdrop = function(self, ...)
-		self.content:SetBackdrop(...)
-	end,
+function Widget:SetContentBackdropBorderColor(...)
+	self._frame.content:SetBackdropBorderColor(addon.unpack(...))
+end
 
-	SetContentBackdropBorderColor = function(self, ...)
-		self.content:SetBackdropBorderColor(...)
-	end,
+function Widget:SetContentBackdropColor(...)
+	self._frame.content:SetBackdropColor(addon.unpack(...))
+end
 
-	SetContentBackdropColor = function(self, ...)
-		self.content:SetBackdropColor(...)
-	end,
+function Widget:SetMovable(movable, ...)
+	local frame = self._frame
+	frame:EnableMouse(movable)
+	frame:SetMovable(movable)
 
-	SetMovable = function(self, movable, ...)
-		local frame = self._frame
+	if movable then
+		frame:RegisterForDrag((...) or "LeftButton", ...)
+	else
+		frame:RegisterForDrag()
+	end
 
-		frame:EnableMouse(movable)
-		frame:SetMovable(movable)
-		if movable then
-			frame:RegisterForDrag((...) or "LeftButton", ...)
-		else
-			frame:RegisterForDrag()
-		end
+	frame:SetScript("OnDragStart", movable and OnDragStart or nil)
+	frame:SetScript("OnDragStop", movable and OnDragStop or nil)
+end
 
-		frame:SetScript("OnDragStart", movable and OnDragStart or nil)
-		frame:SetScript("OnDragStop", movable and OnDragStop or nil)
-	end,
+function Widget:SetPadding(left, right, top, bottom)
+	self.state.padding = {
+		left = left or 0,
+		right = right or 0,
+		top = top or 0,
+		bottom = bottom or 0,
+	}
+end
 
-	SetPadding = function(self, left, right, top, bottom)
-		self.state.padding = {
-			left = left or 0,
-			right = right or 0,
-			top = top or 0,
-			bottom = bottom or 0,
-		}
-	end,
+function Widget:SetSpacing(x, y)
+	self.state.spacing = {
+		x = x or 0,
+		y = y or 0,
+	}
+end
 
-	SetSpacing = function(self, x, y)
-		self.state.spacing = {
-			x = x or 0,
-			y = y or 0,
-		}
-	end,
+function Widget:SetTitle(text)
+	self._frame.title:SetText(text or "")
+end
 
-	SetTitle = function(self, text)
-		self._frame.title:SetText(text or "")
-	end,
-}
+lib:RegisterWidget(widgetType, version, isContainer, function()
+	local widget = CreateFromMixins({
+		_frame = CreateFrame("Frame", addon.GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
+	}, Widget)
 
--- *******************************
--- *** Registration ***
--- *******************************
+	local resizer = CreateFrame("Button", nil, widget._frame)
+	resizer:SetNormalTexture(386862)
+	resizer:SetHighlightTexture(386863)
+	resizer:SetPoint("BOTTOMRIGHT", 0, 0)
+	resizer:SetSize(16, 16)
+	resizer:Hide()
+	resizer:SetScript("OnMouseDown", OnMouseDown)
+	resizer:SetScript("OnMouseUp", OnMouseUp)
 
-lib:RegisterWidget(widgetType, version, true, function(pool)
-	local frame = CreateFromMixins({
-		_frame = CreateFrame("Frame", lib:GetNextWidget(widgetType), UIParent, "BackdropTemplate"),
-	}, widget)
+	local closeButton = CreateFrame("Button", nil, widget._frame)
+	closeButton:SetNormalAtlas("common-search-clearbutton")
+	closeButton:SetPoint("TOPRIGHT", -4, -4)
+	closeButton:SetSize(12, 12)
+	closeButton:SetScript("OnClick", OnClick)
 
-	frame._frame.resizer = CreateFrame("Button", nil, frame._frame)
-	frame._frame.resizer:SetNormalTexture(386862)
-	frame._frame.resizer:SetHighlightTexture(386863)
-	frame._frame.resizer:SetPoint("BOTTOMRIGHT", 0, 0)
-	frame._frame.resizer:SetSize(16, 16)
-	frame._frame.resizer:Hide()
-	frame._frame.resizer:SetScript("OnMouseDown", OnMouseDown)
-	frame._frame.resizer:SetScript("OnMouseUp", OnMouseUp)
+	local title = widget._frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	title:SetPoint("TOPLEFT", 4, -4)
+	title:SetPoint("BOTTOMRIGHT", closeButton, "BOTTOMLEFT", -4, 0)
 
-	local close = CreateFrame("Button", nil, frame._frame)
-	close:SetNormalAtlas("common-search-clearbutton")
-	close:SetPoint("TOPRIGHT", -4, -4)
-	close:SetSize(12, 12)
-	close:SetScript("OnClick", OnClick)
+	local content = CreateFrame("Frame", nil, widget._frame, "BackdropTemplate")
+	content:SetPoint("TOP", title, "BOTTOM", 0, -4)
+	content:SetPoint("LEFT")
+	content:SetPoint("BOTTOMRIGHT")
 
-	frame._frame.title = frame._frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	frame._frame.title:SetPoint("TOPLEFT", 4, -4)
-	frame._frame.title:SetPoint("BOTTOMRIGHT", close, "BOTTOMLEFT", -4, 0)
+	widget._frame.resizer = resizer
+	widget._frame.close = closeButton
+	widget._frame.title = title
+	widget._frame.content = content
 
-	frame.content = CreateFrame("Frame", nil, frame._frame, "BackdropTemplate")
-	frame.content:SetPoint("TOP", frame._frame.title, "BOTTOM", 0, -4)
-	frame.content:SetPoint("LEFT")
-	frame.content:SetPoint("BOTTOMRIGHT")
-
-	return frame
+	return widget
 end)
