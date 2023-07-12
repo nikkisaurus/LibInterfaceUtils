@@ -137,10 +137,14 @@ local function UpdateWidth(self)
 	if self._state.autoWidth then
 		self:SetWidth(text:GetStringWidth() + padding.left + padding.right)
 	end
+
+	if self._state.autoHeight then
+		self:SetHeight(text:GetStringHeight() + padding.top + padding.bottom)
+	end
 end
 
 function Widget._events:OnAcquire()
-	self:SetAutoWidth()
+	self:SetPadding() -- must call before :SetSize to initialize padding before UpdateWidth is triggered
 	self:SetSize(150, 25)
 	self:SetJustifyH("CENTER")
 	self:SetJustifyV("MIDDLE")
@@ -149,6 +153,8 @@ function Widget._events:OnAcquire()
 	self:SetTemplate()
 	self:SetText()
 	self:Enable()
+	self:SetAutoWidth()
+	self:SetAutoHeight()
 	self:Show()
 end
 
@@ -188,13 +194,13 @@ function Widget:Enable()
 	UpdateState(self)
 end
 
-function Widget:SetAutoWidth(autoWidth, left, right)
-	self._state.autoWidth = autoWidth
-	self._state.padding = {
-		left = left or 10,
-		right = right or 10,
-	}
+function Widget:SetAutoHeight(autoHeight)
+	self._state.autoHeight = autoHeight
+	UpdateWidth(self)
+end
 
+function Widget:SetAutoWidth(autoWidth)
+	self._state.autoWidth = autoWidth
 	UpdateWidth(self)
 end
 
@@ -204,6 +210,15 @@ end
 
 function Widget:SetJustifyV(...)
 	self._frame.text:SetJustifyV(...)
+end
+
+function Widget:SetPadding(left, right, top, bottom)
+	self._state.padding = {
+		left = left or 10,
+		right = right or 10,
+		top = top or 5,
+		bottom = bottom or 5,
+	}
 end
 
 function Widget:SetPushedTextOffset(...)
