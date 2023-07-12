@@ -202,11 +202,6 @@ function Widget:SetAutoWidth(autoWidth, left, right)
 	UpdateWidth(self)
 end
 
--- function Widget:SetAutoHeight(autoHeight)
--- 	self._state.autoHeight = autoHeight
--- 	self:SetAnchors()
--- end
-
 function Widget:SetJustifyH(...)
 	self._frame.text:SetJustifyH(...)
 end
