@@ -6,28 +6,23 @@ end
 
 local widgetType, version, isContainer = "Frame", 1, true
 local Widget = { _events = {} }
+-- Custom events: OnResizeStart, OnResizeStop
 
 local function OnClick(closeButton)
 	local frame = closeButton:GetParent()
 	frame.widget:Release()
 end
 
-local function OnDragStart(frame)
-	frame:StartMoving()
-end
-
-local function OnDragStop(frame)
-	frame:StopMovingOrSizing()
-end
-
 local function OnMouseDown(resizer)
 	local frame = resizer:GetParent()
 	frame:StartSizing()
+	frame.widget:Fire("OnResizeStart")
 end
 
 local function OnMouseUp(resizer)
 	local frame = resizer:GetParent()
 	frame:StopMovingOrSizing()
+	frame.widget:Fire("OnResizeStop")
 end
 
 function Widget._events:OnAcquire()
@@ -45,6 +40,18 @@ function Widget._events:OnAcquire()
 	self:SetSpacing(5, 5)
 	self:SetTitle()
 	self:Show()
+end
+
+function Widget._events:OnDragStart(args)
+	if self._state.movable then
+		self._frame:StartMoving()
+	end
+end
+
+function Widget._events:OnDragStop(args)
+	if self._state.movable then
+		self._frame:StopMovingOrSizing()
+	end
 end
 
 function Widget:EnableResize(isEnabled, ...)
@@ -92,8 +99,7 @@ function Widget:SetMovable(movable, ...)
 		frame:RegisterForDrag()
 	end
 
-	frame:SetScript("OnDragStart", movable and OnDragStart or nil)
-	frame:SetScript("OnDragStop", movable and OnDragStop or nil)
+	self._state.movable = movable
 end
 
 function Widget:SetTitle(text)
