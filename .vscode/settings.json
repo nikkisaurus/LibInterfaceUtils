@@ -1,0 +1,13 @@
+{
+    "Lua.diagnostics.globals": [
+        "GenerateClosure",
+        "CreateObjectPool",
+        "GameFontNormal",
+        "ScrollUtil",
+        "CreateScrollBoxLinearView",
+        "ScrollBoxConstants",
+        "CreateAnchor",
+        "GameFontHighlight",
+        "scrollBox"
+    ]
+}

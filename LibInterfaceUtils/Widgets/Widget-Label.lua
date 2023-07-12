@@ -206,7 +206,7 @@ function Widget:SetWordWrap(canWrap)
 	self._frame.text:SetWordWrap(canWrap or false)
 end
 
-lib:RegisterWidget(widgetType, version, isContainer, function(pool)
+lib:RegisterWidget(widgetType, version, isContainer, function()
 	local widget = CreateFromMixins({
 		_frame = CreateFrame("Frame", lib:GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
 	}, Widget)

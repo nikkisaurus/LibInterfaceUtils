@@ -4,94 +4,67 @@ if not lib then
 	return
 end
 
--- *******************************
--- *** Widget ***
--- *******************************
+local widgetType, version, isContainer = "ScrollFrame", 1, true
+local Widget = { _events = {} }
 
-local widgetType, version = "ScrollFrame", 1
+function Widget._events:OnAcquire()
+	self:SetPadding(5, 5, 5, 5)
+	self:SetSpacing(5, 5)
+	self:Show()
+end
 
-local Widget = {
-	_events = {
-		OnAcquire = function(self)
-			self:SetPadding(5, 5, 5, 5)
-			self:SetSpacing(5, 5)
-			self:Show()
-		end,
+function Widget._events:OnLayoutFinished(...)
+	local frame = self._frame
+	frame.content:SetSize(...)
+	frame.scrollBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
+end
 
-		OnLayoutFinished = function(self, ...)
-			self._frame.content:SetSize(...)
-			self._frame.scrollBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
-		end,
-	},
+function Widget:SetContainerBackdrop(...)
+	self._frame:SetBackdrop(...)
+end
 
-	SetBackdrop = function(self, ...)
-		self._frame:SetBackdrop(...)
-	end,
+function Widget:SetContainerBackdropBorderColor(...)
+	self._frame:SetBackdropBorderColor(...)
+end
 
-	SetBackdropBorderColor = function(self, ...)
-		self._frame:SetBackdropBorderColor(...)
-	end,
+function Widget:SetContainerBackdropColor(...)
+	self._frame:SetBackdropColor(...)
+end
 
-	SetBackdropColor = function(self, ...)
-		self._frame:SetBackdropColor(...)
-	end,
+function Widget:SetContentBackdrop(...)
+	self._frame.content:SetBackdrop(...)
+end
 
-	SetContentBackdrop = function(self, ...)
-		self._frame.content:SetBackdrop(...)
-	end,
+function Widget:SetContentBackdropBorderColor(...)
+	self._frame.content:SetBackdropBorderColor(...)
+end
 
-	SetContentBackdropBorderColor = function(self, ...)
-		self._frame.content:SetBackdropBorderColor(...)
-	end,
+function Widget:SetContentBackdropColor(...)
+	self._frame.content:SetBackdropColor(...)
+end
 
-	SetContentBackdropColor = function(self, ...)
-		self._frame.content:SetBackdropColor(...)
-	end,
-
-	SetPadding = function(self, left, right, top, bottom)
-		self._state.padding = {
-			left = left or 0,
-			right = right or 0,
-			top = top or 0,
-			bottom = bottom or 0,
-		}
-	end,
-
-	SetSpacing = function(self, x, y)
-		self._state.spacing = {
-			x = x or 0,
-			y = y or 0,
-		}
-	end,
-}
-
--- *******************************
--- *** Registration ***
--- *******************************
-
-lib:RegisterWidget(widgetType, version, true, function(pool)
-	local frame = CreateFrame("Frame", lib:GenerateWidgetName(widgetType), UIParent, "BackdropTemplate")
+lib:RegisterWidget(widgetType, version, isContainer, function()
 	local widget = CreateFromMixins({
-		_frame = frame,
+		_frame = CreateFrame("Frame", lib:GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
 	}, Widget)
 
-	frame.scrollBar = CreateFrame("EventFrame", nil, frame, "MinimalScrollBar")
-	frame.scrollBar:SetPoint("TOPRIGHT", -2, 0)
-	frame.scrollBar:SetPoint("BOTTOMRIGHT", -2, 0)
+	local frame = widget._frame
 
-	frame.scrollBox = CreateFrame("Frame", nil, frame, "WowScrollBox")
+	local scrollBox = CreateFrame("Frame", nil, frame, "WowScrollBox")
+	local scrollBar = CreateFrame("EventFrame", nil, frame, "MinimalScrollBar")
+	scrollBar:SetPoint("TOPRIGHT", -2, 0)
+	scrollBar:SetPoint("BOTTOMRIGHT", -2, 0)
+	local scrollView = CreateScrollBoxLinearView()
+	scrollView:SetPanExtent(50)
 
-	frame.content = CreateFrame("Frame", nil, frame.scrollBox, "ResizeLayoutFrame, BackdropTemplate")
-	frame.content.scrollable = true
-	frame.content:SetAllPoints(frame.scrollBox)
-
-	frame.scrollView = CreateScrollBoxLinearView()
-	frame.scrollView:SetPanExtent(50)
+	local content = CreateFrame("Frame", nil, scrollBox, "ResizeLayoutFrame, BackdropTemplate")
+	content.scrollable = true
+	content:SetAllPoints(scrollBox)
 
 	local anchors = {
 		with = {
 			CreateAnchor("TOPLEFT", frame, "TOPLEFT", 0, 0),
-			CreateAnchor("BOTTOMRIGHT", frame.scrollBar, "BOTTOMLEFT", -7, 0),
+			CreateAnchor("BOTTOMRIGHT", scrollBar, "BOTTOMLEFT", -7, 0),
 		},
 		without = {
 			CreateAnchor("TOPLEFT", frame, "TOPLEFT", 0, 0),
@@ -99,8 +72,13 @@ lib:RegisterWidget(widgetType, version, true, function(pool)
 		},
 	}
 
-	ScrollUtil.AddManagedScrollBarVisibilityBehavior(frame.scrollBox, frame.scrollBar, anchors.with, anchors.without)
-	ScrollUtil.InitScrollBoxWithScrollBar(frame.scrollBox, frame.scrollBar, frame.scrollView)
+	ScrollUtil.AddManagedScrollBarVisibilityBehavior(scrollBox, scrollBar, anchors.with, anchors.without)
+	ScrollUtil.InitScrollBoxWithScrollBar(scrollBox, scrollBar, scrollView)
+
+	frame.scrollBar = scrollBar
+	frame.scrollBox = scrollBox
+	frame.content = content
+	frame.scrollView = scrollView
 
 	return widget
 end)
