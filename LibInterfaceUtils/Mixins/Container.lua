@@ -14,25 +14,23 @@ function Container:AddChild(widget)
 end
 
 function Container:DoLayoutDeferred()
-	C_Timer.NewTicker(0.1, function()
-		self:DoLayout()
-	end, 1)
+	C_Timer.NewTicker(0.1, GenerateClosure(self.DoLayout, self), 1)
 end
 
 function Container:DoLayout(child)
 	if self._state.paused then
 		return
 	end
+
 	local width, height = self:layout(self._frame.content, self.children, self._frame.scrollBox)
 	addon.Fire("OnLayoutFinished", self, width, height)
+
 	return width, height
 end
 
 function Container:New(widgetType)
 	local widget = lib:New(widgetType)
-	widget._frame:SetParent(self._frame.content)
-	widget._state.parent = self
-	tinsert(self.children, widget)
+	self:AddChild(widget)
 	return widget
 end
 
@@ -65,7 +63,7 @@ end
 
 function Container:SetLayout(layout)
 	layout = layout:lower()
-	self._state.layout = layout
+	self._state.layout = layout -- to ensure there's a name ref if it's a built-in layout
 	self.layout = addon.layouts[layout] or layout
 end
 
