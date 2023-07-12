@@ -10,7 +10,7 @@ function lib:New(widgetType)
 
 	local widget = pool:Acquire()
 	widget.pool = pool
-	addon.Fire("OnAcquire", widget)
+	addon.Fire(widget, "OnAcquire")
 
 	return widget
 end

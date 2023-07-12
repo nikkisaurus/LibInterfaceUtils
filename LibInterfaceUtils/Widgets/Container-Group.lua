@@ -6,6 +6,7 @@ end
 
 local widgetType, version, isContainer = "Group", 1, true
 local Widget = { _events = {} }
+-- Custom events: OnGroupToggle
 
 local function OnMouseDown(title)
 	local widget = title:GetParent().widget
@@ -78,6 +79,10 @@ function Widget._events:OnAcquire()
 	self:Show()
 end
 
+function Widget._events:OnGroupToggle()
+	self:DoParentLayout(true)
+end
+
 function Widget._events:OnLayoutFinished(_, height)
 	local state = self._state
 
@@ -101,7 +106,7 @@ function Widget._events:OnLayoutFinished(_, height)
 	end
 end
 
-function Widget._events:OnSizeChanged(sef)
+function Widget._events:OnSizeChanged()
 	local titlebar = self._frame.titlebar
 	local title = titlebar.title
 	local padding = self._state.titlePadding
@@ -130,7 +135,8 @@ function Widget:SetCollapsed(collapsed, restore)
 	end
 
 	UpdateIconState(self)
-	self:DoParentLayout()
+	self._state.changing = true
+	addon.Fire(self, "OnGroupToggle")
 end
 
 function Widget:SetCollapsible(collapsible)

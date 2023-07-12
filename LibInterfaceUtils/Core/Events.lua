@@ -4,7 +4,7 @@ if not lib then
 	return
 end
 
-function addon.Fire(event, widget, ...)
+function addon.Fire(widget, event, ...)
 	local callback = widget._events[event]
 	addon.safecall(callback, widget, ...)
 	widget:Fire(event, ...)

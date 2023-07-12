@@ -14,7 +14,10 @@ function Container:AddChild(widget)
 end
 
 function Container:DoLayoutDeferred()
-	C_Timer.NewTicker(0.1, GenerateClosure(self.DoLayout, self), 1)
+	local ticker = C_Timer.NewTicker(0, GenerateClosure(self.DoLayout, self))
+	C_Timer.After(0.1, function()
+		ticker:Cancel()
+	end)
 end
 
 function Container:DoLayout(child)
@@ -23,7 +26,7 @@ function Container:DoLayout(child)
 	end
 
 	local width, height = self:layout(self._frame.content, self.children, self._frame.scrollBox)
-	addon.Fire("OnLayoutFinished", self, width, height)
+	addon.Fire(self, "OnLayoutFinished", width, height)
 
 	return width, height
 end
@@ -52,8 +55,9 @@ function Container:ReleaseChild(widget, skipLayout)
 	widget._frame:SetParent(UIParent)
 	widget._state.parent = nil
 	widget:Release()
+
 	if not skipLayout then
-		self:DoLayoutDeferred()
+		self:DoLayout()
 	end
 end
 

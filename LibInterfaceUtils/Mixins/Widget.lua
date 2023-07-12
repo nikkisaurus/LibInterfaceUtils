@@ -54,7 +54,7 @@ function Widget:Release()
 		return
 	end
 	self.pool:Release(self)
-	addon.Fire("OnRelease", self)
+	addon.Fire(self, "OnRelease")
 end
 
 function Widget:Set(key, value)
