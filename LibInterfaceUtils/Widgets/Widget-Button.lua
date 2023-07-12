@@ -70,18 +70,12 @@ local defaultTemplate = {
 	},
 }
 
-local function UpdateState(self)
+local function UpdateTheme(self)
 	local frame = self._frame
 	local text = frame.text
-
-	local state = (not frame:IsEnabled()) and "Disabled"
-		or (self._state.pushed and "Pushed")
-		or (self._state.highlight and "Highlight")
-		or "Normal"
-
+	local state = self:GetState()
 	local SetTexture = frame[("Set%sTexture"):format(state)]
 	local GetTexture = frame[("Get%sTexture"):format(state)]
-
 	local template = self._state.template[state]
 	local borderTemplate, textureTemplate, textTemplate = template.border, template.texture, template.text
 
@@ -211,7 +205,7 @@ end
 function Widget:SetTemplate(template)
 	self._state.template = template or {}
 	addon.setNestedMetatables(self._state.template, defaultTemplate)
-	lib:RegisterStateHandlers(self, UpdateState)
+	lib:RegisterStateHandlers(self, self._frame, UpdateTheme)
 	UpdateWidth(self)
 end
 
