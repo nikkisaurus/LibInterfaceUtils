@@ -7,6 +7,43 @@ end
 local widgetType, version, isContainer = "Label", 1, false
 local Widget = { _events = {} }
 
+local defaultTheme = {
+	Disabled = {
+		fontObject = GameFontHighlight,
+	},
+	Highlight = {
+		fontObject = GameFontNormal,
+	},
+	Normal = {
+		fontObject = GameFontHighlight,
+	},
+	Pushed = {
+		fontObject = GameFontNormal,
+	},
+}
+
+local function UpdateTheme(self)
+	local text = self._frame.text
+	local theme = self._state.theme[self:GetState()]
+
+	if theme.fontObject then
+		local fontObject = theme.fontObject
+		fontObject = (addon.isTable(fontObject)) and fontObject or _G[fontObject]
+		assert(fontObject.GetFont, "Invalid fontObject supplied to Button's :SetTheme().")
+
+		text:SetFontObject(fontObject)
+		text:SetTextColor(fontObject:GetTextColor())
+	end
+
+	if theme.font then
+		text:SetFont(addon.unpack(theme.font))
+	end
+
+	if theme.color then
+		text:SetTextColor(addon.unpack(theme.color))
+	end
+end
+
 local function SetAnchors(self)
 	local point, size
 	if self._state.icon.texture then
@@ -58,9 +95,18 @@ function Widget._events:OnAcquire()
 	self:SetJustifyV("MIDDLE")
 	self:SetWordWrap(true)
 	self:SetAutoWidth(true)
+	self:SetTheme()
 	self:SetText()
 	self:SetInteractive()
 	self:Show()
+end
+
+function Widget._events:OnMouseDown()
+	addon.safecall(self._state.interactive)
+end
+
+function Widget:IsEnabled()
+	return self._state.interactive
 end
 
 function Widget._events:OnSizeChanged()
@@ -97,10 +143,9 @@ function Widget:SetIcon(texture, size, point)
 	SetAnchors(self)
 end
 
-function Widget:SetInteractive(isInteractive, callback)
-	local frame = self._frame
-	frame:EnableMouse(isInteractive)
-	frame:SetScript("OnMouseDown", isInteractive and callback or nil)
+function Widget:SetInteractive(isInteractive)
+	self._state.interactive = isInteractive
+	self:UpdateState()
 end
 
 function Widget:SetJustifyH(...)
@@ -127,6 +172,13 @@ function Widget:SetTextColor(...)
 	self._frame.text:SetTextColor(...)
 end
 
+function Widget:SetTheme(theme)
+	self._state.theme = theme or {}
+	addon.setNestedMetatables(self._state.theme, defaultTheme)
+	lib:RegisterStateHandlers(self, self._frame, UpdateTheme)
+	SetAnchors(self)
+end
+
 function Widget:SetWordWrap(canWrap)
 	self._frame.text:SetWordWrap(canWrap or false)
 end
@@ -137,6 +189,7 @@ lib:RegisterWidget(widgetType, version, isContainer, function()
 	}, Widget)
 
 	local frame = widget._frame
+	frame:EnableMouse(true)
 	frame.icon = frame:CreateTexture(nil, "ARTWORK")
 	frame.text = frame:CreateFontString(nil, "OVERLAY")
 

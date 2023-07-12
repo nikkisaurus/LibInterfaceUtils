@@ -166,6 +166,10 @@ function Widget:Enable()
 	self:UpdateState()
 end
 
+function Widget:IsEnabled()
+	return self._frame:IsEnabled()
+end
+
 function Widget:SetAutoHeight(autoHeight)
 	self._state.autoHeight = autoHeight
 	UpdateWidth(self)

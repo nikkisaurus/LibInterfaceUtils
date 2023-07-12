@@ -100,64 +100,20 @@ local function SetAnchors(self)
 	self:SetHeight(max(size, (points.textureHeight and (size + spacing.y) or 0) + text:GetHeight()))
 end
 
--- local function UpdateState(self)
--- 	local frame = self._frame
--- 	local text = frame.text
-
--- 	local state = (not frame:IsEnabled()) and "Disabled"
--- 		or (self._state.pushed and "Pushed")
--- 		or (self._state.highlight and "Highlight")
--- 		or "Normal"
-
--- 	local SetTexture = frame[("Set%sTexture"):format(state)]
--- 	local GetTexture = frame[("Get%sTexture"):format(state)]
-
--- 	local template = self._state.template[state]
--- 	local borderTemplate, textureTemplate, textTemplate = template.border, template.texture, template.text
-
--- 	for id, border in pairs(frame.borders) do
--- 		if borderTemplate.enabled then
--- 			if (id == "top" or id == "bottom") and (border:GetHeight() ~= borderTemplate.size) then
--- 				border:SetHeight(borderTemplate.size)
--- 			elseif border:GetWidth() ~= borderTemplate.size then
--- 				border:SetWidth(borderTemplate.size)
--- 			end
-
--- 			border:SetTexture(borderTemplate.texture)
--- 			border:SetVertexColor(unpack(borderTemplate.color))
--- 			border:Show()
--- 		else
--- 			border:Hide()
--- 		end
--- 	end
-
--- 	SetTexture(frame, textureTemplate.texture)
--- 	GetTexture(frame):SetVertexColor(unpack(textureTemplate.color))
-
--- 	if textTemplate.fontObject then
--- 		local fontObject = textTemplate.fontObject
--- 		fontObject = (addon.isTable(fontObject)) and fontObject or _G[fontObject]
--- 		assert(fontObject.GetFont, "Invalid fontObject supplied to Button's :SetTemplate().")
-
--- 		text:SetFontObject(fontObject)
--- 		text:SetTextColor(fontObject:GetTextColor())
--- 	end
-
--- 	if textTemplate.font then
--- 		text:SetFont(addon.unpack(textTemplate.font))
--- 	end
-
--- 	if textTemplate.color then
--- 		text:SetTextColor(addon.unpack(textTemplate.color))
--- 	end
--- end
+local function ToggleChecked(self)
+	if self:GetChecked() then
+		self:SetChecked(false)
+	else
+		self:SetChecked(true)
+	end
+end
 
 function Widget._events:OnAcquire()
 	self:SetSpacing()
 	self:SetCheck()
 	self:SetSize(150, 25)
 	self:SetAutoWidth(true)
-	-- self:SetTemplate()
+	self:SetTheme()
 	self:SetIcon() -- TODO remove
 	self:SetChecked()
 	self:Enable()
@@ -165,33 +121,13 @@ function Widget._events:OnAcquire()
 
 	local text = self._frame.text
 	text:Fire("OnAcquire")
-	text:SetInteractive()
+	text:SetInteractive(GenerateClosure(ToggleChecked, self))
 end
 
 function Widget._events:OnClick()
 	self._state.checked = not self._state.checked
 	self:SetChecked(self._state.checked)
 end
-
--- function Widget._events:OnEnter()
--- 	self._state.highlight = true
--- 	UpdateState(self)
--- end
-
--- function Widget._events:OnLeave()
--- 	self._state.highlight = false
--- 	UpdateState(self)
--- end
-
--- function Widget._events:OnMouseDown()
--- 	self._state.pushed = true
--- 	UpdateState(self)
--- end
-
--- function Widget._events:OnMouseUp()
--- 	self._state.pushed = false
--- 	UpdateState(self)
--- end
 
 function Widget._events:OnSizeChanged()
 	SetAnchors(self)
@@ -201,14 +137,22 @@ function Widget:Disable()
 	local frame = self._frame
 	frame:Disable()
 	frame.check:SetAtlas("checkmark-minimal-disabled")
-	-- UpdateState(self)
+	self:UpdateState()
 end
 
 function Widget:Enable()
 	local frame = self._frame
 	frame:Enable()
 	frame.check:SetAtlas("checkmark-minimal")
-	-- UpdateState(self)
+	self:UpdateState()
+end
+
+function Widget:GetChecked()
+	return self._state.checked
+end
+
+function Widget:IsEnabled()
+	return self._frame:IsEnabled()
 end
 
 function Widget:SetAutoWidth(autoWidth)
@@ -226,6 +170,7 @@ function Widget:SetCheck(point, size)
 end
 
 function Widget:SetChecked(isChecked)
+	self._state.checked = isChecked
 	self._frame.check[isChecked and "Show" or "Hide"](self._frame.check)
 end
 
@@ -261,16 +206,17 @@ function Widget:SetText(text)
 	SetAnchors(self)
 end
 
--- function Widget:SetTemplate(template)
--- 	self._state.template = template or {}
--- 	addon.setNestedMetatables(self._state.template, defaultTemplate)
--- 	UpdateWidth(self)
--- 	UpdateState(self)
--- end
+function Widget:SetTheme(...)
+	self._frame.text:SetTheme(...)
+end
 
 function Widget:SetWordWrap(canWrap)
 	self._frame.text:SetWordWrap(canWrap or false)
 	SetAnchors(self)
+end
+
+function Widget:UpdateState()
+	self._frame.text:UpdateState()
 end
 
 lib:RegisterWidget(widgetType, version, isContainer, function()

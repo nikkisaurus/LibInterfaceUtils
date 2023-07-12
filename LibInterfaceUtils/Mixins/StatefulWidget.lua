@@ -28,7 +28,7 @@ end
 
 function StatefulWidget:GetState()
 	local state = self._state
-	return (not self.__frame:IsEnabled()) and "Disabled" or (state.pushed and "Pushed") or (state.highlight and "Highlight") or "Normal"
+	return (not self:IsEnabled()) and "Disabled" or (state.pushed and "Pushed") or (state.highlight and "Highlight") or "Normal"
 end
 
 function StatefulWidget:UpdateState()
