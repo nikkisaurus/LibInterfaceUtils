@@ -7,7 +7,7 @@ end
 local widgetType, version, isContainer = "Button", 1, false
 local Widget = { _events = {} }
 
-local TEXTURES = {
+local defaultTemplate = {
 	Disabled = {
 		border = {
 			enabled = true,
@@ -189,7 +189,7 @@ end
 
 function Widget:SetTemplate(template)
 	self._state.template = template or {}
-	addon.setNestedMetatables(self._state.template, TEXTURES)
+	addon.setNestedMetatables(self._state.template, defaultTemplate)
 	UpdateState(self)
 end
 
