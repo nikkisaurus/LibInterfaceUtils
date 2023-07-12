@@ -42,23 +42,26 @@ function Container:PauseLayout()
 	self._state.paused = true
 end
 
-function Container:ReleaseChild(widget)
+function Container:ReleaseChild(widget, skipLayout)
 	for i, child in ipairs(self.children) do
 		if child == widget then
 			tremove(self.children, i)
 			break
 		end
 	end
+	widget._frame:SetParent(UIParent)
+	widget._state.parent = nil
 	widget:Release()
-	self:DoLayoutDeferred()
+	if not skipLayout then
+		self:DoLayoutDeferred()
+	end
 end
 
 function Container:ReleaseChildren()
-	for _, child in ipairs(self.children) do
-		child:Release()
+	for _, child in ipairs_reverse(self.children) do
+		self:ReleaseChild(child)
 	end
 	self.children = {}
-	self:DoLayoutDeferred()
 end
 
 function Container:ResumeLayout()

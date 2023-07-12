@@ -10,6 +10,7 @@
         "GameFontHighlight",
         "scrollBox",
         "GameFontDisable",
-        "CreateFromMixin"
+        "CreateFromMixin",
+        "ipairs_reverse"
     ]
 }

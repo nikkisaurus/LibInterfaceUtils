@@ -49,8 +49,10 @@ end
 function Widget:Release()
 	assert(addon.isTable(self), "Invalid widget reference supplied to :Release()")
 	assert(self.pool, "Invalid widget reference supplied to :Release()")
-	self._frame:SetParent(UIParent)
-	self._state.parent = nil
+	if self._state.parent then
+		self._state.parent:ReleaseChild(self)
+		return
+	end
 	self.pool:Release(self)
 	addon.Fire("OnRelease", self)
 end
