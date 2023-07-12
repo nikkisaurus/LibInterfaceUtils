@@ -131,16 +131,12 @@ local function UpdateWidth(self)
 	textContainer:SetPoint("TOPLEFT", frame, "TOPLEFT", padding.left, 0)
 	textContainer:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -padding.right, 0)
 
-	text:SetParent(textContainer)
 	text:SetWidth(textContainer:GetWidth())
 	text:SetHeight(textContainer:GetHeight())
 
 	if self._state.autoWidth then
 		self:SetWidth(text:GetStringWidth() + padding.left + padding.right)
 	end
-
-	text:SetParent(frame)
-	textContainer:Hide()
 end
 
 function Widget._events:OnAcquire()
@@ -259,7 +255,7 @@ lib:RegisterWidget(widgetType, version, isContainer, function()
 	-- This is being done to allow the button to resize based on its text width while also truncating the
 	-- text if it fills its parent container due to a lack of available width.
 	local textContainer = CreateFrame("Frame", nil, frame)
-	local text = frame:CreateFontString(nil, "OVERLAY")
+	local text = textContainer:CreateFontString(nil, "OVERLAY")
 	frame:SetFontString(text)
 
 	frame.borders = borders
