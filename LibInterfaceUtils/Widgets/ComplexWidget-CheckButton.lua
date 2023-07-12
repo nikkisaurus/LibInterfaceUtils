@@ -229,6 +229,9 @@ lib:RegisterWidget(widgetType, version, isContainer, function()
 	-- Using a Label widget due to the complexities it already has implemented, such as the
 	-- ability to add and move an icon.
 	local text = lib:New("Label")
+	text:RegisterCallback("OnMouseDown", function()
+		widget:Fire("OnClick")
+	end)
 	text._frame:SetParent(frame)
 
 	-- It's not necessary to use Texture widgets since it is simple to work with already.

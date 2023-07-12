@@ -10,7 +10,9 @@ local Widget = { _events = {} }
 
 local function OnMouseDown(title)
 	local widget = title:GetParent().widget
-	widget:SetCollapsed(not widget._state.collapsed, widget._state.collapsed)
+	if widget._state.collapsible then
+		widget:SetCollapsed(not widget._state.collapsed, widget._state.collapsed)
+	end
 end
 
 local function SetAnchors(self)
@@ -24,23 +26,24 @@ local function SetAnchors(self)
 	title:ClearAllPoints()
 	icon:ClearAllPoints()
 
+	local padding = self._state.padding
+	local titlePadding = self._state.titlePadding
+	local offset = self._state.contentOffset
 	if titleText then
-		local padding = self._state.titlePadding
-		local offset = self._state.contentOffset
 		titlebar:SetPoint("TOPLEFT")
 		titlebar:SetPoint("TOPRIGHT")
 
-		title:SetPoint("TOPLEFT", padding.left, -padding.top)
+		title:SetPoint("TOPLEFT", titlePadding.left, -titlePadding.top)
 		if self._state.collapsible then
-			titlebar.icon:SetPoint("TOPRIGHT", -padding.right, -padding.top)
-			title:SetPoint("TOPRIGHT", titlebar.icon, "TOPLEFT", -padding.right, 0)
+			titlebar.icon:SetPoint("TOPRIGHT", -titlePadding.right, -titlePadding.top)
+			title:SetPoint("TOPRIGHT", titlebar.icon, "TOPLEFT", -titlePadding.right, 0)
 		else
-			title:SetPoint("TOPRIGHT", -padding.right, -padding.top)
+			title:SetPoint("TOPRIGHT", -titlePadding.right, -titlePadding.top)
 		end
 
 		content:SetPoint("TOP", titlebar, "BOTTOM", 0, offset)
 		if not self._state.fullHeight and not self._state.autoHeight then
-			local pendingHeight = self:GetHeight() + titlebar:GetHeight() + padding.top + padding.bottom - offset
+			local pendingHeight = content:GetHeight() + titlebar:GetHeight() + padding.top + padding.bottom - offset
 			if self:GetHeight() ~= pendingHeight then
 				self:SetHeight(pendingHeight)
 			end
@@ -58,23 +61,20 @@ local function UpdateIconState(self)
 end
 
 function Widget._events:OnAcquire()
-	self:SetSize(300, 200)
-	self:SetPadding(5, 5, 5, 5)
-	self:SetSpacing(5, 5)
-	self:SetTitle()
+	self:SetContentOffset()
 	self:SetTitlePadding()
-	self:SetTitlebarBackdrop(addon.defaultBackdrop)
-	self:SetTitlebarBackdropColor(unpack(addon.colors.elvTransparent))
-	self:SetTitlebarBackdropBorderColor(unpack(addon.colors.black))
+	self:SetSpacing(5, 5)
+	self:SetPadding(5, 5, 5, 5)
+	self:SetSize(300, 200)
+	self:SetTitle()
 	self:SetFontObject(GameFontNormal, true)
 	self:SetJustifyH()
 	self:SetJustifyV()
-	self:SetContentOffset()
 	self:SetContentBackdrop(addon.defaultBackdrop)
 	self:SetContentBackdropColor(unpack(addon.colors.elvTransparent))
 	self:SetContentBackdropBorderColor(unpack(addon.colors.black))
 	self:SetAutoHeight(true)
-	self:SetCollapsible(true)
+	self:SetCollapsible()
 	self:SetCollapsed()
 	self:Show()
 end
@@ -92,9 +92,9 @@ function Widget._events:OnLayoutFinished(_, height)
 			return
 		end
 
-		local padding = state.titlePadding
+		local padding = state.padding
 		local titleHeight = self._frame.titlebar.title:GetHeight()
-		local pendingHeight = height + titleHeight + padding.top + padding.bottom - state.contentOffset
+		local pendingHeight = height + titleHeight + padding.bottom - state.contentOffset
 
 		if state.collapsed then
 			pendingHeight = titleHeight + padding.top + padding.bottom
@@ -122,6 +122,9 @@ function Widget:SetCollapsed(collapsed, restore)
 	local state = self._state
 	local frame = self._frame
 
+	if not state.collapsible then
+		return
+	end
 	state.collapsed = collapsed and self:GetHeight()
 
 	if collapsed then
@@ -143,6 +146,7 @@ function Widget:SetCollapsible(collapsible)
 	local titlebar = self._frame.titlebar
 	titlebar:EnableMouse(collapsible)
 	titlebar:SetScript("OnMouseDown", OnMouseDown)
+	self:SetCollapsed()
 	self._state.collapsible = collapsible
 
 	SetAnchors(self)
