@@ -68,3 +68,19 @@ function Container:SetLayout(layout)
 	self._state.layout = layout
 	self.layout = addon.layouts[layout] or layout
 end
+
+function Container:SetPadding(left, right, top, bottom)
+	self._state.padding = {
+		left = left or 0,
+		right = right or 0,
+		top = top or 0,
+		bottom = bottom or 0,
+	}
+end
+
+function Container:SetSpacing(x, y)
+	self._state.spacing = {
+		x = x or 0,
+		y = y or 0,
+	}
+end

@@ -18,7 +18,7 @@ local function Constructor(widgetType, isContainer, constructor)
 	end
 
 	if isContainer then
-		assert(type(widget._frame.content) == "table", ("Widgets of type '%s' must provide a content frame."):format(widgetType))
+		assert(addon.isTable(widget._frame.content), ("Widgets of type '%s' must provide a content frame."):format(widgetType))
 
 		widget.children = {}
 		widget:SetLayout("flow")
@@ -33,14 +33,8 @@ local function Destructor(_, widget)
 	widget:Hide()
 end
 
-function addon.Fire(event, widget, ...)
-	local callback = widget._events[event]
-	addon.safecall(callback, widget, ...)
-	widget:Fire(event, ...)
-end
-
-function addon.GenerateWidgetName(widgetType)
-	local pool = lib.pools[widgetType]
+function lib:GenerateWidgetName(widgetType)
+	local pool = self.pools[widgetType]
 	local count = 1
 
 	for _, _ in pool:EnumerateActive() do
@@ -52,16 +46,6 @@ function addon.GenerateWidgetName(widgetType)
 	end
 
 	return ("Liu%s%d"):format(widgetType, count)
-end
-
-function addon.OnEvent(event, frame, ...)
-	local widget = frame.widget
-	local onEvent = widget._events[event]
-	local callback = widget._callbacks[event]
-
-	print(callback)
-	addon.safecall(onEvent, widget, ...)
-	addon.safecall(callback, widget, ...)
 end
 
 function lib:RegisterWidget(widgetType, version, isContainer, constructor, destructor)
@@ -76,23 +60,5 @@ function lib:RegisterWidget(widgetType, version, isContainer, constructor, destr
 		pool.widgetType = widgetType
 		pool.version = version
 		self.pools[widgetType] = pool
-	end
-end
-
-function addon.RegisterEvent(frame, event, callback)
-	local widget = frame.widget
-	local handler = widget._events[event]
-	local userCallback = widget._callbacks[event]
-
-	if frame:HasScript(event) then
-		if not handler and not userCallback and not callback then
-			-- Unregister event
-			frame:SetScript(event, nil)
-		end
-		frame:SetScript(event, function(...)
-			addon.safecall(handler, widget, ...)
-			addon.safecall(userCallback, widget, ...)
-			addon.safecall(callback, widget, ...)
-		end)
 	end
 end

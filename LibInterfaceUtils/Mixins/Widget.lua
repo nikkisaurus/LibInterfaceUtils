@@ -49,7 +49,7 @@ function Widget:RegisterCallback(event, callback)
 end
 
 function Widget:Release()
-	assert(type(self) == "table", "Invalid widget reference supplied to :Release()")
+	assert(addon.isTable(self), "Invalid widget reference supplied to :Release()")
 	assert(self.pool, "Invalid widget reference supplied to :Release()")
 	self._frame:SetParent(UIParent)
 	self._state.parent = nil

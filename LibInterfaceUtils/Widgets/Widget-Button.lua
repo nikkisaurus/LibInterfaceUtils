@@ -187,7 +187,7 @@ local widget = {
 		local get = self._frame[("Get%sTexture"):format(state)]
 		get(self._frame):SetVertexColor(unpack(template.texture.color))
 
-		lib:SetFont(self._frame.text, template.text)
+		-- lib.SetFont(self._frame.text, template.text)
 	end,
 }
 
@@ -197,7 +197,7 @@ local widget = {
 
 lib:RegisterWidget(widgetType, version, false, function(pool)
 	local frame = CreateFromMixins({
-		_frame = CreateFrame("Button", addon.GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Button", lib:GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
 	}, widget)
 
 	frame.borders = {

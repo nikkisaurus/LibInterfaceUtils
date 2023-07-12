@@ -20,20 +20,3 @@ addon.defaultBackdrop = {
 	edgeFile = addon.defaultTexture,
 	edgeSize = 1,
 }
-
--- TODO refactor:
-function lib:SetFont(fontString, font)
-	if font.font then
-		fontString:SetFont(unpack(font.font))
-	end
-
-	if font.fontObject then
-		local fontObject = _G[font.fontObject] or font.fontObject
-		fontString:SetFont(fontObject:GetFont())
-		fontString:SetFontObject(fontObject)
-	end
-
-	if font.color then
-		fontString:SetTextColor(unpack(font.color))
-	end
-end

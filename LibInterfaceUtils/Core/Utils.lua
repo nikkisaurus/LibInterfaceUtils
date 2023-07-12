@@ -8,6 +8,10 @@ function addon.isValidString(str)
 	return type(str) == "string" and str ~= "" and str
 end
 
+function addon.isTable(tbl)
+	return type(tbl) == "table"
+end
+
 function addon.safecall(func, ...)
 	if type(func) == "function" then
 		return func(...)
@@ -17,17 +21,16 @@ end
 function addon.setNestedMetatables(target, source)
 	setmetatable(target, { __index = source })
 	for key, value in pairs(target) do
-		if type(value) == "table" and type(source[key]) == "table" then
+		if addon.isTable(value) and addon.isTable(source[key]) then
 			addon.setNestedMetatables(value, source[key])
 		end
 	end
 end
 
 function addon.unpack(...)
-	if type(...) == "table" then
+	if addon.isTable(...) then
 		return unpack(...)
 	else
 		return ...
 	end
-	-- return type(...) == "table" and unpack(...) or ...
 end

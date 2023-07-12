@@ -2,6 +2,7 @@
   <Include file="LibInterfaceUtils.lua" />
   <Include file="Mixins/Container.lua" />
   <Include file="Mixins/Widget.lua" />
+  <Include file="Core/Events.lua" />
   <Include file="Core/Factories.lua" />
   <Include file="Core/Layouts.lua" />
   <Include file="Core/Registry.lua" />

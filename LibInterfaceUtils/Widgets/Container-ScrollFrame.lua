@@ -70,7 +70,7 @@ local Widget = {
 -- *******************************
 
 lib:RegisterWidget(widgetType, version, true, function(pool)
-	local frame = CreateFrame("Frame", addon.GenerateWidgetName(widgetType), UIParent, "BackdropTemplate")
+	local frame = CreateFrame("Frame", lib:GenerateWidgetName(widgetType), UIParent, "BackdropTemplate")
 	local widget = CreateFromMixins({
 		_frame = frame,
 	}, Widget)

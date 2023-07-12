@@ -206,7 +206,7 @@ local widget = {
 
 lib:RegisterWidget(widgetType, version, false, function(pool)
 	local frame = CreateFromMixins({
-		_frame = CreateFrame("Frame", addon.GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Frame", lib:GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
 	}, widget)
 
 	frame._frame:SetScript("OnSizeChanged", function()

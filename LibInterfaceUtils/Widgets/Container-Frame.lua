@@ -96,32 +96,18 @@ function Widget:SetMovable(movable, ...)
 	frame:SetScript("OnDragStop", movable and OnDragStop or nil)
 end
 
-function Widget:SetPadding(left, right, top, bottom)
-	self._state.padding = {
-		left = left or 0,
-		right = right or 0,
-		top = top or 0,
-		bottom = bottom or 0,
-	}
-end
-
-function Widget:SetSpacing(x, y)
-	self._state.spacing = {
-		x = x or 0,
-		y = y or 0,
-	}
-end
-
 function Widget:SetTitle(text)
 	self._frame.title:SetText(text or "")
 end
 
 lib:RegisterWidget(widgetType, version, isContainer, function()
 	local widget = CreateFromMixins({
-		_frame = CreateFrame("Frame", addon.GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
+		_frame = CreateFrame("Frame", lib:GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
 	}, Widget)
 
-	local resizer = CreateFrame("Button", nil, widget._frame)
+	local frame = widget._frame
+
+	local resizer = CreateFrame("Button", nil, frame)
 	resizer:SetNormalTexture(386862)
 	resizer:SetHighlightTexture(386863)
 	resizer:SetPoint("BOTTOMRIGHT", 0, 0)
@@ -130,25 +116,25 @@ lib:RegisterWidget(widgetType, version, isContainer, function()
 	resizer:SetScript("OnMouseDown", OnMouseDown)
 	resizer:SetScript("OnMouseUp", OnMouseUp)
 
-	local closeButton = CreateFrame("Button", nil, widget._frame)
+	local closeButton = CreateFrame("Button", nil, frame)
 	closeButton:SetNormalAtlas("common-search-clearbutton")
 	closeButton:SetPoint("TOPRIGHT", -4, -4)
 	closeButton:SetSize(12, 12)
 	closeButton:SetScript("OnClick", OnClick)
 
-	local title = widget._frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	title:SetPoint("TOPLEFT", 4, -4)
 	title:SetPoint("BOTTOMRIGHT", closeButton, "BOTTOMLEFT", -4, 0)
 
-	local content = CreateFrame("Frame", nil, widget._frame, "BackdropTemplate")
+	local content = CreateFrame("Frame", nil, frame, "BackdropTemplate")
 	content:SetPoint("TOP", title, "BOTTOM", 0, -4)
 	content:SetPoint("LEFT")
 	content:SetPoint("BOTTOMRIGHT")
 
-	widget._frame.resizer = resizer
-	widget._frame.close = closeButton
-	widget._frame.title = title
-	widget._frame.content = content
+	frame.resizer = resizer
+	frame.close = closeButton
+	frame.title = title
+	frame.content = content
 
 	return widget
 end)
