@@ -4,9 +4,8 @@ if not lib then
 	return
 end
 
--- *******************************
--- *** Constants ***
--- *******************************
+local widgetType, version, isContainer = "Button", 1, false
+local Widget = { _events = {} }
 
 local TEXTURES = {
 	Disabled = {
@@ -17,7 +16,7 @@ local TEXTURES = {
 			color = { 1, 1, 1, 0.25 },
 		},
 		text = {
-			fontObject = "GameFontDisable",
+			fontObject = GameFontDisable,
 		},
 		texture = {
 			texture = addon.defaultTexture,
@@ -32,7 +31,7 @@ local TEXTURES = {
 			color = addon.colors.white,
 		},
 		text = {
-			fontObject = "GameFontHighlight",
+			fontObject = GameFontHighlight,
 		},
 		texture = {
 			texture = addon.defaultTexture,
@@ -47,7 +46,7 @@ local TEXTURES = {
 			color = addon.colors.black,
 		},
 		text = {
-			fontObject = "GameFontNormal",
+			fontObject = GameFontNormal,
 		},
 		texture = {
 			texture = addon.defaultTexture,
@@ -62,7 +61,7 @@ local TEXTURES = {
 			color = addon.colors.gold,
 		},
 		text = {
-			fontObject = "GameFontNormal",
+			fontObject = GameFontNormal,
 		},
 		texture = {
 			texture = addon.defaultTexture,
@@ -71,190 +70,161 @@ local TEXTURES = {
 	},
 }
 
--- *******************************
--- *** Widget ***
--- *******************************
+local function UpdateState(self)
+	local frame = self._frame
+	local text = frame.text
 
-local widgetType, version = "Button", 1
+	local state = (not frame:IsEnabled()) and "Disabled"
+		or (self._state.pushed and "Pushed")
+		or (self._state.highlight and "Highlight")
+		or "Normal"
 
-local tex
-local widget = {
-	_events = {
-		OnAcquire = function(self)
-			self:SetSize(150, 25)
-			self:SetJustifyH("CENTER")
-			self:SetJustifyV("MIDDLE")
-			self:SetWordWrap()
-			self:SetPushedTextOffset(1, -1)
-			self:SetTextures()
-			self:SetText()
-			self:Enable()
-			self:Show()
-		end,
+	local SetTexture = frame[("Set%sTexture"):format(state)]
+	local GetTexture = frame[("Get%sTexture"):format(state)]
 
-		OnClick = function(self) end,
+	local template = self._state.template[state]
+	local borderTemplate, textureTemplate, textTemplate = template.border, template.texture, template.text
 
-		OnEnter = function(self)
-			self._state.highlight = true
-			self:UpdateState()
-		end,
-
-		OnLeave = function(self)
-			self._state.highlight = false
-			self:UpdateState()
-		end,
-
-		OnMouseDown = function(self)
-			self._state.pushed = true
-			self:UpdateState()
-		end,
-
-		OnMouseUp = function(self)
-			self._state.pushed = false
-			self:UpdateState()
-		end,
-	},
-
-	Disable = function(self)
-		self._frame:Disable()
-		self:UpdateState()
-	end,
-
-	Enable = function(self)
-		self._frame:Enable()
-		self:UpdateState()
-	end,
-
-	-- SetAutoHeight = function(self, autoHeight)
-	-- 	self._state.autoHeight = autoHeight
-	-- 	self:SetAnchors()
-	-- end,
-
-	SetJustifyH = function(self, ...)
-		self._frame.text:SetJustifyH(...)
-	end,
-
-	SetJustifyV = function(self, ...)
-		self._frame.text:SetJustifyV(...)
-	end,
-
-	SetPushedTextOffset = function(self, ...)
-		self._frame:SetPushedTextOffset(...)
-	end,
-
-	SetText = function(self, text)
-		self._state.text = text
-		self._frame.text:SetText(text or "")
-	end,
-
-	SetTextures = function(self, textures)
-		self._state.textures = textures or {}
-		addon.setNestedMetatables(self._state.textures, TEXTURES)
-		self:UpdateState()
-	end,
-
-	SetWordWrap = function(self, canWrap)
-		self._state.canWrap = canWrap or false
-		self._frame.text:SetWordWrap(canWrap or false)
-	end,
-
-	UpdateState = function(self)
-		local state = not self._frame:IsEnabled() and "Disabled"
-			or (self._state.pushed and "Pushed")
-			or (self._state.highlight and "Highlight")
-			or "Normal"
-		local template = self._state.textures[state]
-
-		for id, border in pairs(self.borders) do
-			local borderTemplate = template.border
-			if borderTemplate.enabled then
-				if (id == "top" or id == "bottom") and (border:GetHeight() ~= borderTemplate.size) then
-					border:SetHeight(borderTemplate.size)
-				elseif border:GetWidth() ~= borderTemplate.size then
-					border:SetWidth(borderTemplate.size)
-				end
-
-				border:SetTexture(borderTemplate.texture)
-				border:SetVertexColor(unpack(borderTemplate.color))
-				border:Show()
-			else
-				border:Hide()
+	for id, border in pairs(frame.borders) do
+		if borderTemplate.enabled then
+			if (id == "top" or id == "bottom") and (border:GetHeight() ~= borderTemplate.size) then
+				border:SetHeight(borderTemplate.size)
+			elseif border:GetWidth() ~= borderTemplate.size then
+				border:SetWidth(borderTemplate.size)
 			end
+
+			border:SetTexture(borderTemplate.texture)
+			border:SetVertexColor(unpack(borderTemplate.color))
+			border:Show()
+		else
+			border:Hide()
 		end
+	end
 
-		local set = self._frame[("Set%sTexture"):format(state)]
-		set(self._frame, template.texture.texture)
-		local get = self._frame[("Get%sTexture"):format(state)]
-		get(self._frame):SetVertexColor(unpack(template.texture.color))
+	SetTexture(frame, textureTemplate.texture)
+	GetTexture(frame):SetVertexColor(unpack(textureTemplate.color))
 
-		-- lib.SetFont(self._frame.text, template.text)
-	end,
-}
+	if textTemplate.fontObject then
+		local fontObject = textTemplate.fontObject
+		fontObject = (addon.isTable(fontObject)) and fontObject or _G[fontObject]
+		assert(fontObject.GetFont, "Invalid fontObject supplied to Button's :SetTemplate().")
 
--- *******************************
--- *** Registration ***
--- *******************************
+		text:SetFontObject(fontObject)
+		text:SetTextColor(fontObject:GetTextColor())
+	end
 
-lib:RegisterWidget(widgetType, version, false, function(pool)
-	local frame = CreateFromMixins({
+	if textTemplate.font then
+		text:SetFont(addon.unpack(textTemplate.font))
+	end
+
+	if textTemplate.color then
+		text:SetTextColor(addon.unpack(textTemplate.color))
+	end
+end
+
+function Widget._events:OnAcquire()
+	self:SetSize(150, 25)
+	self:SetJustifyH("CENTER")
+	self:SetJustifyV("MIDDLE")
+	self:SetWordWrap()
+	self:SetPushedTextOffset(1, -1)
+	self:SetTemplate()
+	self:SetText()
+	self:Enable()
+	self:Show()
+end
+
+function Widget._events:OnClick() end
+
+function Widget._events:OnEnter()
+	self._state.highlight = true
+	UpdateState(self)
+end
+
+function Widget._events:OnLeave()
+	self._state.highlight = false
+	UpdateState(self)
+end
+
+function Widget._events:OnMouseDown()
+	self._state.pushed = true
+	UpdateState(self)
+end
+
+function Widget._events:OnMouseUp()
+	self._state.pushed = false
+	UpdateState(self)
+end
+
+function Widget:Disable()
+	self._frame:Disable()
+	UpdateState(self)
+end
+
+function Widget:Enable()
+	self._frame:Enable()
+	UpdateState(self)
+end
+
+-- function Widget:SetAutoHeight(autoHeight)
+-- 	self._state.autoHeight = autoHeight
+-- 	self:SetAnchors()
+-- end
+
+function Widget:SetJustifyH(...)
+	self._frame.text:SetJustifyH(...)
+end
+
+function Widget:SetJustifyV(...)
+	self._frame.text:SetJustifyV(...)
+end
+
+function Widget:SetPushedTextOffset(...)
+	self._frame:SetPushedTextOffset(...)
+end
+
+function Widget:SetText(text)
+	self._frame.text:SetText(text or "")
+end
+
+function Widget:SetTemplate(template)
+	self._state.template = template or {}
+	addon.setNestedMetatables(self._state.template, TEXTURES)
+	UpdateState(self)
+end
+
+function Widget:SetWordWrap(canWrap)
+	self._frame.text:SetWordWrap(canWrap or false)
+end
+
+lib:RegisterWidget(widgetType, version, isContainer, function()
+	local widget = CreateFromMixins({
 		_frame = CreateFrame("Button", lib:GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
-	}, widget)
+	}, Widget)
 
-	frame.borders = {
-		top = frame._frame:CreateTexture(nil, "OVERLAY"),
-		left = frame._frame:CreateTexture(nil, "OVERLAY"),
-		right = frame._frame:CreateTexture(nil, "OVERLAY"),
-		bottom = frame._frame:CreateTexture(nil, "OVERLAY"),
+	local frame = widget._frame
+
+	local borders = {
+		top = frame:CreateTexture(nil, "OVERLAY"),
+		left = frame:CreateTexture(nil, "OVERLAY"),
+		right = frame:CreateTexture(nil, "OVERLAY"),
+		bottom = frame:CreateTexture(nil, "OVERLAY"),
 	}
 
-	frame.borders.top:SetPoint("TOPLEFT")
-	frame.borders.top:SetPoint("TOPRIGHT")
-	frame.borders.left:SetPoint("TOPLEFT")
-	frame.borders.left:SetPoint("BOTTOMLEFT")
-	frame.borders.right:SetPoint("TOPRIGHT")
-	frame.borders.right:SetPoint("BOTTOMRIGHT")
-	frame.borders.bottom:SetPoint("BOTTOMLEFT")
-	frame.borders.bottom:SetPoint("BOTTOMRIGHT")
+	borders.top:SetPoint("TOPLEFT")
+	borders.top:SetPoint("TOPRIGHT")
+	borders.left:SetPoint("TOPLEFT")
+	borders.left:SetPoint("BOTTOMLEFT")
+	borders.right:SetPoint("TOPRIGHT")
+	borders.right:SetPoint("BOTTOMRIGHT")
+	borders.bottom:SetPoint("BOTTOMLEFT")
+	borders.bottom:SetPoint("BOTTOMRIGHT")
 
-	frame._frame.text = frame._frame:CreateFontString(nil, "OVERLAY")
-	frame._frame.text:SetAllPoints(frame._frame)
-	frame._frame:SetFontString(frame._frame.text)
+	local text = frame:CreateFontString(nil, "OVERLAY")
+	frame:SetFontString(text)
 
-	-- frame._frame:SetScript("OnEnter", function()
-	-- 	local borders = frame._state.textures.border
-	-- 	if borders then
-	-- 		for _, border in pairs(frame.borders) do
-	-- 			border:SetVertexColor(unpack(borders[4]))
-	-- 		end
-	-- 	end
-	-- end)
+	frame.borders = borders
+	frame.text = text
 
-	-- frame._frame:SetScript("OnLeave", function()
-	-- 	local borders = frame._state.textures.border
-	-- 	if borders then
-	-- 		for _, border in pairs(frame.borders) do
-	-- 			border:SetVertexColor(unpack(borders[1]))
-	-- 		end
-	-- 	end
-	-- end)
-
-	-- frame._frame:SetScript("OnMouseDown", function()
-	-- 	local borders = frame._state.textures.border
-	-- 	if borders then
-	-- 		for _, border in pairs(frame.borders) do
-	-- 			border:SetVertexColor(unpack(borders[5]))
-	-- 		end
-	-- 	end
-	-- end)
-
-	-- frame._frame:SetScript("OnMouseUp", function()
-	-- 	local borders = frame._state.textures.border
-	-- 	if borders then
-	-- 		for _, border in pairs(frame.borders) do
-	-- 			border:SetVertexColor(unpack(borders[GetMouseFocus() == frame.frame and 4 or 1]))
-	-- 		end
-	-- 	end
-	-- end)
-
-	return frame
+	return widget
 end)
