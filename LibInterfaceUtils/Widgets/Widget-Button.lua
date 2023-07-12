@@ -122,7 +122,29 @@ local function UpdateState(self)
 	end
 end
 
+local function UpdateWidth(self)
+	local frame = self._frame
+	local textContainer = frame.textContainer
+	local text = frame.text
+	local padding = self._state.padding
+
+	textContainer:SetPoint("TOPLEFT", frame, "TOPLEFT", padding.left, 0)
+	textContainer:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -padding.right, 0)
+
+	text:SetParent(textContainer)
+	text:SetWidth(textContainer:GetWidth())
+	text:SetHeight(textContainer:GetHeight())
+
+	if self._state.autoWidth then
+		self:SetWidth(text:GetStringWidth() + padding.left + padding.right)
+	end
+
+	text:SetParent(frame)
+	textContainer:Hide()
+end
+
 function Widget._events:OnAcquire()
+	self:SetAutoWidth()
 	self:SetSize(150, 25)
 	self:SetJustifyH("CENTER")
 	self:SetJustifyV("MIDDLE")
@@ -156,6 +178,10 @@ function Widget._events:OnMouseUp()
 	UpdateState(self)
 end
 
+function Widget._events:OnSizeChanged()
+	UpdateWidth(self)
+end
+
 function Widget:Disable()
 	self._frame:Disable()
 	UpdateState(self)
@@ -164,6 +190,16 @@ end
 function Widget:Enable()
 	self._frame:Enable()
 	UpdateState(self)
+end
+
+function Widget:SetAutoWidth(autoWidth, left, right)
+	self._state.autoWidth = autoWidth
+	self._state.padding = {
+		left = left or 10,
+		right = right or 10,
+	}
+
+	UpdateWidth(self)
 end
 
 -- function Widget:SetAutoHeight(autoHeight)
@@ -185,16 +221,19 @@ end
 
 function Widget:SetText(text)
 	self._frame.text:SetText(text or "")
+	UpdateWidth(self)
 end
 
 function Widget:SetTemplate(template)
 	self._state.template = template or {}
 	addon.setNestedMetatables(self._state.template, defaultTemplate)
+	UpdateWidth(self)
 	UpdateState(self)
 end
 
 function Widget:SetWordWrap(canWrap)
 	self._frame.text:SetWordWrap(canWrap or false)
+	UpdateWidth(self)
 end
 
 lib:RegisterWidget(widgetType, version, isContainer, function()
@@ -220,11 +259,17 @@ lib:RegisterWidget(widgetType, version, isContainer, function()
 	borders.bottom:SetPoint("BOTTOMLEFT")
 	borders.bottom:SetPoint("BOTTOMRIGHT")
 
+	-- By setting the text's parent to the textContainer, we can control the width and height of the text
+	-- independently of the frame's size.
+	-- This is being done to allow the button to resize based on its text width while also truncating the
+	-- text if it fills its parent container due to a lack of available width.
+	local textContainer = CreateFrame("Frame", nil, frame)
 	local text = frame:CreateFontString(nil, "OVERLAY")
 	frame:SetFontString(text)
 
 	frame.borders = borders
 	frame.text = text
+	frame.textContainer = textContainer
 
 	return widget
 end)

@@ -28,6 +28,10 @@ function Container:DoLayout(child)
 	return width, height
 end
 
+function Container:GetContentSize()
+	return self._frame.content:GetWidth(), self._frame.content:GetHeight()
+end
+
 function Container:New(widgetType)
 	local widget = lib:New(widgetType)
 	self:AddChild(widget)

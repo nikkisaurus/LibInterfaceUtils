@@ -11,10 +11,10 @@ function Widget:ClearAllPoints()
 	self._frame:ClearAllPoints()
 end
 
-function Widget:DoParentLayout()
+function Widget:DoParentLayout(deferred)
 	local parent = self._state.parent
 	while parent do
-		parent:DoLayout()
+		parent[deferred and "DoLayoutDeferred" or "DoLayout"](parent)
 		parent = parent._state.parent
 	end
 end
