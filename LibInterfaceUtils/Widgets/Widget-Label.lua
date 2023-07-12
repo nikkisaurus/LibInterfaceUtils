@@ -4,11 +4,10 @@ if not lib then
 	return
 end
 
--- *******************************
--- *** Constants ***
--- *******************************
+local widgetType, version, isContainer = "Label", 1, false
+local Widget = { _events = {} }
 
-local POINTS = function(icon)
+local function GetPoints(icon)
 	return {
 		TOP = {
 			icon = { "TOP" },
@@ -87,139 +86,134 @@ local POINTS = function(icon)
 	}
 end
 
--- *******************************
--- *** Widget ***
--- *******************************
+local function SetAnchors(self)
+	local point, size
+	if self._state.icon.texture then
+		point = self._state.icon.point
+		size = self._state.icon.size
+	end
 
-local widgetType, version = "Label", 1
+	local icon = self._frame.icon
+	icon:ClearAllPoints()
+	icon:Hide()
 
-local widget = {
-	_events = {
-		OnAcquire = function(self)
-			self:SetSize(200, 0)
-			self:SetFontObject(GameFontHighlight)
-			self:SetJustifyH("LEFT")
-			self:SetJustifyV("MIDDLE")
-			self:SetWordWrap(true)
-			self:SetIcon()
-			self:SetText()
-			self:SetAutoWidth(true)
-			self:SetInteractive()
-			self:Show()
-		end,
-	},
+	local text = self._frame.text
+	text:ClearAllPoints()
 
-	SetAnchors = function(self)
-		local point, size
-		if self._state.icon.texture then
-			point = self._state.icon.point
-			size = self._state.icon.size
-		end
+	if point then
+		local points = GetPoints(icon)[point]
+		icon:SetPoint(unpack(points.icon))
+		text:SetPoint(unpack(points.text[1]))
 
-		local icon = self._frame.icon
-		icon:ClearAllPoints()
-		icon:Hide()
-
-		local text = self._frame.text
-		text:ClearAllPoints()
-
-		if point then
-			local points = POINTS(icon)[point]
-			icon:SetPoint(unpack(points.icon))
-			text:SetPoint(unpack(points.text[1]))
-
-			if self._state.autoWidth and not self._state.fullWidth and not self._state.availableWidth then
-				text:SetWidth(text:GetStringWidth())
-				self:SetWidth((points.iconWidth and size or 0) + text:GetWidth())
-			else
-				text:SetWidth(self:GetWidth() - (points.iconWidth and size or 0))
-			end
-
-			text:SetPoint(unpack(points.text[2]))
-			if points.text[3] then
-				text:SetPoint(unpack(points.text[3]))
-			end
-			self:SetHeight(max(size, (points.iconHeight and size or 0) + text:GetStringHeight()))
-
-			icon:Show()
+		if self._state.autoWidth and not self._state.fullWidth and not self._state.availableWidth then
+			text:SetWidth(text:GetStringWidth())
+			self:SetWidth((points.iconWidth and size or 0) + text:GetWidth())
 		else
-			text:SetPoint("TOPLEFT")
-
-			if self._state.autoWidth and not self._state.fullWidth then
-				text:SetWidth(text:GetStringWidth())
-			end
-
-			text:SetPoint("TOPRIGHT")
-			self:SetWidth(text:GetWidth())
-			self:SetHeight(text:GetStringHeight())
+			text:SetWidth(self:GetWidth() - (points.iconWidth and size or 0))
 		end
-	end,
 
-	SetAutoWidth = function(self, autoWidth)
-		self._state.autoWidth = autoWidth
-		self:SetAnchors()
-	end,
+		text:SetPoint(unpack(points.text[2]))
+		if points.text[3] then
+			text:SetPoint(unpack(points.text[3]))
+		end
+		self:SetHeight(max(size, (points.iconHeight and size or 0) + text:GetStringHeight()))
 
-	SetFontObject = function(self, ...)
-		self._frame.text:SetFontObject(...)
-	end,
+		icon:Show()
+	else
+		text:SetPoint("TOPLEFT")
 
-	SetInteractive = function(self, isInteractive, callback)
-		self._frame:EnableMouse(isInteractive)
-		self._frame:SetScript("OnMouseDown", isInteractive and callback or nil)
-	end,
+		if self._state.autoWidth and not self._state.fullWidth then
+			text:SetWidth(text:GetStringWidth())
+		end
 
-	SetJustifyH = function(self, ...)
-		self._frame.text:SetJustifyH(...)
-	end,
+		text:SetPoint("TOPRIGHT")
+		self:SetWidth(text:GetWidth())
+		self:SetHeight(text:GetStringHeight())
+	end
+end
 
-	SetJustifyV = function(self, ...)
-		self._frame.text:SetJustifyV(...)
-	end,
+function Widget._events:OnAcquire()
+	self:SetSize(200, 0)
+	self:SetIcon()
+	self:SetFontObject(GameFontHighlight, true)
+	self:SetJustifyH("LEFT")
+	self:SetJustifyV("MIDDLE")
+	self:SetWordWrap(true)
+	self:SetAutoWidth(true)
+	self:SetText()
+	self:SetInteractive()
+	self:Show()
+end
 
-	SetIcon = function(self, texture, size, point)
-		self._state.icon = {
-			texture = texture ~= "" and texture,
-			size = size or 14,
-			point = point or "TOPLEFT",
-		}
+function Widget._events:OnSizeChanged()
+	SetAnchors(self)
+end
 
-		local icon = self._frame.icon
-		icon:SetTexture(texture)
-		icon:SetSize(size or 14, size or 14)
-		self:SetAnchors()
-	end,
+function Widget:SetAutoWidth(autoWidth)
+	self._state.autoWidth = autoWidth
+	SetAnchors(self)
+end
 
-	SetText = function(self, text)
-		self._frame.text:SetText(text or "")
-		self:SetAnchors()
-	end,
+function Widget:SetFont(...)
+	self._frame.text:SetFont(...)
+end
 
-	SetWordWrap = function(self, canWrap)
-		self._frame.text:SetWordWrap(canWrap or false)
-	end,
-}
+function Widget:SetFontObject(fontObject, resetColor)
+	local text = self._frame.text
+	text:SetFontObject(fontObject)
+	if resetColor then
+		text:SetTextColor(fontObject:GetTextColor())
+	end
+end
 
--- *******************************
--- *** Registration ***
--- *******************************
+function Widget:SetIcon(texture, size, point)
+	self._state.icon = {
+		texture = texture ~= "" and texture,
+		size = size or 14,
+		point = point or "TOPLEFT",
+	}
 
-lib:RegisterWidget(widgetType, version, false, function(pool)
-	local frame = CreateFromMixins({
+	local icon = self._frame.icon
+	icon:SetTexture(texture)
+	icon:SetSize(size or 14, size or 14)
+	SetAnchors(self)
+end
+
+function Widget:SetInteractive(isInteractive, callback)
+	local frame = self._frame
+	frame:EnableMouse(isInteractive)
+	frame:SetScript("OnMouseDown", isInteractive and callback or nil)
+end
+
+function Widget:SetJustifyH(...)
+	self._frame.text:SetJustifyH(...)
+end
+
+function Widget:SetJustifyV(...)
+	self._frame.text:SetJustifyV(...)
+end
+
+function Widget:SetText(text)
+	self._frame.text:SetText(text or "")
+	SetAnchors(self)
+end
+
+function Widget:SetTextColor(...)
+	self._frame.text:SetTextColor(...)
+end
+
+function Widget:SetWordWrap(canWrap)
+	self._frame.text:SetWordWrap(canWrap or false)
+end
+
+lib:RegisterWidget(widgetType, version, isContainer, function(pool)
+	local widget = CreateFromMixins({
 		_frame = CreateFrame("Frame", lib:GenerateWidgetName(widgetType), UIParent, "BackdropTemplate"),
-	}, widget)
+	}, Widget)
 
-	frame._frame:SetScript("OnSizeChanged", function()
-		frame:SetAnchors()
-	end)
+	local frame = widget._frame
+	frame.icon = frame:CreateTexture(nil, "ARTWORK")
+	frame.text = frame:CreateFontString(nil, "OVERLAY")
 
-	frame._frame.icon = frame._frame:CreateTexture(nil, "ARTWORK")
-	frame._frame.text = frame._frame:CreateFontString(nil, "OVERLAY")
-
-	-- frame._frame:SetBackdrop({
-	-- 	bgFile = addon.defaultTexture,
-	-- })
-	-- frame._frame:SetBackdropColor(0, 1, 0, 0.75)
-
-	return frame
+	return widget
 end)
