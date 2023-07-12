@@ -7,7 +7,7 @@ end
 local widgetType, version, isContainer = "Button", 1, false
 local Widget = { _events = {} }
 
-local defaultTemplate = {
+local defaultTheme = {
 	Disabled = {
 		border = {
 			enabled = true,
@@ -76,43 +76,43 @@ local function UpdateTheme(self)
 	local state = self:GetState()
 	local SetTexture = frame[("Set%sTexture"):format(state)]
 	local GetTexture = frame[("Get%sTexture"):format(state)]
-	local template = self._state.template[state]
-	local borderTemplate, textureTemplate, textTemplate = template.border, template.texture, template.text
+	local theme = self._state.theme[state]
+	local borderTheme, textureTheme, textTheme = theme.border, theme.texture, theme.text
 
 	for id, border in pairs(frame.borders) do
-		if borderTemplate.enabled then
-			if (id == "top" or id == "bottom") and (border:GetHeight() ~= borderTemplate.size) then
-				border:SetHeight(borderTemplate.size)
-			elseif border:GetWidth() ~= borderTemplate.size then
-				border:SetWidth(borderTemplate.size)
+		if borderTheme.enabled then
+			if (id == "top" or id == "bottom") and (border:GetHeight() ~= borderTheme.size) then
+				border:SetHeight(borderTheme.size)
+			elseif border:GetWidth() ~= borderTheme.size then
+				border:SetWidth(borderTheme.size)
 			end
 
-			border:SetTexture(borderTemplate.texture)
-			border:SetVertexColor(unpack(borderTemplate.color))
+			border:SetTexture(borderTheme.texture)
+			border:SetVertexColor(unpack(borderTheme.color))
 			border:Show()
 		else
 			border:Hide()
 		end
 	end
 
-	SetTexture(frame, textureTemplate.texture)
-	GetTexture(frame):SetVertexColor(unpack(textureTemplate.color))
+	SetTexture(frame, textureTheme.texture)
+	GetTexture(frame):SetVertexColor(unpack(textureTheme.color))
 
-	if textTemplate.fontObject then
-		local fontObject = textTemplate.fontObject
+	if textTheme.fontObject then
+		local fontObject = textTheme.fontObject
 		fontObject = (addon.isTable(fontObject)) and fontObject or _G[fontObject]
-		assert(fontObject.GetFont, "Invalid fontObject supplied to Button's :SetTemplate().")
+		assert(fontObject.GetFont, "Invalid fontObject supplied to Button's :SetTheme().")
 
 		text:SetFontObject(fontObject)
 		text:SetTextColor(fontObject:GetTextColor())
 	end
 
-	if textTemplate.font then
-		text:SetFont(addon.unpack(textTemplate.font))
+	if textTheme.font then
+		text:SetFont(addon.unpack(textTheme.font))
 	end
 
-	if textTemplate.color then
-		text:SetTextColor(addon.unpack(textTemplate.color))
+	if textTheme.color then
+		text:SetTextColor(addon.unpack(textTheme.color))
 	end
 end
 
@@ -144,7 +144,7 @@ function Widget._events:OnAcquire()
 	self:SetJustifyV("MIDDLE")
 	self:SetWordWrap()
 	self:SetPushedTextOffset(1, -1)
-	self:SetTemplate()
+	self:SetTheme()
 	self:SetText()
 	self:Enable()
 	self:SetAutoWidth()
@@ -202,9 +202,9 @@ function Widget:SetText(text)
 	UpdateWidth(self)
 end
 
-function Widget:SetTemplate(template)
-	self._state.template = template or {}
-	addon.setNestedMetatables(self._state.template, defaultTemplate)
+function Widget:SetTheme(theme)
+	self._state.theme = theme or {}
+	addon.setNestedMetatables(self._state.theme, defaultTheme)
 	lib:RegisterStateHandlers(self, self._frame, UpdateTheme)
 	UpdateWidth(self)
 end
