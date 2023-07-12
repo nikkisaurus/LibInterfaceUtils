@@ -161,3 +161,85 @@ function layouts.list(self, frame, children, scrollBox)
 	local contentHeight = math.abs(yOffset) + padding.top + padding.bottom
 	return (scrollBox or frame):GetWidth(), contentHeight
 end
+function layouts.tabflow(self, frame, children, scrollBox)
+	local padding = self._state.padding
+	local spacing = self._state.spacing
+	local xOffset, yOffset = padding.left, padding.bottom
+	local rowHeight = 0
+	local availableWidth = (scrollBox or frame):GetWidth() - padding.left - padding.right
+	local rowWidth = 0
+	local availableHeight = frame:GetHeight() - padding.top - padding.bottom
+
+	-- Position child widgets and calculate row heights
+	for i, child in ipairs(children) do
+		-- Save the original size if not already saved
+		if not child._state.originalSize then
+			child._state.originalSize = {
+				width = child:GetWidth(),
+				height = child:GetHeight(),
+			}
+		end
+
+		-- Start a new row if fullWidth is true or availableWidth is zero
+		if child._state.fullWidth or availableWidth == 0 then
+			xOffset = padding.left
+			yOffset = yOffset + rowHeight + spacing.y
+			rowHeight = 0
+			rowWidth = 0
+		end
+
+		-- Calculate the remaining width for fillWidth child
+		local remainingWidth = availableWidth - rowWidth
+		if child._state.fullWidth and remainingWidth > 0 then
+			-- Set the child width to the availableWidth
+			child:SetSize(availableWidth, child:GetHeight())
+			rowWidth = availableWidth
+		elseif child._state.fillWidth and remainingWidth > 0 then
+			-- Set the child width to the remainingWidth
+			child:SetSize(remainingWidth, child:GetHeight())
+			rowWidth = rowWidth + remainingWidth + spacing.x
+		else
+			-- Set the child width based on the original size and available width
+			local childWidth = math.min(child._state.originalSize.width, availableWidth)
+			if childWidth == availableWidth then
+				child._state.availableWidth = true
+			end
+			child:SetSize(childWidth, child:GetHeight())
+
+			-- Update row width
+			rowWidth = rowWidth + childWidth + spacing.x
+
+			-- Start a new row if child width exceeds available width
+			if rowWidth > availableWidth then
+				xOffset = padding.left
+				yOffset = yOffset + rowHeight + spacing.y
+				rowHeight = 0
+				rowWidth = childWidth + spacing.x
+			end
+		end
+
+		-- Check if child has fullHeight property
+		if child._state.fullHeight then
+			-- Set the child height to the remaining height of the frame
+			local childHeight = math.max(child._state.originalSize.height, availableHeight - yOffset - spacing.y)
+			child:SetSize(child:GetWidth(), childHeight)
+		end
+
+		-- Position the child on the current row
+		child:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", xOffset, yOffset)
+
+		-- Update xOffset, rowHeight, and adjust rowWidth
+		xOffset = xOffset + child:GetWidth() + spacing.x
+		rowHeight = math.max(rowHeight, child:GetHeight())
+	end
+
+	-- Perform child layout after positioning
+	for _, child in ipairs(children) do
+		addon.safecall(child.DoLayout, child)
+	end
+
+	-- Calculate the total content height based on the positioned child widgets
+	local contentHeight = yOffset + rowHeight + padding.top + padding.bottom
+
+	return (scrollBox or frame):GetWidth(), contentHeight
+end
