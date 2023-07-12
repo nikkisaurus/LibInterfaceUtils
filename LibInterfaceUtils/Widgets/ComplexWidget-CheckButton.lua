@@ -115,6 +115,7 @@ function Widget._events:OnAcquire()
 	self:SetAutoWidth(true)
 	self:SetTheme()
 	self:SetIcon()
+	self:SetCheckStyle()
 	self:SetChecked()
 	self:Enable()
 	self:Show()
@@ -122,6 +123,7 @@ function Widget._events:OnAcquire()
 	local text = self._frame.text
 	text:Fire("OnAcquire")
 	text:SetInteractive(GenerateClosure(ToggleChecked, self))
+	text:SetTheme({ Disabled = { fontObject = GameFontDisable } })
 end
 
 function Widget._events:OnClick()
@@ -136,14 +138,22 @@ end
 function Widget:Disable()
 	local frame = self._frame
 	frame:Disable()
-	frame.check:SetAtlas("checkmark-minimal-disabled")
+	if self._state.checkStyle == "radio" then
+		frame.check:SetDesaturated(true)
+	else
+		frame.check:SetDesaturated(false)
+		frame.check:SetAtlas("checkmark-minimal-disabled")
+	end
+	frame.text:SetInteractive()
 	self:UpdateState()
 end
 
 function Widget:Enable()
 	local frame = self._frame
 	frame:Enable()
-	frame.check:SetAtlas("checkmark-minimal")
+	frame.check:SetDesaturated(false)
+	frame.check:SetAtlas(self._state.checkStyle == "radio" and "common-radiobutton-dot" or "checkmark-minimal")
+	frame.text:SetInteractive(GenerateClosure(ToggleChecked, self))
 	self:UpdateState()
 end
 
@@ -167,6 +177,14 @@ function Widget:SetCheck(point, size)
 		size = size or 14,
 	}
 	SetAnchors(self)
+end
+
+function Widget:SetCheckStyle(style)
+	self._state.checkStyle = style
+	local frame = self._frame
+	frame.check:SetDesaturated(false)
+	frame.check:SetAtlas(style == "radio" and "common-radiobutton-dot" or "checkmark-minimal")
+	frame.checkBox:SetAtlas(style == "radio" and "common-radiobutton-circle" or "checkbox-minimal")
 end
 
 function Widget:SetChecked(isChecked)
@@ -236,7 +254,6 @@ lib:RegisterWidget(widgetType, version, isContainer, function()
 
 	-- It's not necessary to use Texture widgets since it is simple to work with already.
 	local checkBox = frame:CreateTexture(nil, "BACKGROUND")
-	checkBox:SetAtlas("checkbox-minimal")
 
 	local check = frame:CreateTexture(nil, "ARTWORK")
 	check:SetAllPoints(checkBox)

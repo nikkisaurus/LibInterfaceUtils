@@ -45,8 +45,16 @@ function lib:GetCheckGroup(parent, config)
 	if addon.isTable(config.options) then
 		for i, option in ipairs(config.options) do
 			local check = group:New("CheckButton")
+			check:SetCheckStyle(config.checkStyle)
 			check:SetText(option.label)
-			options[i] = check
+
+			-- todo enable callback
+			if option.disabled then
+				check:Disable()
+			else
+				check:Enable()
+			end
+
 			check:RegisterCallback("OnClick", function()
 				if check:GetChecked() and not config.multiSelect then
 					for _, option in ipairs(options) do
@@ -56,6 +64,12 @@ function lib:GetCheckGroup(parent, config)
 					end
 				end
 			end)
+
+			if config.multiSelect then
+				-- todo trigger callback... maybe add a "force"
+				check:SetChecked(option.checked)
+			end
+			options[i] = check
 		end
 	else
 		print(
