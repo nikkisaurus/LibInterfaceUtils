@@ -157,7 +157,6 @@ function Widget._events:OnAcquire()
 	self:SetCheck()
 	self:SetSize(150, 25)
 	self:SetAutoWidth(true)
-	self:SetPushedTextOffset(0, 0)
 	-- self:SetTemplate()
 	self:SetIcon() -- TODO remove
 	self:SetChecked()
@@ -250,10 +249,6 @@ function Widget:SetJustifyV(...)
 	self._frame.text:SetJustifyV(...)
 end
 
-function Widget:SetPushedTextOffset(...)
-	self._frame:SetPushedTextOffset(...)
-end
-
 function Widget:SetSpacing(x, y)
 	self._state.spacing = {
 		x = x or 4,
@@ -288,9 +283,7 @@ lib:RegisterWidget(widgetType, version, isContainer, function()
 	-- Using a Label widget due to the complexities it already has implemented, such as the
 	-- ability to add and move an icon.
 	local text = lib:New("Label")
-	text:SetInteractive()
 	text._frame:SetParent(frame)
-	-- frame:SetFontString(text._frame.text)
 
 	-- It's not necessary to use Texture widgets since it is simple to work with already.
 	local checkBox = frame:CreateTexture(nil, "BACKGROUND")
