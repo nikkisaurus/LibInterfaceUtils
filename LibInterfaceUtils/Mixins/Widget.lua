@@ -20,10 +20,8 @@ function Widget:DoParentLayout()
 end
 
 function Widget:Fire(event, ...)
-	local callback = self._callbacks[event]
-	if callback then
-		callback(...)
-	end
+	local userCallback = self._callbacks[event]
+	addon.safecall(userCallback, self, ...)
 end
 
 function Widget:Get(key)
@@ -73,16 +71,16 @@ function Widget:SetFullWidth(fullWidth)
 	self._state.fullWidth = fullWidth
 end
 
+function Widget:SetHeight(...)
+	self._frame:SetHeight(...)
+end
+
 function Widget:SetPoint(...)
 	self._frame:SetPoint(...)
 end
 
 function Widget:SetSize(...)
 	self._frame:SetSize(...)
-end
-
-function Widget:SetHeight(...)
-	self._frame:SetHeight(...)
 end
 
 function Widget:SetWidth(...)
