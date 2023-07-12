@@ -158,8 +158,6 @@ function Widget._events:OnAcquire()
 	self:Show()
 end
 
-function Widget._events:OnClick() end
-
 function Widget._events:OnEnter()
 	self._state.highlight = true
 	UpdateState(self)
