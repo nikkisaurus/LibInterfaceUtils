@@ -114,7 +114,7 @@ function Widget._events:OnAcquire()
 	self:SetSize(150, 25)
 	self:SetAutoWidth(true)
 	self:SetTheme()
-	self:SetIcon() -- TODO remove
+	self:SetIcon()
 	self:SetChecked()
 	self:Enable()
 	self:Show()

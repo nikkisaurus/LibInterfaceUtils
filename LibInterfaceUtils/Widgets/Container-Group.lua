@@ -43,7 +43,7 @@ local function SetAnchors(self)
 
 		content:SetPoint("TOP", titlebar, "BOTTOM", 0, offset)
 		if not self._state.fullHeight and not self._state.autoHeight then
-			local pendingHeight = content:GetHeight() + titlebar:GetHeight() + padding.top + padding.bottom - offset
+			local pendingHeight = content:GetHeight() + titlebar:GetHeight() - offset
 			if self:GetHeight() ~= pendingHeight then
 				self:SetHeight(pendingHeight)
 			end
@@ -93,11 +93,11 @@ function Widget._events:OnLayoutFinished(_, height)
 		end
 
 		local padding = state.padding
-		local titleHeight = self._frame.titlebar.title:GetHeight()
-		local pendingHeight = height + titleHeight + padding.bottom - state.contentOffset
+		local titleHeight = self._frame.titlebar:GetHeight()
+		local pendingHeight = height + titleHeight - state.contentOffset - padding.bottom
 
 		if state.collapsed then
-			pendingHeight = titleHeight + padding.top + padding.bottom
+			pendingHeight = titleHeight
 		end
 
 		if self:GetHeight() ~= pendingHeight then

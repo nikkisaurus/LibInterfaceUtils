@@ -113,6 +113,19 @@ function Widget._events:OnSizeChanged()
 	SetAnchors(self)
 end
 
+function Widget:SetAtlas(atlas, point, size)
+	self._state.icon = {
+		texture = atlas,
+		size = size or 14,
+		point = point or "TOPLEFT",
+	}
+
+	local icon = self._frame.icon
+	icon:SetAtlas(atlas)
+	icon:SetSize(size or 14, size or 14)
+	SetAnchors(self)
+end
+
 function Widget:SetAutoWidth(autoWidth)
 	self._state.autoWidth = autoWidth
 	SetAnchors(self)
@@ -130,7 +143,7 @@ function Widget:SetFontObject(fontObject, resetColor)
 	end
 end
 
-function Widget:SetIcon(texture, size, point)
+function Widget:SetIcon(texture, point, size)
 	self._state.icon = {
 		texture = texture ~= "" and texture,
 		size = size or 14,

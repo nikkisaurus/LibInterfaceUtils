@@ -8,6 +8,7 @@ function lib:GetScrollableFrame()
 	local frame = self:New("Frame")
 	frame:SetLayout("fill")
 	local scrollFrame = frame:New("ScrollFrame")
+	scrollFrame:SetPadding(0, 0, 0, 0)
 
 	return frame, scrollFrame
 end
@@ -25,7 +26,6 @@ end
 
 function lib:GetSimpleGroup(parent)
 	local group = (parent or self):New("Group")
-	group:SetSpacing(0, 0)
 	group:SetPadding(0, 0, 0, 0)
 	group:SetContentBackdrop()
 
