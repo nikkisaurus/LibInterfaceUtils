@@ -5,7 +5,7 @@ if not lib then
 end
 
 function lib:New(widgetType)
-	local pool = lib.pools[widgetType]
+	local pool = self.pools[widgetType]
 	assert(pool, ("Widget type '%s' does not exist."):format(widgetType))
 
 	local widget = pool:Acquire()
