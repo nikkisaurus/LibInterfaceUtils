@@ -158,38 +158,18 @@ function Widget._events:OnAcquire()
 	self:Show()
 end
 
-function Widget._events:OnEnter()
-	self._state.highlight = true
-	UpdateState(self)
-end
-
-function Widget._events:OnLeave()
-	self._state.highlight = false
-	UpdateState(self)
-end
-
-function Widget._events:OnMouseDown()
-	self._state.pushed = true
-	UpdateState(self)
-end
-
-function Widget._events:OnMouseUp()
-	self._state.pushed = false
-	UpdateState(self)
-end
-
 function Widget._events:OnSizeChanged()
 	UpdateWidth(self)
 end
 
 function Widget:Disable()
 	self._frame:Disable()
-	UpdateState(self)
+	self:UpdateState()
 end
 
 function Widget:Enable()
 	self._frame:Enable()
-	UpdateState(self)
+	self:UpdateState()
 end
 
 function Widget:SetAutoHeight(autoHeight)
@@ -231,8 +211,8 @@ end
 function Widget:SetTemplate(template)
 	self._state.template = template or {}
 	addon.setNestedMetatables(self._state.template, defaultTemplate)
+	lib:RegisterStateHandlers(self, UpdateState)
 	UpdateWidth(self)
-	UpdateState(self)
 end
 
 function Widget:SetWordWrap(canWrap)

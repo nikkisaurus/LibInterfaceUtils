@@ -6,6 +6,7 @@
   <Include file="Core/Factories.lua" />
   <Include file="Core/Layouts.lua" />
   <Include file="Core/Registry.lua" />
+  <Include file="Core/StateHandler.lua" />
   <Include file="Core/Themes.lua" />
   <Include file="Core/Utils.lua" />
   <Include file="Widgets/Container-Frame.lua" />

@@ -107,6 +107,8 @@ function addon.setNestedMetatables(target, source)
 			addon.setNestedMetatables(value, source[key])
 		end
 	end
+
+	return target
 end
 
 function addon.unpack(...)

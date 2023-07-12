@@ -9,6 +9,7 @@
         "CreateAnchor",
         "GameFontHighlight",
         "scrollBox",
-        "GameFontDisable"
+        "GameFontDisable",
+        "CreateFromMixin"
     ]
 }
