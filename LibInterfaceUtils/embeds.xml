@@ -14,5 +14,6 @@
   <Include file="Widgets/Container-ScrollFrame.lua" />
   <Include file="Widgets/Widget-Button.lua" />
   <Include file="Widgets/Widget-Label.lua" />
+  <Include file="Widgets/Widget-Texture.lua" />
   <Include file="Widgets/ComplexWidget-CheckButton.lua" />
 </Ui>

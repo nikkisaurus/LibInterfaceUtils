@@ -1,4 +1,5 @@
-local lib = LibStub:GetLibrary("LibInterfaceUtils-1.0")
+local addonName, addon = ...
+local lib = LibStub:GetLibrary(addonName .. "-1.0")
 if not lib then
 	return
 end
@@ -173,6 +174,10 @@ local function TestFrame()
 	})
 	checkGroup:SetFullWidth(true)
 
+	local tex = scrollFrame:New("Texture")
+	tex:SetAtlas("Mobile-MechanicIcon-Lethal")
+	tex:SetVertexColor(1, 0, 0, 1)
+	
 	frame:DoLayout()
 end
 

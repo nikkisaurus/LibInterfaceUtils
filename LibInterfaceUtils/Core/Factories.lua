@@ -32,6 +32,7 @@ function lib:GetSimpleGroup(parent)
 	return group
 end
 
+-- Consider making this a widget since it's a bit more complicated than the other Factories
 function lib:GetCheckGroup(parent, config)
 	local group
 	if config.title then
