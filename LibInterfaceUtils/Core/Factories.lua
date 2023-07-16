@@ -7,6 +7,7 @@ end
 function lib:GetScrollableFrame()
 	local frame = self:New("Frame")
 	frame:SetLayout("fill")
+
 	local scrollFrame = frame:New("ScrollFrame")
 	scrollFrame:SetPadding(0, 0, 0, 0)
 
