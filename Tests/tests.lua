@@ -153,7 +153,13 @@ local function TestFrame()
 
 	local tex = scrollFrame:New("Texture")
 	tex:SetAtlas("Mobile-MechanicIcon-Lethal")
-	tex:SetVertexColor(1, 0, 0, 1)
+	tex:RegisterCallback("OnMouseDown", function()
+		tex:Release()
+		tex = scrollFrame:New("Texture")
+		scrollFrame:MoveChild(#scrollFrame.children, 5)
+		scrollFrame:DoLayoutDeferred()
+	end)
+	-- tex:SetInteractive(true)
 
 	local options = {}
 	for i = 1, 5 do
@@ -170,7 +176,7 @@ local function TestFrame()
 	multiCheckGroup:AddOptions(unpack(options))
 	multiCheckGroup:SetMultiselect(true)
 	multiCheckGroup:SetCollapsible(true)
-	-- multiCheckGroup:AddOption({text = "LABEL"}, 3)
+	-- multiCheckGroup, :AddOption({text = "LABEL"}, 3)
 	-- multiCheckGroup:ClearSelected()
 
 	local checkGroup = scrollFrame:New("CheckGroup")
@@ -183,7 +189,7 @@ local function TestFrame()
 	something:RegisterCallback("OnClick", function()
 		-- multiCheckGroup:Release()
 		-- checkGroup:Release()
-		-- scrollFrame:DoLayoutDeferred()
+		scrollFrame:DoLayoutDeferred()
 	end)
 
 	frame:DoLayout()
