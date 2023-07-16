@@ -18,7 +18,7 @@ function Widget:AddOption(option, pos)
 	local button = self:New("CheckButton")
 	button:SetText(option.text or ("Option " .. (#self._state.options + 1)))
 	button:SetCheckStyle(not self._state.multiselect and "radio")
-	button:SetChecked(addon.safecall(option.checked))
+	button:SetChecked((self._state.multiselect or not self:GetChecked()) and addon.safecall(option.checked))
 	if addon.safecall(option.disabled) then
 		button:Disable()
 	else
@@ -26,9 +26,7 @@ function Widget:AddOption(option, pos)
 	end
 
 	button:RegisterCallback("OnClick", function(...)
-		if button:GetChecked() and not self._state.multiselect then
-			self:ClearSelected(button)
-		end
+		self:ClearSelected(button:GetChecked() and button)
 		addon.safecall(option.onClick, ...)
 	end)
 
@@ -36,7 +34,7 @@ function Widget:AddOption(option, pos)
 	if pos then
 		self:MoveChild(#self._state.options, pos)
 	end
-	
+
 	return button
 end
 
@@ -47,6 +45,10 @@ function Widget:AddOptions(...)
 end
 
 function Widget:ClearSelected(ignoreButton)
+	if self._state.multiselect then
+		return
+	end
+
 	for _, button in ipairs(self._state.options) do
 		if button ~= ignoreButton then
 			button:SetChecked()
@@ -54,8 +56,27 @@ function Widget:ClearSelected(ignoreButton)
 	end
 end
 
+function Widget:GetChecked()
+	local checked = {}
+	for id, button in ipairs(self._state.options) do
+		if button:GetChecked() then
+			tinsert(checked, id)
+		end
+	end
+	return unpack(checked)
+end
+
 function Widget:GetOption(key)
 	return self._state.options[key]
+end
+
+function Widget:SetChecked(id, checked, force)
+	local button = self:GetOption(id)
+	assert(button, "Invalid option id supplied to CheckGroup:SetChecked()")
+	if button:IsEnabled() or force then
+		button:SetChecked(checked)
+		self:ClearSelected(button)
+	end
 end
 
 function Widget:SetMultiselect(multiselect)
