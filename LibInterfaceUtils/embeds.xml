@@ -16,4 +16,5 @@
   <Include file="Widgets/Widget-Label.lua" />
   <Include file="Widgets/Widget-Texture.lua" />
   <Include file="Widgets/ComplexWidget-CheckButton.lua" />
+  <Include file="Widgets/ComplexWidget-CheckGroup.lua" />
 </Ui>

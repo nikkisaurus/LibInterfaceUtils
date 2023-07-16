@@ -7,69 +7,6 @@ end
 local widgetType, version, isContainer = "CheckButton", 1, false
 local Widget = { _events = {} }
 
--- local defaultTemplate = {
--- 	Disabled = {
--- 		border = {
--- 			enabled = true,
--- 			size = 1,
--- 			texture = addon.defaultTexture,
--- 			color = { 1, 1, 1, 0.25 },
--- 		},
--- 		text = {
--- 			fontObject = GameFontDisable,
--- 		},
--- 		texture = {
--- 			texture = addon.defaultTexture,
--- 			color = { 0, 0, 0, 0.25 },
--- 		},
--- 	},
--- 	Highlight = {
--- 		border = {
--- 			enabled = true,
--- 			size = 1,
--- 			texture = addon.defaultTexture,
--- 			color = addon.colors.white,
--- 		},
--- 		text = {
--- 			fontObject = GameFontHighlight,
--- 		},
--- 		texture = {
--- 			texture = addon.defaultTexture,
--- 			color = addon.colors.black,
--- 		},
--- 	},
--- 	Normal = {
--- 		border = {
--- 			enabled = true,
--- 			size = 1,
--- 			texture = addon.defaultTexture,
--- 			color = addon.colors.black,
--- 		},
--- 		text = {
--- 			fontObject = GameFontNormal,
--- 		},
--- 		texture = {
--- 			texture = addon.defaultTexture,
--- 			color = addon.colors.elvBackdrop,
--- 		},
--- 	},
--- 	Pushed = {
--- 		border = {
--- 			enabled = true,
--- 			size = 1,
--- 			texture = addon.defaultTexture,
--- 			color = addon.colors.gold,
--- 		},
--- 		text = {
--- 			fontObject = GameFontNormal,
--- 		},
--- 		texture = {
--- 			texture = addon.defaultTexture,
--- 			color = addon.colors.elvBackdrop,
--- 		},
--- 	},
--- }
-
 local function SetAnchors(self)
 	local state = self._state
 	local point = state.check.point

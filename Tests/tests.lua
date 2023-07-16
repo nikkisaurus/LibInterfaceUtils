@@ -151,6 +151,10 @@ local function TestFrame()
 		end)
 	end
 
+	local tex = scrollFrame:New("Texture")
+	tex:SetAtlas("Mobile-MechanicIcon-Lethal")
+	tex:SetVertexColor(1, 0, 0, 1)
+	
 	local options = {}
 	for i = 1, 5 do
 		tinsert(options, {
@@ -160,24 +164,24 @@ local function TestFrame()
 		})
 	end
 
-	local multiCheckGroup, multiChecks = lib:GetCheckGroup(scrollFrame, {
-		title = "Select multiple options:",
-		multiSelect = true,
-		options = options,
-	})
-	multiCheckGroup:SetFullWidth(true)
-
-	local checkGroup, checks = lib:GetCheckGroup(scrollFrame, {
-		title = "Select one option:",
-		checkStyle = "radio",
-		options = options,
-	})
+	local checkGroup = scrollFrame:New("CheckGroup")
 	checkGroup:SetFullWidth(true)
+	checkGroup:SetTitle("Select multiple options:")
 
-	local tex = scrollFrame:New("Texture")
-	tex:SetAtlas("Mobile-MechanicIcon-Lethal")
-	tex:SetVertexColor(1, 0, 0, 1)
-	
+
+	-- local multiCheckGroup, multiChecks = lib:GetCheckGroup(scrollFrame, {
+	-- 	title = "Select multiple options:",
+	-- 	multiSelect = true,
+	-- 	options = options,
+	-- })
+	-- multiCheckGroup:SetFullWidth(true)
+
+	-- local checkGroup, checks = lib:GetCheckGroup(scrollFrame, {
+	-- 	title = "Select one option:",
+	-- 	checkStyle = "radio",
+	-- 	options = options,
+	-- })
+	-- checkGroup:SetFullWidth(true)
 	frame:DoLayout()
 end
 
