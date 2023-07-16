@@ -35,6 +35,12 @@ function Container:GetContentSize()
 	return self._frame.content:GetWidth(), self._frame.content:GetHeight()
 end
 
+function Container:MoveChild(pos, before)
+	local child = self.children[pos]
+	tremove(self.children, pos)
+	tinsert(self.children, before, child)
+end
+
 function Container:New(widgetType)
 	local widget = lib:New(widgetType)
 	self:AddChild(widget)

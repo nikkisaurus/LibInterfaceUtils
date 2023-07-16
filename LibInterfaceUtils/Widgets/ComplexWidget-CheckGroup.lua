@@ -12,7 +12,7 @@ function Widget._events:_OnAcquire()
 	self:SetMultiselect()
 end
 
-function Widget:AddOption(option)
+function Widget:AddOption(option, pos)
 	assert(addon.isTable(option), "Invalid option table supplied to CheckGroup:AddOption().")
 
 	local button = self:New("CheckButton")
@@ -33,6 +33,10 @@ function Widget:AddOption(option)
 	end)
 
 	tinsert(self._state.options, button)
+	if pos then
+		self:MoveChild(#self._state.options, pos)
+	end
+	
 	return button
 end
 
@@ -52,10 +56,6 @@ end
 
 function Widget:GetOption(key)
 	return self._state.options[key]
-end
-
-function Widget:GetOptions()
-	return self._state.options
 end
 
 function Widget:SetMultiselect(multiselect)

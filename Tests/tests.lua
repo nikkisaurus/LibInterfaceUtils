@@ -170,6 +170,7 @@ local function TestFrame()
 	multiCheckGroup:AddOptions(unpack(options))
 	multiCheckGroup:SetMultiselect(true)
 	multiCheckGroup:SetCollapsible(true)
+	-- multiCheckGroup:AddOption({text = "LABEL"}, 3)
 
 	local checkGroup = scrollFrame:New("CheckGroup")
 	checkGroup:SetFullWidth(true)
