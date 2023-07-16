@@ -67,11 +67,36 @@ local function TestFrame()
 		label:SetAtlas(icons[icon], v)
 	end
 
-	local buttons = lib:GetCollapsibleGroup(scrollFrame)
+	local checkButtons = lib:GetCollapsibleGroup(scrollFrame, true)
+	checkButtons:SetFullWidth(true)
+	checkButtons:SetTitle("Check Buttons")
+
+	local options = {}
+	for i = 1, 5 do
+		tinsert(options, {
+			text = "Check option " .. i,
+			disabled = fastrandom(1, 2) == 1,
+			checked = fastrandom(1, 2) == 1,
+		})
+	end
+
+	local multiCheckGroup = checkButtons:New("CheckGroup")
+	multiCheckGroup:SetFullWidth(true)
+	multiCheckGroup:SetTitle("Select multiple options:")
+	multiCheckGroup:AddOptions(unpack(options))
+	multiCheckGroup:SetMultiselect(true)
+	multiCheckGroup:SetCollapsible(true)
+
+	local checkGroup = checkButtons:New("CheckGroup")
+	checkGroup:SetFullWidth(true)
+	checkGroup:SetTitle("Select one option:")
+	checkGroup:AddOptions(unpack(options))
+
+	local buttons = lib:GetCollapsibleGroup(scrollFrame, true)
 	buttons:SetFullWidth(true)
 	buttons:SetTitle("Buttons")
 
-	local simpleGroup = lib:GetSimpleGroup(scrollFrame)
+	local simpleGroup = lib:GetSimpleGroup(buttons)
 	simpleGroup:SetFullWidth(true)
 
 	local checkNum = 6
@@ -126,16 +151,6 @@ local function TestFrame()
 		end
 	end
 
-	-- Not necessary to show these off since you can see them with the CheckGroup
-	-- local checkButtons = lib:GetSimpleGroup(widgets)
-	-- checkButtons:SetFullWidth(true)
-	-- checkButtons:SetTitle("Check Buttons")
-
-	-- for i = 1, 10 do
-	-- 	local button = checkButtons:New("CheckButton")
-	-- 	button:SetText("Check button " .. i)
-	-- end
-
 	for i = 1, 5 do
 		local label = simpleGroup:New("Label")
 		label:SetFullWidth(true)
@@ -153,42 +168,11 @@ local function TestFrame()
 
 	local tex = scrollFrame:New("Texture")
 	tex:SetAtlas("Mobile-MechanicIcon-Lethal")
+	-- tex:SetInteractive(true)
 	tex:RegisterCallback("OnMouseDown", function()
 		tex:Release()
 		tex = scrollFrame:New("Texture")
 		scrollFrame:MoveChild(#scrollFrame.children, 5)
-		scrollFrame:DoLayoutDeferred()
-	end)
-	-- tex:SetInteractive(true)
-
-	local options = {}
-	for i = 1, 5 do
-		tinsert(options, {
-			text = "Check option " .. i,
-			disabled = fastrandom(1, 2) == 1,
-			checked = fastrandom(1, 2) == 1,
-		})
-	end
-
-	local multiCheckGroup = scrollFrame:New("CheckGroup")
-	multiCheckGroup:SetFullWidth(true)
-	multiCheckGroup:SetTitle("Select multiple options:")
-	multiCheckGroup:AddOptions(unpack(options))
-	multiCheckGroup:SetMultiselect(true)
-	multiCheckGroup:SetCollapsible(true)
-	-- multiCheckGroup, :AddOption({text = "LABEL"}, 3)
-	-- multiCheckGroup:ClearSelected()
-
-	local checkGroup = scrollFrame:New("CheckGroup")
-	checkGroup:SetFullWidth(true)
-	checkGroup:SetTitle("Select one option:")
-	checkGroup:AddOptions(unpack(options))
-
-	local something = scrollFrame:New("Button")
-	something:SetText("Do something")
-	something:RegisterCallback("OnClick", function()
-		-- multiCheckGroup:Release()
-		-- checkGroup:Release()
 		scrollFrame:DoLayoutDeferred()
 	end)
 
