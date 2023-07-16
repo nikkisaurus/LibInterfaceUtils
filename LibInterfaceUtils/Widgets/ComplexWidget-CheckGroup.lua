@@ -4,75 +4,71 @@ if not lib then
 	return
 end
 
-local widgetType, version, isContainer = "CheckGroup", 1, false
+local widgetType, version, isContainer = "CheckGroup", 1, true
 local Widget = { _events = {} }
 
-
-function Widget._events:OnAcquire()
-    -- self._events:_OnAcquire()
-    self:Fire("_OnAcquire")
--- 	self:SetSpacing()
--- 	self:SetCheck()
-	-- self:SetSize(150, 25)
--- 	self:SetAutoWidth(true)
--- 	self:SetTheme()
--- 	self:SetIcon()
--- 	self:SetCheckStyle()
--- 	self:SetChecked()
--- 	self:Enable()
-	-- self:Show()
-
-    -- self._frame.group:Fire("OnAcquire")
-    -- local check = self._frame.group:New("CheckButton")
-	-- 	check:SetText("Check button " .. 1)
-
--- 	local text = self._frame.text
--- 	text:Fire("OnAcquire")
--- 	text:SetInteractive(GenerateClosure(ToggleChecked, self))
--- 	text:SetTheme({ Disabled = { fontObject = GameFontDisable } })
+function Widget._events:_OnAcquire()
+	self._state.options = {}
+	self:SetMultiselect()
 end
 
--- function Widget:SetTitle(...)
---     self._frame.group:SetTitle(...)
--- end
+function Widget:AddOption(option)
+	assert(addon.isTable(option), "Invalid option table supplied to CheckGroup:AddOption().")
 
+	local button = self:New("CheckButton")
+	button:SetText(option.text or ("Option " .. (#self._state.options + 1)))
+	button:SetCheckStyle(not self._state.multiselect and "radio")
+	button:SetChecked(addon.safecall(option.checked))
+	if addon.safecall(option.disabled) then
+		button:Disable()
+	else
+		button:Enable()
+	end
+
+	button:RegisterCallback("OnClick", function(...)
+		if button:GetChecked() and not self._state.multiselect then
+			self:ClearSelected(button)
+		end
+		addon.safecall(option.onClick, ...)
+	end)
+
+	tinsert(self._state.options, button)
+	return button
+end
+
+function Widget:AddOptions(...)
+	for _, option in ipairs({ ... }) do
+		self:AddOption(option)
+	end
+end
+
+function Widget:ClearSelected(ignoreButton)
+	for _, button in ipairs(self._state.options) do
+		if button ~= ignoreButton then
+			button:SetChecked()
+		end
+	end
+end
+
+function Widget:GetOption(key)
+	return self._state.options[key]
+end
+
+function Widget:GetOptions()
+	return self._state.options
+end
+
+function Widget:SetMultiselect(multiselect)
+	self._state.multiselect = multiselect
+
+	for _, button in ipairs(self._state.options) do
+		button:SetCheckStyle(not multiselect and "radio")
+	end
+end
 
 lib:RegisterWidget(widgetType, version, isContainer, function()
-    local Group = lib:New("Group")
-    local widget = CreateFromMixins(Widget, Group)
-    -- Widget._events._OnAcquire = widget._events.OnAcquire
-    -- widget._events = Mixin(widget._events, Widget._events)
-	-- local widget = CreateFromMixins({
-	-- 	_frame = CreateFrame("Frame", lib:GenerateWidgetName(widgetType), UIParent),
-	-- }, Widget)
-
-	-- local frame = widget._frame
-
-    -- local group = lib:New("Group")
-	-- group._frame:SetParent(frame)
-    -- group._frame:SetAllPoints(frame)
-    -- group:RegisterCallback("OnSizeChanged", function()
-    --    widget:SetSize(group._frame:GetWidth(), group._frame:GetHeight())
-    -- end)
-
-	-- -- Using a Label widget due to the complexities it already has implemented, such as the
-	-- -- ability to add and move an icon.
-	-- local text = lib:New("Label")
-	-- text:RegisterCallback("OnMouseDown", function()
-	-- 	widget:Fire("OnClick")
-	-- end)
-	-- text._frame:SetParent(frame)
-
-	-- -- It's not necessary to use Texture widgets since it is simple to work with already.
-	-- local checkBox = frame:CreateTexture(nil, "BACKGROUND")
-
-	-- local check = frame:CreateTexture(nil, "ARTWORK")
-	-- check:SetAllPoints(checkBox)
-
-	-- frame.checkBox = checkBox
-	-- frame.check = check
-	-- frame.text = text
-    -- frame.group = group
+	local Group = lib:New("Group")
+	local widget = addon.mixin({}, Widget, Group)
 
 	return widget
 end)

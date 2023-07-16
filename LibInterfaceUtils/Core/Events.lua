@@ -5,8 +5,8 @@ if not lib then
 end
 
 function addon.Fire(widget, event, ...)
-	local callback = widget._events[event]
-	addon.safecall(callback, widget, ...)
+	addon.safecall(widget._events[event], widget, ...)
+	addon.safecall(widget._events["_" .. event], widget, ...) -- allows for ComplexWidgets to have their own events without overwriting nested widgets
 	widget:Fire(event, ...)
 end
 

@@ -154,34 +154,36 @@ local function TestFrame()
 	local tex = scrollFrame:New("Texture")
 	tex:SetAtlas("Mobile-MechanicIcon-Lethal")
 	tex:SetVertexColor(1, 0, 0, 1)
-	
+
 	local options = {}
 	for i = 1, 5 do
 		tinsert(options, {
-			label = "Check option " .. i,
+			text = "Check option " .. i,
 			disabled = fastrandom(1, 2) == 1,
 			checked = fastrandom(1, 2) == 1,
 		})
 	end
 
+	local multiCheckGroup = scrollFrame:New("CheckGroup")
+	multiCheckGroup:SetFullWidth(true)
+	multiCheckGroup:SetTitle("Select multiple options:")
+	multiCheckGroup:AddOptions(unpack(options))
+	multiCheckGroup:SetMultiselect(true)
+	multiCheckGroup:SetCollapsible(true)
+
 	local checkGroup = scrollFrame:New("CheckGroup")
 	checkGroup:SetFullWidth(true)
-	checkGroup:SetTitle("Select multiple options:")
+	checkGroup:SetTitle("Select one option:")
+	checkGroup:AddOptions(unpack(options))
 
+	-- local release = scrollFrame:New("Button")
+	-- release:SetText("Release CheckGroups")
+	-- release:RegisterCallback("OnClick", function()
+	-- 	-- multiCheckGroup:Release()
+	-- 	checkGroup:Release()
+	-- 	scrollFrame:DoLayoutDeferred()
+	-- end)
 
-	-- local multiCheckGroup, multiChecks = lib:GetCheckGroup(scrollFrame, {
-	-- 	title = "Select multiple options:",
-	-- 	multiSelect = true,
-	-- 	options = options,
-	-- })
-	-- multiCheckGroup:SetFullWidth(true)
-
-	-- local checkGroup, checks = lib:GetCheckGroup(scrollFrame, {
-	-- 	title = "Select one option:",
-	-- 	checkStyle = "radio",
-	-- 	options = options,
-	-- })
-	-- checkGroup:SetFullWidth(true)
 	frame:DoLayout()
 end
 

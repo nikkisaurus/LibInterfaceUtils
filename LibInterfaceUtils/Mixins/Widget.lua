@@ -53,6 +53,7 @@ function Widget:Release()
 		self._state.parent:ReleaseChild(self)
 		return
 	end
+	addon.safecall(self.ReleaseChildren, self)
 	self.pool:Release(self)
 	addon.Fire(self, "OnRelease")
 end

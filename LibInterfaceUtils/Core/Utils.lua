@@ -4,6 +4,32 @@ if not lib then
 	return
 end
 
+local function mixinTables(dest, src)
+	for key, value in pairs(src) do
+		if type(value) == "table" and dest[key] and type(dest[key]) == "table" then
+			mixinTables(dest[key], value)
+		else
+			dest[key] = value
+		end
+	end
+end
+
+function addon.mixin(destination, ...)
+	local mixins = { ... }
+
+	for _, mixin in ipairs(mixins) do
+		for key, value in pairs(mixin) do
+			if type(value) == "table" and destination[key] and type(destination[key]) == "table" then
+				mixinTables(destination[key], value)
+			else
+				destination[key] = value
+			end
+		end
+	end
+
+	return destination
+end
+
 function addon.getPoints(anchor, spacing)
 	local spacingX = addon.isTable(spacing) and spacing.x or 0
 	local spacingY = addon.isTable(spacing) and spacing.y or 0
@@ -98,6 +124,7 @@ function addon.safecall(func, ...)
 	if type(func) == "function" then
 		return func(...)
 	end
+	return func
 end
 
 function addon.setNestedMetatables(target, source)
