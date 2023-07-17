@@ -11,6 +11,8 @@
         "scrollBox",
         "GameFontDisable",
         "CreateFromMixin",
-        "ipairs_reverse"
+        "ipairs_reverse",
+        "ClearFocus",
+        "ChatFontNormal"
     ]
 }

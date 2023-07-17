@@ -166,15 +166,27 @@ local function TestFrame()
 		end)
 	end
 
+	local texid = 1
 	local tex = scrollFrame:New("Texture")
 	tex:SetAtlas("Mobile-MechanicIcon-Lethal")
-	-- tex:SetInteractive(true)
+	tex:SetInteractive(true)
 	tex:RegisterCallback("OnMouseDown", function()
-		tex:Release()
-		tex = scrollFrame:New("Texture")
-		scrollFrame:MoveChild(#scrollFrame.children, 5)
-		scrollFrame:DoLayoutDeferred()
+		-- tex:Release()
+		-- tex = scrollFrame:New("Texture")
+		if texid == 1 then
+			texid = 2
+			tex:SetAtlas("Mobile-MechanicIcon-Disorienting")
+		else
+			texid = 1
+			tex:SetAtlas("Mobile-MechanicIcon-Lethal")
+		end
+		-- scrollFrame:MoveChild(#scrollFrame.children, 5)
+		-- scrollFrame:DoLayoutDeferred()
 	end)
+
+	local multiLineEditbox = scrollFrame:New("MultiLineEditbox")
+	multiLineEditbox:SetFullWidth(true)
+	multiLineEditbox:SetTitle("Multi-Line Editbox")
 
 	frame:DoLayout()
 end

@@ -9,9 +9,9 @@ local Widget = { _events = {} }
 
 function Widget._events:OnAcquire()
 	self:SetSize(100, 100)
-	self:SetTexture(134400)
+	self:SetTexture()
 	self:SetTexCoord(0, 1, 0, 1)
-	self:SetBlendMode("DISABLE")
+	self:SetBlendMode("BLEND")
 	self:SetVertexColor(1, 1, 1, 1)
 	self:SetDesaturated()
 	self:SetHorizTile()
